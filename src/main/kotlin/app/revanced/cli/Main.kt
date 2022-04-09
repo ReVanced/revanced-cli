@@ -12,12 +12,14 @@ fun main(args: Array<String>) {
         SignatureParser.parse(args[2]).toTypedArray() // signatures.json
     )
 
+    // add integrations dex container
+    patcher.addFiles(File(args[3]))
+
     // load all patches
     for (patch in patches) {
         patcher.addPatches(patch())
     }
 
-    // apply all patches
     patcher.applyPatches().forEach{ (name, result) ->
         println("$name: $result")
     }
