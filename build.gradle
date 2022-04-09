@@ -10,8 +10,9 @@ repositories {
 }
 
 dependencies {
-    implementation(files("P:\\Andere Dateien\\STUFF\\Coding\\Java\\revanced\\revanced-patcher\\build\\libs\\revanced-patcher-1.0.0-dev.8.jar"))
-    implementation(files("P:\\Andere Dateien\\STUFF\\Coding\\Java\\revanced\\revanced-patches\\build\\libs\\revanced-patches-1.0.0-dev.4.jar"))
+    // Temporal file dependency
+    implementation(files("revanced-patches-1.0.0-dev.4.jar"))
+    implementation(files("revanced-patcher-1.0.0-dev.8.jar"))
 
     implementation("com.google.code.gson:gson:2.9.0")
     implementation("com.github.lanchon.dexpatcher:multidexlib2:2.3.4.r2")
