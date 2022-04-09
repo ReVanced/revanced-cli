@@ -7,15 +7,19 @@ version '1.0-SNAPSHOT'
 
 repositories {
     mavenCentral()
+    mavenLocal()
+    maven {
+        url = uri("https://maven.pkg.github.com/ReVancedTeam/multidexlib2")
+        credentials {
+            username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
+            password = project.findProperty("gpr.key") ?: System.getenv("TOKEN")
+         }
+    }
 }
 
 dependencies {
-    // Temporal file dependency
-    implementation(files("revanced-patches-1.0.0-dev.4.jar"))
-    implementation(files("revanced-patcher-1.0.0-dev.8.jar"))
-
+    implementation("app.revanced:revanced-patcher:1.0.0-dev.8")
+    implementation("app.revanced:revanced-patches:1.0.0-dev.4")
     implementation("com.google.code.gson:gson:2.9.0")
-    implementation("com.github.lanchon.dexpatcher:multidexlib2:2.3.4.r2")
-    implementation("org.smali:smali:2.3.4")
-    implementation "org.jetbrains.kotlin:kotlin-stdlib"
+    implementation("org.jetbrains.kotlin:kotlin-stdlib")
 }
