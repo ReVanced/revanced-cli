@@ -1,9 +1,10 @@
 package app.revanced.cli.utils
-import com.google.gson.JsonParser
-import java.io.File
+
 import app.revanced.patcher.signature.MethodSignature
+import com.google.gson.JsonParser
 import org.jf.dexlib2.AccessFlags
 import org.jf.dexlib2.Opcodes
+import java.io.File
 
 class SignatureParser {
     companion object {
