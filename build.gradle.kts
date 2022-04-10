@@ -18,11 +18,14 @@ repositories {
     }
 }
 
+val patchesDependency = "app.revanced:revanced-patches:1.0.0-dev.4"
+
 dependencies {
     implementation(kotlin("stdlib"))
+    implementation("org.jetbrains.kotlinx:kotlinx-cli:0.3.4")
 
     implementation("app.revanced:revanced-patcher:1.0.0-dev.8")
-    implementation("app.revanced:revanced-patches:1.0.0-dev.4")
+    implementation(patchesDependency)
 
     implementation("com.google.code.gson:gson:2.9.0")
 }
@@ -32,8 +35,15 @@ tasks {
         dependsOn(shadowJar)
     }
     shadowJar {
+        dependencies {
+            // This makes sure we link to the library, but don't include it.
+            // So, a "runtime only" dependency.
+            exclude(dependency(patchesDependency))
+        }
         manifest {
-            attributes(Pair("Main-Class", "app.revanced.cli.MainKt"))
+            attributes("Main-Class" to "app.revanced.cli.Main")
+            attributes("Implementation-Title" to project.name)
+            attributes("Implementation-Version" to project.version)
         }
     }
 }

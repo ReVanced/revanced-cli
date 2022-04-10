@@ -4,19 +4,15 @@ import app.revanced.patcher.signature.MethodSignature
 import com.google.gson.JsonParser
 import org.jf.dexlib2.AccessFlags
 import org.jf.dexlib2.Opcodes
-import java.io.File
 
 class SignatureParser {
     companion object {
-        fun parse(signatureJsonPath: String): List<MethodSignature> {
-            val json = File(signatureJsonPath).readText()
+        fun parse(json: String): List<MethodSignature> {
             val signatures = JsonParser.parseString(json).asJsonObject.get("signatures").asJsonArray.map { sig ->
                 val signature = sig.asJsonObject
-
                 val returnType = signature.get("returns").asString
 
                 var accessFlags = 0
-
                 signature
                     .get("accessors").asJsonArray
                     .forEach { accessFlags = accessFlags or AccessFlags.getAccessFlag(it.asString).value }
