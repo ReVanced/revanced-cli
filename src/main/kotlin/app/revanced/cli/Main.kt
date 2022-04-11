@@ -20,11 +20,13 @@ class Main {
             inApk: String,
             inSignatures: String,
             inPatches: String,
+            integrations: String,
             inOutput: String,
         ) {
             val apk = Preconditions.isFile(inApk)
             val signatures = Preconditions.isFile(inSignatures)
             val patchesFile = Preconditions.isFile(inPatches)
+            val integrationsFile = Preconditions.isFile(integrations)
             val output = Preconditions.isDirectory(inOutput)
 
             val patcher = Patcher(
@@ -33,6 +35,8 @@ class Main {
                     .parse(signatures.readText())
                     .toTypedArray()
             )
+
+            patcher.addFiles(integrationsFile)
 
             PatchLoader.injectPatches(patchesFile)
             val patches = Patches.loadPatches()
@@ -72,19 +76,25 @@ class Main {
                 shortName = "p",
                 description = "Patches JAR file"
             ).required()
+            val integrations by parser.option(
+                ArgType.String,
+                fullName = "integrations",
+                shortName = "i",
+                description = "Integrations APK file"
+            ).required()
             val output by parser.option(
                 ArgType.String,
                 fullName = "output",
                 shortName = "o",
                 description = "Output directory"
             ).required()
-            // TODO: merge dex file
 
             parser.parse(args)
             runCLI(
                 apk,
                 signatures,
                 patches,
+                integrations,
                 output,
             )
         }
