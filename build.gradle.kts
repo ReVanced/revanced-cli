@@ -28,6 +28,7 @@ dependencies {
     implementation(patchesDependency)
 
     implementation("com.google.code.gson:gson:2.9.0")
+    implementation("me.tongfei:progressbar:0.9.3")
 }
 
 tasks {
