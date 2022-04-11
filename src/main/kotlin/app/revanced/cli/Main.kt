@@ -1,9 +1,10 @@
 package app.revanced.cli
 
-import app.revanced.cli.utils.PatchLoader
-import app.revanced.cli.utils.Patches
+import app.revanced.cli.utils.patch.PatchLoader
+import app.revanced.cli.utils.patch.Patches
 import app.revanced.cli.utils.Preconditions
-import app.revanced.cli.utils.SignatureParser
+import app.revanced.cli.utils.signature.SignatureDownloader
+import app.revanced.cli.utils.signature.SignatureParser
 import app.revanced.patcher.Patcher
 import app.revanced.patcher.patch.PatchResult
 import kotlinx.cli.ArgParser
@@ -25,6 +26,7 @@ class Main {
             inPatches: String,
             inIntegrations: String?,
             inOutput: String,
+            downloadSignatures: Boolean? = true
         ) {
             val bar = ProgressBarBuilder()
                 .setTaskName("Working..")
@@ -34,6 +36,9 @@ class Main {
                 .build()
                 .maxHint(1)
                 .setExtraMessage("Initializing")
+
+            if(downloadSignatures) SignatureDownloader.download("youtube.signatures.json") // Not tested due private repos + not merged branches.
+
             val apk = Preconditions.isFile(inApk)
             val signatures = Preconditions.isFile(inSignatures)
             val patchesFile = Preconditions.isFile(inPatches)
@@ -129,6 +134,12 @@ class Main {
                 shortName = "o",
                 description = "Output directory"
             ).required()
+            val downloadSignatures by parser.option(
+                ArgType.Boolean,
+                fullName = "downloadSignatures",
+                shortName = "ds",
+                description = "Downloads signatures automatically."
+            )
 
             parser.parse(args)
             runCLI(
@@ -137,6 +148,7 @@ class Main {
                 patches,
                 integrations,
                 output,
+                downloadSignatures
             )
         }
     }

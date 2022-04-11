@@ -1,6 +1,5 @@
-package app.revanced.cli.utils
+package app.revanced.cli.utils.signature
 
-import app.revanced.patcher.signature.MethodSignature
 import com.google.gson.JsonParser
 import me.tongfei.progressbar.ProgressBar
 import org.jf.dexlib2.AccessFlags
