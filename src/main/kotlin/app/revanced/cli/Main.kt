@@ -22,7 +22,7 @@ class Main {
     companion object {
         private fun runCLI(
             inApk: String,
-            inSignatures: String,
+            inSignatures: String?,
             inPatches: String,
             inIntegrations: String?,
             inOutput: String,
@@ -115,7 +115,7 @@ class Main {
                 fullName = "signatures",
                 shortName = "s",
                 description = "Signatures JSON file"
-            ).required()
+            )
             val patches by parser.option(
                 ArgType.String,
                 fullName = "patches",
@@ -136,7 +136,7 @@ class Main {
             ).required()
             val downloadSignatures by parser.option(
                 ArgType.Boolean,
-                fullName = "downloadSignatures",
+                fullName = "download-signatures",
                 shortName = "ds",
                 description = "Downloads signatures automatically."
             )
