@@ -20,13 +20,12 @@ class Main {
             inApk: String,
             inSignatures: String,
             inPatches: String,
-            integrations: String,
+            inIntegrations: String?,
             inOutput: String,
         ) {
             val apk = Preconditions.isFile(inApk)
             val signatures = Preconditions.isFile(inSignatures)
             val patchesFile = Preconditions.isFile(inPatches)
-            val integrationsFile = Preconditions.isFile(integrations)
             val output = Preconditions.isDirectory(inOutput)
 
             val patcher = Patcher(
@@ -36,7 +35,10 @@ class Main {
                     .toTypedArray()
             )
 
-            patcher.addFiles(integrationsFile)
+            inIntegrations?.let {
+                val integrations = Preconditions.isFile(it)
+                patcher.addFiles(integrations)
+            }
 
             PatchLoader.injectPatches(patchesFile)
             val patches = Patches.loadPatches()
@@ -81,7 +83,7 @@ class Main {
                 fullName = "integrations",
                 shortName = "i",
                 description = "Integrations APK file"
-            ).required()
+            )
             val output by parser.option(
                 ArgType.String,
                 fullName = "output",
