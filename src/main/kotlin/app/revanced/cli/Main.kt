@@ -37,7 +37,7 @@ class Main {
                 .maxHint(1)
                 .setExtraMessage("Initializing")
 
-            if(downloadSignatures) SignatureDownloader.download("youtube.signatures.json") // Not tested due private repos + not merged branches.
+            if (downloadSignatures) SignatureDownloader.download("youtube.signatures.json") // Not tested due private repos + not merged branches.
 
             val apk = Preconditions.isFile(inApk)
             val signatures = Preconditions.isFile(inSignatures)

@@ -13,7 +13,7 @@ object SignatureDownloader {
 
         val file = File(out)
 
-        if(!file.exists()) {
+        if (!file.exists()) {
             url.openStream().use { Files.copy(it, Paths.get(out)) }
         }
 
