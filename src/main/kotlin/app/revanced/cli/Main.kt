@@ -74,7 +74,7 @@ class Main {
             bar.reset().maxHint(dexFiles.size.toLong())
                 .extraMessage = "Saving dex files"
             dexFiles.forEach { (dexName, dexData) ->
-                Files.write(File(output, dexName).toPath(), dexData.buffer)
+                Files.write(File(output, dexName).toPath(), dexData.data)
                 bar.step()
             }
             bar.close()
