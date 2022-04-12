@@ -49,7 +49,7 @@ class Main {
                 bar.reset().maxHint(1)
                     .extraMessage = "Merging integrations"
                 val integrations = Preconditions.isFile(it)
-                patcher.addFiles(integrations)
+                patcher.addFiles(listOf(integrations))
                 bar.step()
             }
 
