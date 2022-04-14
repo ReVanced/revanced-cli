@@ -58,6 +58,8 @@ class Main {
             val patches = Patches.loadPatches().map { it() }
             patcher.addPatches(patches)
 
+            patcher.resolveSignatures()
+
             val amount = patches.size.toLong()
             bar.reset().maxHint(amount)
                 .extraMessage = "Applying patches"
