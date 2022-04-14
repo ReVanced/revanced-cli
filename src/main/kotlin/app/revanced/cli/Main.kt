@@ -3,8 +3,8 @@ package app.revanced.cli
 import app.revanced.cli.utils.PatchLoader
 import app.revanced.cli.utils.Patches
 import app.revanced.cli.utils.Preconditions
-import app.revanced.cli.utils.SignatureParser
 import app.revanced.patcher.Patcher
+import app.revanced.patcher.patch.PatchMetadata
 import app.revanced.patcher.patch.PatchResult
 import kotlinx.cli.ArgParser
 import kotlinx.cli.ArgType
@@ -21,7 +21,6 @@ class Main {
     companion object {
         private fun runCLI(
             inApk: String,
-            inSignatures: String,
             inPatches: String,
             inIntegrations: String?,
             inOutput: String,
@@ -35,21 +34,19 @@ class Main {
                 .maxHint(1)
                 .setExtraMessage("Initializing")
             val apk = Preconditions.isFile(inApk)
-            val signatures = Preconditions.isFile(inSignatures)
             val patchesFile = Preconditions.isFile(inPatches)
             val output = Preconditions.isDirectory(inOutput)
             bar.step()
 
             val patcher = Patcher(
                 apk,
-                SignatureParser.parse(signatures.readText(), bar)
             )
 
             inIntegrations?.let {
                 bar.reset().maxHint(1)
                     .extraMessage = "Merging integrations"
                 val integrations = Preconditions.isFile(it)
-                patcher.addFiles(listOf(integrations))
+                //patcher.addFiles(listOf(integrations))
                 bar.step()
             }
 
@@ -83,12 +80,12 @@ class Main {
             printResults(results)
         }
 
-        private fun printResults(results: Map<String, Result<PatchResult>>) {
-            for ((name, result) in results) {
+        private fun printResults(results: Map<PatchMetadata, Result<PatchResult>>) {
+            for ((metadata, result) in results) {
                 if (result.isSuccess) {
-                    println("Patch $name was applied successfully!")
+                    println("${metadata.name} was applied successfully!")
                 } else {
-                    println("Patch $name failed to apply! Cause:")
+                    println("${metadata.name} failed to apply! Cause:")
                     result.exceptionOrNull()!!.printStackTrace()
                 }
             }
@@ -104,12 +101,6 @@ class Main {
                 fullName = "apk",
                 shortName = "a",
                 description = "APK file"
-            ).required()
-            val signatures by parser.option(
-                ArgType.String,
-                fullName = "signatures",
-                shortName = "s",
-                description = "Signatures JSON file"
             ).required()
             val patches by parser.option(
                 ArgType.String,
@@ -133,7 +124,6 @@ class Main {
             parser.parse(args)
             runCLI(
                 apk,
-                signatures,
                 patches,
                 integrations,
                 output,
