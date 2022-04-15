@@ -1,7 +1,7 @@
 package app.revanced.cli.utils
 
 // TODO: make this a class with PACKAGE_NAME as argument, then use that everywhere.
-// make sure
+// make sure to remove the "const" from all the vals, they won't compile obviously.
 object Scripts {
     private const val PACKAGE_NAME = "com.google.android.youtube"
     private const val DATA_PATH = "/data/adb/ReVanced"
