@@ -1,5 +1,6 @@
 package app.revanced.cli
 
+import app.revanced.cli.runner.Emulator
 import app.revanced.cli.utils.PatchLoader
 import app.revanced.cli.utils.Patches
 import app.revanced.cli.utils.Preconditions
@@ -8,6 +9,7 @@ import app.revanced.patcher.patch.PatchMetadata
 import app.revanced.patcher.patch.PatchResult
 import kotlinx.cli.ArgParser
 import kotlinx.cli.ArgType
+import kotlinx.cli.default
 import kotlinx.cli.required
 import me.tongfei.progressbar.ProgressBarBuilder
 import me.tongfei.progressbar.ProgressBarStyle
@@ -23,7 +25,9 @@ class Main {
             inApk: String,
             inPatches: String,
             inIntegrations: String?,
-            inOutput: String,
+            inOutput: String?,
+            inEmulate: String?,
+            hideResults: Boolean,
         ) {
             val bar = ProgressBarBuilder()
                 .setTaskName("Working..")
@@ -35,12 +39,9 @@ class Main {
                 .setExtraMessage("Initializing")
             val apk = Preconditions.isFile(inApk)
             val patchesFile = Preconditions.isFile(inPatches)
-            val output = Preconditions.isDirectory(inOutput)
             bar.step()
 
-            val patcher = Patcher(
-                apk,
-            )
+            val patcher = Patcher(apk)
 
             inIntegrations?.let {
                 bar.reset().maxHint(1)
@@ -53,12 +54,14 @@ class Main {
             bar.reset().maxHint(1)
                 .extraMessage = "Loading patches"
             PatchLoader.injectPatches(patchesFile)
-            bar.step()
-
             val patches = Patches.loadPatches().map { it() }
             patcher.addPatches(patches)
+            bar.step()
 
+            bar.reset().maxHint(1)
+                .extraMessage = "Resolving signatures"
             patcher.resolveSignatures()
+            bar.step()
 
             val amount = patches.size.toLong()
             bar.reset().maxHint(amount)
@@ -70,24 +73,41 @@ class Main {
             bar.reset().maxHint(-1)
                 .extraMessage = "Generating dex files"
             val dexFiles = patcher.save()
-            bar.reset().maxHint(dexFiles.size.toLong())
-                .extraMessage = "Saving dex files"
-            dexFiles.forEach { (dexName, dexData) ->
-                Files.write(File(output, dexName).toPath(), dexData.data)
-                bar.step()
+
+            inOutput?.let {
+                val output = Preconditions.isDirectory(it)
+                val amount = dexFiles.size.toLong()
+                bar.reset().maxHint(amount)
+                    .extraMessage = "Saving dex files"
+                dexFiles.forEach { (dexName, dexData) ->
+                    Files.write(File(output, dexName).toPath(), dexData.data)
+                    bar.step()
+                }
+                bar.stepTo(amount)
             }
+
             bar.close()
 
+            inEmulate?.let { device ->
+                Emulator.emulate(
+                    apk,
+                    dexFiles,
+                    device
+                )
+            }
+
             println("All done!")
-            printResults(results)
+            if (!hideResults) {
+                printResults(results)
+            }
         }
 
         private fun printResults(results: Map<PatchMetadata, Result<PatchResult>>) {
             for ((metadata, result) in results) {
                 if (result.isSuccess) {
-                    println("${metadata.name} was applied successfully!")
+                    println("${metadata.shortName} was applied successfully!")
                 } else {
-                    println("${metadata.name} failed to apply! Cause:")
+                    println("${metadata.shortName} failed to apply! Cause:")
                     result.exceptionOrNull()!!.printStackTrace()
                 }
             }
@@ -97,6 +117,9 @@ class Main {
         fun main(args: Array<String>) {
             println("$CLI_NAME version $CLI_VERSION")
             val parser = ArgParser(CLI_NAME)
+
+            // TODO: add some kind of incremental building, so merging integrations can be skipped.
+            // this can be achieved manually, but doing it automatically is better.
 
             val apk by parser.option(
                 ArgType.String,
@@ -121,7 +144,18 @@ class Main {
                 fullName = "output",
                 shortName = "o",
                 description = "Output directory"
-            ).required()
+            )
+            val emulate by parser.option(
+                ArgType.String,
+                fullName = "run-on",
+                description = "After the CLI is done building, which ADB device should it run on?"
+            )
+            // TODO: package name
+            val hideResults by parser.option(
+                ArgType.Boolean,
+                fullName = "hide-results",
+                description = "Don't print the patch results."
+            ).default(false)
 
             parser.parse(args)
             runCLI(
@@ -129,6 +163,8 @@ class Main {
                 patches,
                 integrations,
                 output,
+                emulate,
+                hideResults,
             )
         }
     }

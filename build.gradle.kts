@@ -4,7 +4,6 @@ plugins {
 }
 
 group = "app.revanced"
-version = "1.0"
 
 repositories {
     mavenCentral()
@@ -15,6 +14,9 @@ repositories {
             username = project.findProperty("gpr.user") as String? ?: System.getenv("GITHUB_ACTOR") // DO NOT CHANGE!
             password = project.findProperty("gpr.key")  as String? ?: System.getenv("GITHUB_TOKEN") // DO NOT CHANGE!
         }
+    }
+    maven {
+        url = uri("https://jitpack.io")
     }
 }
 
@@ -29,7 +31,11 @@ dependencies {
 
     implementation("com.google.code.gson:gson:2.9.0")
     implementation("me.tongfei:progressbar:0.9.3")
+    implementation("com.github.li-wjohnson:jadb:master-SNAPSHOT") // using a fork instead.
+    implementation("org.bouncycastle:bcpkix-jdk15on:1.70")
 }
+
+val cliMainClass = "app.revanced.cli.Main"
 
 tasks {
     build {
@@ -42,7 +48,7 @@ tasks {
             exclude(dependency(patchesDependency))
         }
         manifest {
-            attributes("Main-Class" to "app.revanced.cli.Main")
+            attributes("Main-Class" to cliMainClass)
             attributes("Implementation-Title" to project.name)
             attributes("Implementation-Version" to project.version)
         }
