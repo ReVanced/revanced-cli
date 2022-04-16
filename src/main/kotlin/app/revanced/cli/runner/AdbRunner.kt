@@ -12,14 +12,15 @@ import se.vidstige.jadb.JadbDevice
 import se.vidstige.jadb.RemoteFile
 import se.vidstige.jadb.ShellProcessBuilder
 import java.io.File
-import java.nio.file.Files
 import java.util.concurrent.Executors
 
-object Emulator {
-    fun emulate(
+object AdbRunner {
+    fun runApk(
         apk: File,
         dexFiles: Map<String, MemoryDataStore>,
-        deviceName: String
+        outputDir: File,
+        deviceName: String,
+        noLogging: Boolean
     ) {
         lateinit var dvc: JadbDevice
         pbar("Initializing").use { bar ->
@@ -33,14 +34,23 @@ object Emulator {
         lateinit var tmpFile: File // we need this file at the end to clean up.
         pbar("Generating APK file", 3).use { bar ->
             bar.step().extraMessage = "Creating APK file"
-            tmpFile = Files.createTempFile("rvc-cli", ".apk").toFile()
+            tmpFile = File(outputDir, "revanced.apk")
             apk.copyTo(tmpFile, true)
 
             bar.step().extraMessage = "Replacing dex files"
             DexReplacer.replaceDex(tmpFile, dexFiles)
 
             bar.step().extraMessage = "Signing APK file"
-            Signer.signApk(tmpFile)
+            try {
+                Signer.signApk(tmpFile)
+            } catch (e: SecurityException) {
+                throw IllegalStateException(
+                    "A security exception occurred when signing the APK! " +
+                            "If it has anything to with \"cannot authenticate\" then please make sure " +
+                            "you are using Zulu or OpenJDK as they do work when using the adb runner.",
+                    e
+                )
+            }
         }
 
         pbar("Running application", 6, false).use { bar ->
@@ -63,14 +73,26 @@ object Emulator {
             bar.step().setExtraMessage("Debugging APK file").refresh()
             println("\nWaiting until app is closed.")
             val executor = Executors.newSingleThreadExecutor()
+            val pipe = if (noLogging) {
+                ProcessBuilder.Redirect.PIPE
+            } else {
+                ProcessBuilder.Redirect.INHERIT
+            }
             val p = dvc.cmd(Scripts.LOGCAT_COMMAND)
-                .redirectOutput(ProcessBuilder.Redirect.INHERIT)
-                .redirectError(ProcessBuilder.Redirect.INHERIT)
+                .redirectOutput(pipe)
+                .redirectError(pipe)
                 .useExecutor(executor)
                 .start()
             Thread.sleep(250) // give the app some time to start up.
-            while (dvc.cmd(Scripts.PIDOF_APP_COMMAND).startAndWait() == 0) {
-                Thread.sleep(250)
+            while (true) {
+                try {
+                    while (dvc.cmd(Scripts.PIDOF_APP_COMMAND).startAndWait() == 0) {
+                        Thread.sleep(250)
+                    }
+                    break
+                } catch (e: Exception) {
+                    throw RuntimeException("An error occurred while monitoring state of app", e)
+                }
             }
             println("App closed, continuing.")
             p.destroy()
@@ -82,8 +104,6 @@ object Emulator {
                 exitCode = dvc.cmd(Scripts.UNMOUNT_COMMAND).startAndWait()
             } while (exitCode != 0)
         }
-
-        tmpFile.delete()
     }
 }
 

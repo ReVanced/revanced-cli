@@ -1,6 +1,6 @@
 package app.revanced.cli
 
-import app.revanced.cli.runner.Emulator
+import app.revanced.cli.runner.AdbRunner
 import app.revanced.cli.utils.PatchLoader
 import app.revanced.cli.utils.Patches
 import app.revanced.cli.utils.Preconditions
@@ -25,9 +25,10 @@ class Main {
             inApk: String,
             inPatches: String,
             inIntegrations: String?,
-            inOutput: String?,
-            inEmulate: String?,
+            inOutput: String,
+            inRunOnAdb: String?,
             hideResults: Boolean,
+            noLogging: Boolean,
         ) {
             val bar = ProgressBarBuilder()
                 .setTaskName("Working..")
@@ -39,6 +40,7 @@ class Main {
                 .setExtraMessage("Initializing")
             val apk = Preconditions.isFile(inApk)
             val patchesFile = Preconditions.isFile(inPatches)
+            val output = Preconditions.isDirectory(inOutput)
             bar.step()
 
             val patcher = Patcher(apk)
@@ -63,8 +65,8 @@ class Main {
             patcher.resolveSignatures()
             bar.step()
 
-            val amount = patches.size.toLong()
-            bar.reset().maxHint(amount)
+            val szPatches = patches.size.toLong()
+            bar.reset().maxHint(szPatches)
                 .extraMessage = "Applying patches"
             val results = patcher.applyPatches {
                 bar.step().extraMessage = "Applying $it"
@@ -74,25 +76,24 @@ class Main {
                 .extraMessage = "Generating dex files"
             val dexFiles = patcher.save()
 
-            inOutput?.let {
-                val output = Preconditions.isDirectory(it)
-                val amount = dexFiles.size.toLong()
-                bar.reset().maxHint(amount)
-                    .extraMessage = "Saving dex files"
-                dexFiles.forEach { (dexName, dexData) ->
-                    Files.write(File(output, dexName).toPath(), dexData.data)
-                    bar.step()
-                }
-                bar.stepTo(amount)
+            val szDexFiles = dexFiles.size.toLong()
+            bar.reset().maxHint(szDexFiles)
+                .extraMessage = "Saving dex files"
+            dexFiles.forEach { (dexName, dexData) ->
+                Files.write(File(output, dexName).toPath(), dexData.data)
+                bar.step()
             }
+            bar.stepTo(szDexFiles)
 
             bar.close()
 
-            inEmulate?.let { device ->
-                Emulator.emulate(
+            inRunOnAdb?.let { device ->
+                AdbRunner.runApk(
                     apk,
                     dexFiles,
-                    device
+                    output,
+                    device,
+                    noLogging
                 )
             }
 
@@ -144,8 +145,8 @@ class Main {
                 fullName = "output",
                 shortName = "o",
                 description = "Output directory"
-            )
-            val emulate by parser.option(
+            ).required()
+            val runOnAdb by parser.option(
                 ArgType.String,
                 fullName = "run-on",
                 description = "After the CLI is done building, which ADB device should it run on?"
@@ -156,6 +157,11 @@ class Main {
                 fullName = "hide-results",
                 description = "Don't print the patch results."
             ).default(false)
+            val noLogging by parser.option(
+                ArgType.Boolean,
+                fullName = "no-logging",
+                description = "Don't print the output of the application when used in combination with \"run-on\"."
+            ).default(false)
 
             parser.parse(args)
             runCLI(
@@ -163,8 +169,9 @@ class Main {
                 patches,
                 integrations,
                 output,
-                emulate,
+                runOnAdb,
                 hideResults,
+                noLogging,
             )
         }
     }
