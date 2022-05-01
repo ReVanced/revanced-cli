@@ -1,4 +1,4 @@
-package app.revanced.cli.utils.signer
+package app.revanced.utils.signing
 
 import java.security.PrivateKey
 import java.security.cert.X509Certificate

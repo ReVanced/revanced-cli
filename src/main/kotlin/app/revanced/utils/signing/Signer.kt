@@ -3,7 +3,7 @@
  * Licensed under the Open Software License version 3.0
  */
 
-package app.revanced.cli.utils.signer
+package app.revanced.utils.signing
 
 import org.bouncycastle.asn1.x500.X500Name
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo
@@ -41,7 +41,7 @@ val PASSWORD = "revanced".toCharArray() // TODO: make it secure; random password
 /**
  * APK Signer.
  * @author Aliucord authors
- * @author ReVanced Team
+ * @author ReVanced team
  */
 object Signer {
     private fun newKeystore(out: File) {

@@ -1,4 +1,4 @@
-package app.revanced.cli.utils
+package app.revanced.utils.dex
 
 import lanchon.multidexlib2.BasicDexFileNamer
 import org.jf.dexlib2.writer.io.MemoryDataStore

@@ -1,4 +1,4 @@
-package app.revanced.cli.utils
+package app.revanced.utils.patch
 
 import app.revanced.patches.Index
 
