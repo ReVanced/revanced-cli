@@ -1,12 +1,12 @@
-package app.revanced.utils.patch
+package app.revanced.patch
 
 import java.io.File
 import java.net.URL
 import java.net.URLClassLoader
 
-class PatchLoader {
-    companion object {
-        fun injectPatches(file: File) {
+internal class PatchLoader {
+    internal companion object {
+        internal fun injectPatches(file: File) {
             // This function will fail on Java 9 and above.
             try {
                 val url = file.toURI().toURL()
