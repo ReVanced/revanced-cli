@@ -15,7 +15,7 @@ internal object MainCommand : Runnable {
 
     @Parameters(
         paramLabel = "INCLUDE",
-        description = ["Which patches to include. If none is specified, all compatible patches will be included."]
+        description = ["Which patches to include. If none is specified, all compatible patches will be included"]
     )
     internal var includedPatches = arrayOf<String>()
 
@@ -24,6 +24,10 @@ internal object MainCommand : Runnable {
 
     @Option(names = ["-r", "--resource-patcher"], description = ["Enable patching resources"])
     internal var patchResources: Boolean = false
+
+    @Option(names = ["-w", "--wipe-after"], description = ["Wipe the temporal directory before exiting the patcher"])
+    internal var wipe: Boolean = false
+
 
     @Option(names = ["-l", "--list"], description = ["List patches only"])
     internal var listOnly: Boolean = false
@@ -49,6 +53,9 @@ internal object MainCommand : Runnable {
         }
 
         Patcher.run()
+
+        if (!wipe) return
+        File(cacheDirectory).deleteRecursively()
     }
 }
 
