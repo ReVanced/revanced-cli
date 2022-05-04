@@ -2,6 +2,7 @@ package app.revanced.cli
 
 import app.revanced.patch.PatchLoader
 import app.revanced.patch.Patches
+import app.revanced.utils.adb.Adb
 import picocli.CommandLine
 import picocli.CommandLine.*
 import java.io.File
@@ -10,14 +11,14 @@ import java.io.File
     name = "ReVanced-CLI", version = ["1.0.0"], mixinStandardHelpOptions = true
 )
 internal object MainCommand : Runnable {
-    @Option(names = ["-p", "--patches"], description = ["One or more bundles of patches"])
-    internal var patchBundles = arrayOf<File>()
-
     @Parameters(
         paramLabel = "INCLUDE",
         description = ["Which patches to include. If none is specified, all compatible patches will be included"]
     )
     internal var includedPatches = arrayOf<String>()
+
+    @Option(names = ["-p", "--patches"], description = ["One or more bundles of patches"])
+    internal var patchBundles = arrayOf<File>()
 
     @Option(names = ["-c", "--cache"], description = ["Output resource cache directory"], required = true)
     internal lateinit var cacheDirectory: String
@@ -41,6 +42,10 @@ internal object MainCommand : Runnable {
     @Option(names = ["-o", "--out"], description = ["Output file path"], required = true)
     internal lateinit var outputPath: String
 
+    @Option(names = ["-d", "--deploy-on"], description = ["If specified, deploy to adb device with given name"])
+    internal var deploy: String? = null
+
+
     override fun run() {
         if (listOnly) {
             patchBundles.forEach {
@@ -52,10 +57,23 @@ internal object MainCommand : Runnable {
             return
         }
 
-        Patcher.run()
+        val patcher = app.revanced.patcher.Patcher(
+            inputFile,
+            cacheDirectory,
+            patchResources
+        )
+        Patcher.start(patcher)
 
         if (!wipe) return
         File(cacheDirectory).deleteRecursively()
+
+        deploy?.let {
+            Adb(
+                File(outputPath),
+                patcher.packageName,
+                deploy!!
+            ).deploy()
+        }
     }
 }
 

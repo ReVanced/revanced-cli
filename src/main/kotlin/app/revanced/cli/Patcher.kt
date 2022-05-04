@@ -10,13 +10,7 @@ import java.io.File
 
 internal class Patcher {
     internal companion object {
-        internal fun run() {
-            val patcher = app.revanced.patcher.Patcher(
-                MainCommand.inputFile,
-                MainCommand.cacheDirectory,
-                MainCommand.patchResources
-            )
-
+        internal fun start(patcher: app.revanced.patcher.Patcher) {
             // merge files like necessary integrations
             patcher.addFiles(MainCommand.mergeFiles)
             // add patches, but filter incompatible or excluded patches
