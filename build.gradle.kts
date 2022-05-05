@@ -20,7 +20,7 @@ repositories {
     }
 }
 
-val patchesDependency = "app.revanced:revanced-patches:+"
+val patchesDependency = "app.revanced:revanced-patches:1.0.0-dev.4"
 
 dependencies {
     implementation(kotlin("stdlib"))
@@ -42,7 +42,7 @@ tasks {
             exclude(dependency(patchesDependency))
         }
         manifest {
-            attributes("Main-Class" to "app.revanced.cli.Main")
+            attributes("Main-Class" to "app.revanced.cli.MainKt")
             attributes("Implementation-Title" to project.name)
             attributes("Implementation-Version" to project.version)
         }
