@@ -2,7 +2,6 @@ package app.revanced.cli
 
 import app.revanced.patch.PatchLoader
 import app.revanced.patch.Patches
-import picocli.CommandLine
 import picocli.CommandLine.*
 import java.io.File
 
@@ -57,8 +56,4 @@ internal object MainCommand : Runnable {
         if (!wipe) return
         File(cacheDirectory).deleteRecursively()
     }
-}
-
-internal fun main(args: Array<String>) {
-    CommandLine(MainCommand).execute(*args)
 }
