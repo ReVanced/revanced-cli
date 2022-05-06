@@ -9,7 +9,7 @@ repositories {
     mavenCentral()
     mavenLocal()
     maven {
-        url = uri("https://maven.pkg.github.com/ReVancedTeam/multidexlib2")
+        url = uri("https://maven.pkg.github.com/revanced/multidexlib2")
         credentials {
             username = project.findProperty("gpr.user") as String? ?: System.getenv("GITHUB_ACTOR") // DO NOT CHANGE!
             password = project.findProperty("gpr.key")  as String? ?: System.getenv("GITHUB_TOKEN") // DO NOT CHANGE!
