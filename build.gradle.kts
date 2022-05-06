@@ -24,18 +24,14 @@ val patchesDependency = "app.revanced:revanced-patches:1.0.0-dev.4"
 
 dependencies {
     implementation(kotlin("stdlib"))
-    implementation("org.jetbrains.kotlinx:kotlinx-cli:0.3.4")
-
-    implementation("app.revanced:revanced-patcher:1.0.0-dev.8")
+    implementation("app.revanced:revanced-patcher:+")
     implementation(patchesDependency)
+    implementation("info.picocli:picocli:+")
 
-    implementation("com.google.code.gson:gson:2.9.0")
-    implementation("me.tongfei:progressbar:0.9.3")
+    implementation("me.tongfei:progressbar:+")
     implementation("com.github.li-wjohnson:jadb:master-SNAPSHOT") // using a fork instead.
-    implementation("org.bouncycastle:bcpkix-jdk15on:1.70")
+    implementation("org.bouncycastle:bcpkix-jdk15on:+")
 }
-
-val cliMainClass = "app.revanced.cli.Main"
 
 tasks {
     build {
@@ -43,12 +39,10 @@ tasks {
     }
     shadowJar {
         dependencies {
-            // This makes sure we link to the library, but don't include it.
-            // So, a "runtime only" dependency.
             exclude(dependency(patchesDependency))
         }
         manifest {
-            attributes("Main-Class" to cliMainClass)
+            attributes("Main-Class" to "app.revanced.cli.MainKt")
             attributes("Implementation-Title" to project.name)
             attributes("Implementation-Version" to project.version)
         }
