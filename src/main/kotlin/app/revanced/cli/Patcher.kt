@@ -16,10 +16,10 @@ internal class Patcher {
             // add patches, but filter incompatible or excluded patches
             patcher.addPatchesFiltered()
             // apply patches
-            for (patchResult in patcher.applyPatches {
-                println("Applying: $it")
+            for ((meta, result) in patcher.applyPatches {
+                println("Applying $it.")
             }) {
-                println(patchResult)
+                println("Applied ${meta.name}. The result was $result.")
             }
 
             // write output file
@@ -71,7 +71,8 @@ internal class Patcher {
                                 it == packageVersion
                             }
                         }) {
-                        // TODO: report to stdout
+
+                        println("Skipping ${patch.metadata.name} due to incompatibility with current package $packageName.")
                         return@patch
                     }
 
@@ -79,7 +80,7 @@ internal class Patcher {
                         return@patch
                     }
 
-                    // TODO: report to stdout
+                    println("Adding ${patch.metadata.name}.")
                     includedPatches.add(patch)
 
                 }
