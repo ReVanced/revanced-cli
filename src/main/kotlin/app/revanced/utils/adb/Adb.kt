@@ -17,40 +17,49 @@ internal class Adb(
         device = JadbConnection().devices.find { it.serial == deviceName }
             ?: throw IllegalArgumentException("No such device with name $deviceName")
 
-        if (device.run("su -h") == 0)
+        if (device.run("su -h", false) != 0)
             throw IllegalArgumentException("Root required on $deviceName. Deploying failed.")
+    }
+
+    private fun String.replacePlaceholder(): String {
+        return this.replace(Constants.PLACEHOLDER, packageName)
     }
 
     internal fun deploy() {
         // create revanced path
-        device.run(Constants.COMMAND_CREATE_DIR + Constants.PATH_DATA)
-
-        // create mount script
-        device.createFile(
-            Constants.PATH_INIT_PUSH,
-            Constants.CONTENT_MOUNT_SCRIPT.replace(Constants.PLACEHOLDER, packageName)
-        )
-
-        // move the mount script to the revanced path
-        device.run(Constants.COMMAND_MOVE_MOUNT)
-        // make the mount script executable
-        device.run(Constants.COMMAND_CHMOD_MOUNT + Constants.NAME_MOUNT_SCRIPT)
+        device.run("${Constants.COMMAND_CREATE_DIR} ${Constants.PATH_REVANCED}")
 
         // push patched file
         device.copy(Constants.PATH_INIT_PUSH, apk)
-        // move patched file to revanced path
-        device.run(Constants.COMMAND_MOVE_BASE)
+        // install apk
+        device.run(Constants.COMMAND_INSTALL_APK.replacePlaceholder())
 
-        // kill, mount & run app
-        device.run(Constants.COMMAND_KILL_APP.replace(Constants.PLACEHOLDER, packageName))
-        device.run(Constants.COMMAND_MOUNT)
-        device.run(Constants.COMMAND_RUN_APP.replace(Constants.PLACEHOLDER, packageName))
+        // push mount script
+        device.createFile(
+            Constants.PATH_INIT_PUSH,
+            Constants.CONTENT_MOUNT_SCRIPT.replacePlaceholder()
+        )
+        // install mount script
+        device.run(Constants.COMMAND_INSTALL_MOUNT.replacePlaceholder())
+
+        // push umount script
+        device.createFile(
+            Constants.PATH_INIT_PUSH,
+            Constants.CONTENT_UMOUNT_SCRIPT.replacePlaceholder()
+        )
+        // install mount script
+        device.run(Constants.COMMAND_INSTALL_UMOUNT.replacePlaceholder())
+
+        // unmount the apk for sanity
+        device.run(Constants.PATH_UMOUNT.replacePlaceholder())
+        // mount the apk
+        device.run(Constants.PATH_MOUNT.replacePlaceholder())
+
+        // relaunch app
+        device.run(Constants.COMMAND_RESTART.replacePlaceholder())
 
         // log the app
         log()
-
-        // unmount it, after it closes
-        device.run(Constants.COMMAND_UNMOUNT.replace(Constants.PLACEHOLDER, packageName))
     }
 
     private fun log() {
@@ -61,16 +70,16 @@ internal class Adb(
             ProcessBuilder.Redirect.PIPE
         }
 
-        val process = device.buildCommand(Constants.COMMAND_LOGCAT.replace(Constants.PLACEHOLDER, packageName))
+        val process = device.buildCommand(Constants.COMMAND_LOGCAT.replacePlaceholder())
             .redirectOutput(pipe)
             .redirectError(pipe)
             .useExecutor(executor)
             .start()
 
-        Thread.sleep(250) // give the app some time to start up.
+        Thread.sleep(500) // give the app some time to start up.
         while (true) {
             try {
-                while (device.run(Constants.COMMAND_PID_OF + packageName) == 0) {
+                while (device.run("${Constants.COMMAND_PID_OF} $packageName") == 0) {
                     Thread.sleep(1000)
                 }
                 break
