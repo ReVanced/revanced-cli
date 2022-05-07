@@ -20,7 +20,7 @@ repositories {
     }
 }
 
-val patchesDependency = "app.revanced:revanced-patches:1.0.0-dev.4"
+val patchesDependency = "app.revanced:revanced-patches:1.0.0-dev.5"
 
 dependencies {
     implementation(kotlin("stdlib"))
