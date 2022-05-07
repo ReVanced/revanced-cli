@@ -1,6 +1,5 @@
 package app.revanced.cli
 
-import app.revanced.patch.PatchLoader
 import app.revanced.patch.Patches
 import app.revanced.utils.adb.Adb
 import picocli.CommandLine.*
@@ -49,8 +48,7 @@ internal object MainCommand : Runnable {
     override fun run() {
         if (listOnly) {
             patchBundles.forEach {
-                PatchLoader.injectPatches(it)
-                Patches.loadPatches().forEach {
+                Patches.load(it).forEach {
                     println(it().metadata)
                 }
             }

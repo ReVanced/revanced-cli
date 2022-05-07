@@ -12,10 +12,7 @@ internal class FileSystemUtils(
     private var fileSystem: FileSystem
 
     init {
-        fileSystem = FileSystems.newFileSystem(
-            file.toPath(),
-            null
-        )
+        fileSystem = FileSystems.newFileSystem(file.toPath(), null as ClassLoader?)
     }
 
     private fun deleteDirectory(dirPath: String) {
