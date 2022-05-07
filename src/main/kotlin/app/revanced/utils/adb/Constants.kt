@@ -43,7 +43,7 @@ internal object Constants {
             #!/system/bin/sh
             
             stock_path=${'$'}{ pm path $PLACEHOLDER | grep base | sed 's/package://g' }
-            umount -l $PLACEHOLDER; done< /proc/mounts
+            umount -l ${'$'}stock_path
         """.trimIndent()
 
     // mount script
