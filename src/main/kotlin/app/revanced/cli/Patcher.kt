@@ -1,6 +1,5 @@
 package app.revanced.cli
 
-import app.revanced.patch.PatchLoader
 import app.revanced.patch.Patches
 import app.revanced.patcher.data.base.Data
 import app.revanced.patcher.patch.base.Patch
@@ -52,19 +51,16 @@ internal class Patcher {
         }
 
         private fun app.revanced.patcher.Patcher.addPatchesFiltered() {
-            // TODO: get package metadata (outside of this method) for apk file which needs to be patched
             val packageName = this.packageName
             val packageVersion = this.packageVersion
 
             val checkInclude = MainCommand.includedPatches.isNotEmpty()
 
             MainCommand.patchBundles.forEach { bundle ->
-                PatchLoader.injectPatches(bundle)
                 val includedPatches = mutableListOf<Patch<Data>>()
-                Patches.loadPatches().forEach patch@{
+                Patches.load(bundle).forEach patch@{
                     val patch = it()
 
-                    // TODO: filter out incompatible patches with package metadata
                     val filterOutPatches = true
                     if (filterOutPatches && !patch.metadata.compatiblePackages.any { packageMetadata ->
                             packageMetadata.name == packageName && packageMetadata.versions.any {
