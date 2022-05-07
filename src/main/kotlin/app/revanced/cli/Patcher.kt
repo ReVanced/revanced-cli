@@ -52,7 +52,6 @@ internal class Patcher {
         }
 
         private fun app.revanced.patcher.Patcher.addPatchesFiltered() {
-            // TODO: get package metadata (outside of this method) for apk file which needs to be patched
             val packageName = this.packageName
             val packageVersion = this.packageVersion
 
@@ -64,7 +63,6 @@ internal class Patcher {
                 Patches.loadPatches().forEach patch@{
                     val patch = it()
 
-                    // TODO: filter out incompatible patches with package metadata
                     val filterOutPatches = true
                     if (filterOutPatches && !patch.metadata.compatiblePackages.any { packageMetadata ->
                             packageMetadata.name == packageName && packageMetadata.versions.any {
