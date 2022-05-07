@@ -1,15 +1,26 @@
 package app.revanced.patch
 
+import app.revanced.patcher.data.base.Data
+import app.revanced.patcher.patch.base.Patch
 import app.revanced.patches.Index
+import java.io.File
+import java.net.URLClassLoader
 
-internal class Patches {
-    internal companion object {
-        // You may ask yourself, "why do this?".
-        // We do it like this, because we don't want the Index class
-        // to be loaded while the dependency hasn't been injected yet.
-        // You can see this as "controlled class loading".
-        // Whenever this class is loaded (because it is invoked), all the imports
-        // will be loaded too. We don't want to do this until we've injected the class.
-        internal fun loadPatches() = Index.patches
+internal object Patches {
+
+
+    /**
+     * This method loads patches from a given patch file
+     * @return the loaded patches represented as a list of functions returning instances of [Patch]
+     */
+    internal fun load(patchFile: File): List<() -> Patch<Data>> {
+        val url = patchFile.toURI().toURL()
+        val classLoader = URLClassLoader(arrayOf(url))
+        return loadIndex(classLoader).patches
     }
+    private fun loadIndex(classLoader: ClassLoader) = classLoader
+        .loadClass(Index::class.java.canonicalName)
+        .fields
+        .first()
+        .get(null) as Index
 }

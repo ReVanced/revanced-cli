@@ -1,6 +1,5 @@
 package app.revanced.cli
 
-import app.revanced.patch.PatchLoader
 import app.revanced.patch.Patches
 import app.revanced.patcher.data.base.Data
 import app.revanced.patcher.patch.base.Patch
@@ -58,9 +57,8 @@ internal class Patcher {
             val checkInclude = MainCommand.includedPatches.isNotEmpty()
 
             MainCommand.patchBundles.forEach { bundle ->
-                PatchLoader.injectPatches(bundle)
                 val includedPatches = mutableListOf<Patch<Data>>()
-                Patches.loadPatches().forEach patch@{
+                Patches.load(bundle).forEach patch@{
                     val patch = it()
 
                     val filterOutPatches = true

@@ -91,7 +91,7 @@ object Signer {
             (keyStore.getKey(alias, PASSWORD) as PrivateKey)
         )
 
-        val zip = FileSystems.newFileSystem(apkFile.toPath(), null)
+        val zip = FileSystems.newFileSystem(apkFile.toPath(), null as ClassLoader?)
 
         val dig = MessageDigest.getInstance("SHA1")
         val digests: MutableMap<String, String> = LinkedHashMap()
