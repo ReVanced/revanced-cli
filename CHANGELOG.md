@@ -1,3 +1,11 @@
+## [1.0.1](https://github.com/revanced/revanced-cli/compare/v1.0.0...v1.0.1) (2022-05-07)
+
+
+### Bug Fixes
+
+* broken script `CONTENT_UNMOUNT_SCRIPT` ([be53e64](https://github.com/revanced/revanced-cli/commit/be53e649a7a43de70ba2a7227c49b085001066a6))
+* use latest version of patches dependency ([029f1ad](https://github.com/revanced/revanced-cli/commit/029f1ad72223e5be6664c2c8810ac35e5807d9a8))
+
 # 1.0.0 (2022-05-07)
 
 
