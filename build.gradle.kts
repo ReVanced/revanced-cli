@@ -22,12 +22,9 @@ repositories {
     }
 }
 
-val patchesDependency = "app.revanced:revanced-patches:1.+"
-
 dependencies {
     implementation(kotlin("stdlib"))
     implementation("app.revanced:revanced-patcher:+")
-    implementation(patchesDependency)
     implementation("info.picocli:picocli:+")
 
     implementation("me.tongfei:progressbar:+")
@@ -45,9 +42,6 @@ tasks {
         dependsOn(shadowJar)
     }
     shadowJar {
-        dependencies {
-            exclude(dependency(patchesDependency))
-        }
         manifest {
             attributes("Main-Class" to "app.revanced.cli.MainKt")
             attributes("Implementation-Title" to project.name)
