@@ -1,3 +1,10 @@
+# [1.1.0-dev.2](https://github.com/revanced/revanced-cli/compare/v1.1.0-dev.1...v1.1.0-dev.2) (2022-05-07)
+
+
+### Bug Fixes
+
+* wrong use of dependency to `revanced-patches` ([351de6c](https://github.com/revanced/revanced-cli/commit/351de6cb90aa0f2ec93e8b8f6c10d7d312082079))
+
 # [1.1.0-dev.1](https://github.com/revanced/revanced-cli/compare/v1.0.1...v1.1.0-dev.1) (2022-05-07)
 
 
