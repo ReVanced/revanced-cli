@@ -12,7 +12,7 @@ internal object Constants {
     internal const val COMMAND_RESTART = "monkey -p $PLACEHOLDER 1 && kill ${'$'}($COMMAND_PID_OF $PLACEHOLDER)"
 
     // default mount file name
-    private const val NAME_MOUNT_SCRIPT = "mount_$PLACEHOLDER.sh"
+    private const val NAME_MOUNT_SCRIPT = "mount_revanced_$PLACEHOLDER.sh"
 
     // initial directory to push files to via adb push
     internal const val PATH_INIT_PUSH = "/sdcard/revanced.delete"
@@ -41,7 +41,9 @@ internal object Constants {
     internal val CONTENT_UMOUNT_SCRIPT =
         """
             #!/system/bin/sh
-            while read line; do echo ${'$'}{line} | grep $PLACEHOLDER | awk '{print ${'$'}2}' | xargs umount -l; done< /proc/mounts
+            
+            stock_path=${'$'}{ pm path $PLACEHOLDER | grep base | sed 's/package://g' }
+            umount -l $PLACEHOLDER; done< /proc/mounts
         """.trimIndent()
 
     // mount script
