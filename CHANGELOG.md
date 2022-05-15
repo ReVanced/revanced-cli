@@ -1,3 +1,10 @@
+# [1.1.0-dev.3](https://github.com/revanced/revanced-cli/compare/v1.1.0-dev.2...v1.1.0-dev.3) (2022-05-15)
+
+
+### Bug Fixes
+
+* wrong use of variable substitution / typo ([81d53b5](https://github.com/revanced/revanced-cli/commit/81d53b5518454e479b7a8f2e9be934bee30702af)), closes [revanced/revanced-cli#12](https://github.com/revanced/revanced-cli/issues/12)
+
 # [1.1.0-dev.2](https://github.com/revanced/revanced-cli/compare/v1.1.0-dev.1...v1.1.0-dev.2) (2022-05-07)
 
 
