@@ -42,7 +42,7 @@ internal object Constants {
         """
             #!/system/bin/sh
             
-            stock_path=${'$'}{ pm path $PLACEHOLDER | grep base | sed 's/package://g' }
+            stock_path=${'$'}( pm path $PLACEHOLDER | grep base | sed 's/package://g' )
             umount -l ${'$'}stock_path
         """.trimIndent()
 
@@ -53,7 +53,7 @@ internal object Constants {
             while [ "${'$'}(getprop sys.boot_completed | tr -d '\r')" != "1" ]; do sleep 1; done
             
             base_path="$PATH_REVANCED_APP"
-            stock_path=${'$'}{ pm path $PLACEHOLDER | grep base | sed 's/package://g' }
+            stock_path=${'$'}( pm path $PLACEHOLDER | grep base | sed 's/package://g' )
             mount -o bind ${'$'}base_path ${'$'}stock_path
         """.trimIndent()
 }
