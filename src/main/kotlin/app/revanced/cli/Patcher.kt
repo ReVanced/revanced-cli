@@ -1,7 +1,10 @@
 package app.revanced.cli
 
 import app.revanced.patch.Patches
+import app.revanced.patcher.annotation.Compatibility
+import app.revanced.patcher.annotation.Name
 import app.revanced.patcher.data.base.Data
+import app.revanced.patcher.extensions.findAnnotationRecursively
 import app.revanced.patcher.patch.base.Patch
 import app.revanced.utils.filesystem.FileSystemUtils
 import app.revanced.utils.signing.Signer
@@ -15,10 +18,8 @@ internal class Patcher {
             // add patches, but filter incompatible or excluded patches
             patcher.addPatchesFiltered()
             // apply patches
-            for ((meta, result) in patcher.applyPatches {
-                println("Applying $it.")
-            }) {
-                println("Applied ${meta.name}. The result was $result.")
+            for ((patch, result) in patcher.applyPatches()) {
+                println("[error: ${result.isFailure}] $patch")
             }
 
             // write output file
@@ -34,7 +35,7 @@ internal class Patcher {
             }
 
             if (MainCommand.patchResources) {
-                for (file in File(MainCommand.cacheDirectory).resolve("build/").listFiles().first().listFiles()) {
+                for (file in File(MainCommand.cacheDirectory).resolve("build/").listFiles()?.first()?.listFiles()!!) {
                     if (!file.isDirectory) {
                         zipFileSystem.replaceFile(file.name, file.readBytes())
                         continue
@@ -48,6 +49,8 @@ internal class Patcher {
 
             // and sign the apk file
             Signer.signApk(outFile)
+
+            println("[done]")
         }
 
         private fun app.revanced.patcher.Patcher.addPatchesFiltered() {
@@ -58,25 +61,34 @@ internal class Patcher {
 
             MainCommand.patchBundles.forEach { bundle ->
                 val includedPatches = mutableListOf<Patch<Data>>()
-                Patches.load(bundle).forEach patch@{
-                    val patch = it()
+                Patches.load(bundle).forEach patch@{ it ->
+                    val patch = it.getDeclaredConstructor().newInstance()
 
                     val filterOutPatches = true
-                    if (filterOutPatches && !patch.metadata.compatiblePackages.any { packageMetadata ->
-                            packageMetadata.name == packageName && packageMetadata.versions.any {
-                                it == packageVersion
-                            }
-                        }) {
 
-                        println("Skipping ${patch.metadata.name} due to incompatibility with current package $packageName.")
+                    val compatibilityAnnotation = patch.javaClass.findAnnotationRecursively(Compatibility::class.java)
+
+                    val patchName =
+                        patch.javaClass.findAnnotationRecursively(Name::class.java)?.name ?: Name::class.java.name
+
+                    if (checkInclude && !MainCommand.includedPatches.contains(patchName)) {
                         return@patch
                     }
 
-                    if (checkInclude && !MainCommand.includedPatches.contains(patch.metadata.shortName)) {
-                        return@patch
+                    if (filterOutPatches) {
+                        if (compatibilityAnnotation == null || !(compatibilityAnnotation.compatiblePackages.any { packageMetadata ->
+                                packageMetadata.name == packageName && packageMetadata.versions.any {
+                                    it == packageVersion
+                                }
+                            })) {
+                            // TODO: misleading error message
+                            println("[Skipped] $patchName: Incompatible with current package.")
+                            return@patch
+                        }
                     }
 
-                    println("Adding ${patch.metadata.name}.")
+
+                    println("[loaded] $patchName")
                     includedPatches.add(patch)
 
                 }

@@ -1,6 +1,8 @@
 package app.revanced.cli
 
 import app.revanced.patch.Patches
+import app.revanced.patcher.annotation.Name
+import app.revanced.patcher.extensions.findAnnotationRecursively
 import app.revanced.utils.adb.Adb
 import picocli.CommandLine.*
 import java.io.File
@@ -47,36 +49,36 @@ internal object MainCommand : Runnable {
 
     override fun run() {
         if (listOnly) {
-            patchBundles.forEach {
-                Patches.load(it).forEach {
-                    println(it().metadata)
-                }
-            }
+            for (patchBundle in patchBundles) for (it in Patches.load(patchBundle)) println(
+                "[available] ${
+                    it.javaClass.findAnnotationRecursively(
+                        Name::class.java
+                    )?.name ?: Name::class.java.name
+                }"
+            )
             return
         }
 
+        val outputFile = File(outputPath)
+
         val patcher = app.revanced.patcher.Patcher(
-            inputFile,
-            cacheDirectory,
-            patchResources
+            inputFile, cacheDirectory, patchResources
         )
+
+        var adb: Adb? = null
+        deploy?.let {
+            adb = Adb(
+                outputFile, patcher.packageName, deploy!!
+            )
+        }
 
         Patcher.start(patcher)
 
         if (clean) {
             File(cacheDirectory).deleteRecursively()
+            outputFile.delete()
         }
 
-        val outputFile = File(outputPath)
-
-        deploy?.let {
-            Adb(
-                outputFile,
-                patcher.packageName,
-                deploy!!
-            ).deploy()
-        }
-
-        if (clean) outputFile.delete()
+        adb?.deploy()
     }
 }

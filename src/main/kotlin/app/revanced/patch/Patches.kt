@@ -1,26 +1,35 @@
 package app.revanced.patch
 
-import app.revanced.patcher.data.base.Data
 import app.revanced.patcher.patch.base.Patch
 import java.io.File
 import java.net.URLClassLoader
+import java.util.jar.JarFile
 
 internal object Patches {
 
     /**
-     * This method loads patches from a given patch file
-     * @return the loaded patches represented as a list of functions returning instances of [Patch]
+     * This method loads patches from a given jar file containing [Patch]es
+     * @return the loaded patches represented as a list of [Patch] classes
      */
-    internal fun load(patchesJar: File): List<() -> Patch<Data>> {
-        val url = patchesJar.toURI().toURL()
-        val classLoader = URLClassLoader(arrayOf(url))
+    internal fun load(patchesJar: File) = buildList {
+        val jarFile = JarFile(patchesJar)
+        val classLoader = URLClassLoader(arrayOf(patchesJar.toURI().toURL()))
 
-        val indexClass = classLoader.loadClass("app.revanced.patches.Index")
+        val entries = jarFile.entries()
+        while (entries.hasMoreElements()) {
+            val entry = entries.nextElement()
+            if (!entry.name.endsWith(".class") || entry.name.contains("$")) continue
 
-        val index = indexClass.declaredFields.last()
-        index.isAccessible = true
+            val clazz = classLoader.loadClass(entry.realName.replace('/', '.').replace(".class", ""))
 
-        @Suppress("UNCHECKED_CAST")
-        return index.get(null) as List<() -> Patch<Data>>
+            if (!clazz.isAnnotationPresent(app.revanced.patcher.patch.annotations.Patch::class.java)) continue
+
+            @Suppress("UNCHECKED_CAST")
+            val patch = clazz as Class<Patch<*>>
+
+            // TODO: include declared classes from patch
+
+            this.add(patch)
+        }
     }
 }
