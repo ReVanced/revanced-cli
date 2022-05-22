@@ -23,15 +23,15 @@ repositories {
 }
 
 dependencies {
-    implementation(kotlin("stdlib"))
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.6.21")
     implementation("app.revanced:revanced-patcher:+")
     implementation("app.revanced:revanced-patches:+")
 
-    implementation("info.picocli:picocli:+")
+    implementation("info.picocli:picocli:4.6.3")
 
     implementation("com.github.li-wjohnson:jadb:master-SNAPSHOT") // using a fork instead.
-    implementation("org.bouncycastle:bcpkix-jdk15on:+")
-    implementation(kotlin("reflect"))
+    implementation("org.bouncycastle:bcpkix-jdk15on:1.70")
+    implementation("org.jetbrains.kotlin:kotlin-reflect:1.6.21")
 }
 
 java {
