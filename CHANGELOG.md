@@ -1,15 +1,16 @@
-# [1.1.0](https://github.com/revanced/revanced-cli/compare/v1.0.1...v1.1.0) (2022-05-07)
+# [1.1.0-dev.3](https://github.com/revanced/revanced-cli/compare/v1.1.0-dev.2...v1.1.0-dev.3) (2022-05-15)
 
 
 ### Bug Fixes
 
-* ClassLoader not working with Java 9+ ([3a11e11](https://github.com/revanced/revanced-cli/commit/3a11e1135bd1e8958dd21247622d549440725ead))
-* leftover TODOs ([5b1139c](https://github.com/revanced/revanced-cli/commit/5b1139ce43df1f5c2c848a8209a9e618857031ce))
+* wrong use of variable substitution / typo ([81d53b5](https://github.com/revanced/revanced-cli/commit/81d53b5518454e479b7a8f2e9be934bee30702af)), closes [revanced/revanced-cli#12](https://github.com/revanced/revanced-cli/issues/12)
+
+# [1.1.0-dev.2](https://github.com/revanced/revanced-cli/compare/v1.1.0-dev.1...v1.1.0-dev.2) (2022-05-07)
 
 
-### Features
+### Bug Fixes
 
-* run `release.yml` workflow on branch `dev` ([9a64730](https://github.com/revanced/revanced-cli/commit/9a6473056b940c6df4860dd09c09d7ac61545f7d))
+* wrong use of dependency to `revanced-patches` ([351de6c](https://github.com/revanced/revanced-cli/commit/351de6cb90aa0f2ec93e8b8f6c10d7d312082079))
 
 # [1.1.0-dev.1](https://github.com/revanced/revanced-cli/compare/v1.0.1...v1.1.0-dev.1) (2022-05-07)
 

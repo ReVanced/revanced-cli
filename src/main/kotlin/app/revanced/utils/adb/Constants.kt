@@ -8,7 +8,7 @@ internal object Constants {
     private const val COMMAND_CHMOD_MOUNT = "chmod +x"
     internal const val COMMAND_PID_OF = "pidof -s"
     internal const val COMMAND_CREATE_DIR = "mkdir -p"
-    internal const val COMMAND_LOGCAT = "logcat -c && logcat --pid=$($COMMAND_PID_OF $PLACEHOLDER)"
+    internal const val COMMAND_LOGCAT = "logcat -c && logcat | grep AndroidRuntime"
     internal const val COMMAND_RESTART = "monkey -p $PLACEHOLDER 1 && kill ${'$'}($COMMAND_PID_OF $PLACEHOLDER)"
 
     // default mount file name
@@ -42,7 +42,7 @@ internal object Constants {
         """
             #!/system/bin/sh
             
-            stock_path=${'$'}{ pm path $PLACEHOLDER | grep base | sed 's/package://g' }
+            stock_path=${'$'}( pm path $PLACEHOLDER | grep base | sed 's/package://g' )
             umount -l ${'$'}stock_path
         """.trimIndent()
 
@@ -53,7 +53,7 @@ internal object Constants {
             while [ "${'$'}(getprop sys.boot_completed | tr -d '\r')" != "1" ]; do sleep 1; done
             
             base_path="$PATH_REVANCED_APP"
-            stock_path=${'$'}{ pm path $PLACEHOLDER | grep base | sed 's/package://g' }
+            stock_path=${'$'}( pm path $PLACEHOLDER | grep base | sed 's/package://g' )
             mount -o bind ${'$'}base_path ${'$'}stock_path
         """.trimIndent()
 }

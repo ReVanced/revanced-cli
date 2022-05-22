@@ -22,17 +22,16 @@ repositories {
     }
 }
 
-val patchesDependency = "app.revanced:revanced-patches:1.+"
-
 dependencies {
     implementation(kotlin("stdlib"))
     implementation("app.revanced:revanced-patcher:+")
-    implementation(patchesDependency)
+    implementation("app.revanced:revanced-patches:+")
+
     implementation("info.picocli:picocli:+")
 
-    implementation("me.tongfei:progressbar:+")
     implementation("com.github.li-wjohnson:jadb:master-SNAPSHOT") // using a fork instead.
     implementation("org.bouncycastle:bcpkix-jdk15on:+")
+    implementation(kotlin("reflect"))
 }
 
 java {
@@ -45,9 +44,6 @@ tasks {
         dependsOn(shadowJar)
     }
     shadowJar {
-        dependencies {
-            exclude(dependency(patchesDependency))
-        }
         manifest {
             attributes("Main-Class" to "app.revanced.cli.MainKt")
             attributes("Implementation-Title" to project.name)

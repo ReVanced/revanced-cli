@@ -1,9 +1,9 @@
 package app.revanced.cli
 
-import app.revanced.patch.Patches
-import app.revanced.patcher.data.base.Data
-import app.revanced.patcher.patch.base.Patch
 import app.revanced.utils.filesystem.FileSystemUtils
+import app.revanced.utils.patcher.addPatchesFiltered
+import app.revanced.utils.patcher.applyPatchesPrint
+import app.revanced.utils.patcher.mergeFiles
 import app.revanced.utils.signing.Signer
 import java.io.File
 
@@ -11,15 +11,11 @@ internal class Patcher {
     internal companion object {
         internal fun start(patcher: app.revanced.patcher.Patcher) {
             // merge files like necessary integrations
-            patcher.addFiles(MainCommand.mergeFiles)
+            patcher.mergeFiles()
             // add patches, but filter incompatible or excluded patches
-            patcher.addPatchesFiltered()
+            patcher.addPatchesFiltered(includeFilter = MainCommand.includedPatches.isNotEmpty())
             // apply patches
-            for ((meta, result) in patcher.applyPatches {
-                println("Applying $it.")
-            }) {
-                println("Applied ${meta.name}. The result was $result.")
-            }
+            patcher.applyPatchesPrint()
 
             // write output file
             val outFile = File(MainCommand.outputPath)
@@ -34,7 +30,7 @@ internal class Patcher {
             }
 
             if (MainCommand.patchResources) {
-                for (file in File(MainCommand.cacheDirectory).resolve("build/").listFiles().first().listFiles()) {
+                for (file in File(MainCommand.cacheDirectory).resolve("build/").listFiles()?.first()?.listFiles()!!) {
                     if (!file.isDirectory) {
                         zipFileSystem.replaceFile(file.name, file.readBytes())
                         continue
@@ -48,40 +44,10 @@ internal class Patcher {
 
             // and sign the apk file
             Signer.signApk(outFile)
+
+            println("[done]")
         }
 
-        private fun app.revanced.patcher.Patcher.addPatchesFiltered() {
-            val packageName = this.packageName
-            val packageVersion = this.packageVersion
 
-            val checkInclude = MainCommand.includedPatches.isNotEmpty()
-
-            MainCommand.patchBundles.forEach { bundle ->
-                val includedPatches = mutableListOf<Patch<Data>>()
-                Patches.load(bundle).forEach patch@{
-                    val patch = it()
-
-                    val filterOutPatches = true
-                    if (filterOutPatches && !patch.metadata.compatiblePackages.any { packageMetadata ->
-                            packageMetadata.name == packageName && packageMetadata.versions.any {
-                                it == packageVersion
-                            }
-                        }) {
-
-                        println("Skipping ${patch.metadata.name} due to incompatibility with current package $packageName.")
-                        return@patch
-                    }
-
-                    if (checkInclude && !MainCommand.includedPatches.contains(patch.metadata.shortName)) {
-                        return@patch
-                    }
-
-                    println("Adding ${patch.metadata.name}.")
-                    includedPatches.add(patch)
-
-                }
-                this.addPatches(includedPatches)
-            }
-        }
     }
 }
