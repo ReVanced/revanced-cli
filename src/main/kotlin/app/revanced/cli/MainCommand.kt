@@ -1,9 +1,11 @@
 package app.revanced.cli
 
-import app.revanced.patch.Patches
 import app.revanced.patcher.annotation.Name
 import app.revanced.patcher.extensions.findAnnotationRecursively
+import app.revanced.patcher.util.patch.PatchLoader
 import app.revanced.utils.adb.Adb
+import app.revanced.utils.patcher.addPatchesFiltered
+import app.revanced.utils.signature.Signature
 import picocli.CommandLine.*
 import java.io.File
 
@@ -35,6 +37,9 @@ internal object MainCommand : Runnable {
     @Option(names = ["-l", "--list"], description = ["List patches only"])
     internal var listOnly: Boolean = false
 
+    @Option(names = ["-s", "--signature-checker"], description = ["Check signatures of all patches"])
+    internal var signatureCheck: Boolean = false
+
     @Option(names = ["-m", "--merge"], description = ["One or more dex file containers to merge"])
     internal var mergeFiles = listOf<File>()
 
@@ -49,21 +54,29 @@ internal object MainCommand : Runnable {
 
     override fun run() {
         if (listOnly) {
-            for (patchBundle in patchBundles) for (it in Patches.load(patchBundle)) println(
-                "[available] ${
-                    it.javaClass.findAnnotationRecursively(
-                        Name::class.java
-                    )?.name ?: Name::class.java.name
-                }"
-            )
+            for (patchBundle in patchBundles)
+                for (it in PatchLoader.loadFromFile(patchBundle))
+                    println(
+                        "[available] ${
+                            it.javaClass.findAnnotationRecursively(
+                                Name::class.java
+                            )?.name ?: Name::class.java.name
+                        }"
+                    )
             return
         }
-
-        val outputFile = File(outputPath)
 
         val patcher = app.revanced.patcher.Patcher(
             inputFile, cacheDirectory, patchResources
         )
+
+        if (signatureCheck) {
+            patcher.addPatchesFiltered()
+            Signature.checkSignatures(patcher)
+            return
+        }
+
+        val outputFile = File(outputPath)
 
         var adb: Adb? = null
         deploy?.let {
