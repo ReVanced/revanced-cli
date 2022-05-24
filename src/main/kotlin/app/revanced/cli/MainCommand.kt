@@ -87,11 +87,10 @@ internal object MainCommand : Runnable {
 
         Patcher.start(patcher)
 
-        if (clean) {
-            File(cacheDirectory).deleteRecursively()
-            outputFile.delete()
-        }
+        if (clean) File(cacheDirectory).deleteRecursively()
 
         adb?.deploy()
+      
+        if (clean) outputFile.delete()
     }
 }

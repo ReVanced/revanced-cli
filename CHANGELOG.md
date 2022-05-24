@@ -1,3 +1,10 @@
+## [1.1.2](https://github.com/revanced/revanced-cli/compare/v1.1.1...v1.1.2) (2022-05-22)
+
+
+### Bug Fixes
+
+* delete `outputFile` after deploying ([329f8a3](https://github.com/revanced/revanced-cli/commit/329f8a383fe52f4c2a66075d893c6599d3550bee))
+
 ## [1.1.1](https://github.com/revanced/revanced-cli/compare/v1.1.0...v1.1.1) (2022-05-22)
 
 
