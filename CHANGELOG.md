@@ -1,3 +1,10 @@
+## [1.1.3](https://github.com/revanced/revanced-cli/compare/v1.1.2...v1.1.3) (2022-05-25)
+
+
+### Bug Fixes
+
+* only accept directories when looking for files in resource patch ([c76da7e](https://github.com/revanced/revanced-cli/commit/c76da7e5ffa208860eea008dad358e4e3bb3d735))
+
 ## [1.1.2](https://github.com/revanced/revanced-cli/compare/v1.1.1...v1.1.2) (2022-05-22)
 
 
