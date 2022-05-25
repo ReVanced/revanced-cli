@@ -7,7 +7,7 @@ import app.revanced.patcher.annotation.Name
 import app.revanced.patcher.data.base.Data
 import app.revanced.patcher.extensions.findAnnotationRecursively
 import app.revanced.patcher.patch.base.Patch
-import app.revanced.patcher.util.patch.PatchLoader
+import app.revanced.patcher.util.patch.implementation.JarPatchBundle
 
 fun Patcher.addPatchesFiltered(
     packageCompatibilityFilter: Boolean = true,
@@ -19,7 +19,7 @@ fun Patcher.addPatchesFiltered(
 
     MainCommand.patchBundles.forEach { bundle ->
         val includedPatches = mutableListOf<Patch<Data>>()
-        PatchLoader.loadFromFile(bundle).forEach patch@{ p ->
+        JarPatchBundle(bundle).loadPatches().forEach patch@{ p ->
             val patch = p.getDeclaredConstructor().newInstance()
 
             val compatibilityAnnotation = patch.javaClass.findAnnotationRecursively(Compatibility::class.java)
@@ -41,13 +41,13 @@ fun Patcher.addPatchesFiltered(
                 }
 
 
-                for (compatiblePackage in compatibilityAnnotation.compatiblePackages) {
+                compatibilityAnnotation.compatiblePackages.forEach { compatiblePackage ->
                     if (packageCompatibilityFilter && compatiblePackage.name != packageName) {
                         println("$prefix: Package name not matching ${compatiblePackage.name}.")
                         return@patch
                     }
 
-                    if (!packageVersionCompatibilityFilter || compatiblePackage.versions.any { it == packageVersion }) continue
+                    if (!packageVersionCompatibilityFilter || compatiblePackage.versions.any { it == packageVersion }) return@patch
                     println("$prefix: Unsupported version.")
                     return@patch
                 }
@@ -61,8 +61,13 @@ fun Patcher.addPatchesFiltered(
 }
 
 fun Patcher.applyPatchesPrint() {
-    for ((patch, result) in this.applyPatches()) {
-        println("[${if (result.isFailure) "error" else "success"}] $patch")
+    this.applyPatches().forEach { (patch, result) ->
+        if (result.isSuccess) {
+            println("[success] $patch")
+            return@forEach
+        }
+        println("[error] $patch:")
+        result.exceptionOrNull()!!.printStackTrace()
     }
 }
 

@@ -2,7 +2,7 @@ package app.revanced.cli
 
 import app.revanced.patcher.annotation.Name
 import app.revanced.patcher.extensions.findAnnotationRecursively
-import app.revanced.patcher.util.patch.PatchLoader
+import app.revanced.patcher.util.patch.implementation.JarPatchBundle
 import app.revanced.utils.adb.Adb
 import app.revanced.utils.patcher.addPatchesFiltered
 import app.revanced.utils.signature.Signature
@@ -20,7 +20,7 @@ internal object MainCommand : Runnable {
     internal var includedPatches = arrayOf<String>()
 
     @Option(names = ["-p", "--patches"], description = ["One or more bundles of patches"])
-    internal var patchBundles = arrayOf<File>()
+    internal var patchBundles = arrayOf<String>()
 
     @Option(names = ["-t", "--temp-dir"], description = ["Temporal resource cache directory"], required = true)
     internal lateinit var cacheDirectory: String
@@ -54,8 +54,8 @@ internal object MainCommand : Runnable {
 
     override fun run() {
         if (listOnly) {
-            for (patchBundle in patchBundles)
-                for (it in PatchLoader.loadFromFile(patchBundle))
+            for (patchBundlePath in patchBundles)
+                for (it in JarPatchBundle(patchBundlePath).loadPatches())
                     println(
                         "[available] ${
                             it.javaClass.findAnnotationRecursively(
@@ -90,7 +90,7 @@ internal object MainCommand : Runnable {
         if (clean) File(cacheDirectory).deleteRecursively()
 
         adb?.deploy()
-      
+
         if (clean) outputFile.delete()
     }
 }
