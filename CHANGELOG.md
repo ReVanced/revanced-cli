@@ -1,3 +1,10 @@
+## [1.1.4](https://github.com/revanced/revanced-cli/compare/v1.1.3...v1.1.4) (2022-05-26)
+
+
+### Bug Fixes
+
+* migrate from `PatchLoader.load(...)` to `JarPatchBundle(...).loadPatches()` ([cabd32f](https://github.com/revanced/revanced-cli/commit/cabd32fda41d32616a61ae450c60e1ee7c35bc59))
+
 ## [1.1.3](https://github.com/revanced/revanced-cli/compare/v1.1.2...v1.1.3) (2022-05-25)
 
 
