@@ -24,8 +24,8 @@ repositories {
 
 dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib:1.6.21")
-    implementation("app.revanced:revanced-patcher:+")
-    implementation("app.revanced:revanced-patches:+")
+    implementation("app.revanced:revanced-patcher:1.0.0-dev.16")
+    implementation("app.revanced:revanced-patches:1.0.0-dev.11")
 
     implementation("info.picocli:picocli:4.6.3")
 
