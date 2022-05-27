@@ -24,7 +24,7 @@ fun Patcher.addPatchesFiltered(
 
             val compatibilityAnnotation = patch.javaClass.findAnnotationRecursively(Compatibility::class.java)
 
-            val patchName = patch.javaClass.findAnnotationRecursively(Name::class.java)?.name ?: Name::class.java.name
+            val patchName = patch.javaClass.findAnnotationRecursively(Name::class.java)?.name ?: patch.javaClass.name
 
             val prefix = "[skipped] $patchName"
 
@@ -47,9 +47,10 @@ fun Patcher.addPatchesFiltered(
                         return@patch
                     }
 
-                    if (!packageVersionCompatibilityFilter || compatiblePackage.versions.any { it == packageVersion }) return@patch
-                    println("$prefix: Unsupported version.")
-                    return@patch
+                    if (packageVersionCompatibilityFilter && !compatiblePackage.versions.any { it == packageVersion }) {
+                        println("$prefix: Unsupported version.")
+                        return@patch
+                    }
                 }
             }
 

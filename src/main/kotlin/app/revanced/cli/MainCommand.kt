@@ -58,9 +58,9 @@ internal object MainCommand : Runnable {
                 for (it in JarPatchBundle(patchBundlePath).loadPatches())
                     println(
                         "[available] ${
-                            it.javaClass.findAnnotationRecursively(
+                            it.findAnnotationRecursively(
                                 Name::class.java
-                            )?.name ?: Name::class.java.name
+                            )?.name ?: it::class.java.name
                         }"
                     )
             return
