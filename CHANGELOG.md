@@ -1,3 +1,10 @@
+## [1.1.5](https://github.com/revanced/revanced-cli/compare/v1.1.4...v1.1.5) (2022-05-27)
+
+
+### Bug Fixes
+
+* invalid code flow when adding patches ([206f202](https://github.com/revanced/revanced-cli/commit/206f2029d7498b6474c16a47cbe451c170fdd31f))
+
 ## [1.1.4](https://github.com/revanced/revanced-cli/compare/v1.1.3...v1.1.4) (2022-05-26)
 
 
