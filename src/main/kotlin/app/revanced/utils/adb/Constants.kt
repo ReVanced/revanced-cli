@@ -50,10 +50,10 @@ internal object Constants {
     internal val CONTENT_MOUNT_SCRIPT =
         """
             #!/system/bin/sh
-            while [ "${'$'}(getprop sys.boot_completed | tr -d '\r')" != "1" ]; do /data/adb/magisk/busybox sleep 1; done
+            while [ "${'$'}(getprop sys.boot_completed | /data/adb/magisk/busybox tr -d '\r')" != "1" ]; do /data/adb/magisk/busybox sleep 1; done
             
             base_path="$PATH_REVANCED_APP"
-            stock_path=${'$'}( pm path $PLACEHOLDER | grep base | sed 's/package://g' )
+            stock_path=${'$'}( pm path $PLACEHOLDER | /data/adb/magisk/busybox grep base | /data/adb/magisk/busybox sed 's/package://g' )
             /data/adb/magisk/busybox mount -o bind ${'$'}base_path ${'$'}stock_path
         """.trimIndent()
 }
