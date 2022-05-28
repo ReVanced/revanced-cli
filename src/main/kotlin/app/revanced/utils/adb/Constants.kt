@@ -42,18 +42,18 @@ internal object Constants {
         """
             #!/system/bin/sh
             
-            stock_path=${'$'}( pm path $PLACEHOLDER | grep base | sed 's/package://g' )
-            umount -l ${'$'}stock_path
+            stock_path=${'$'}( pm path $PLACEHOLDER | /data/adb/magisk/busybox grep base | /data/adb/magisk/busybox sed 's/package://g' )
+            /data/adb/magisk/busybox umount -l ${'$'}stock_path
         """.trimIndent()
 
     // mount script
     internal val CONTENT_MOUNT_SCRIPT =
         """
             #!/system/bin/sh
-            while [ "${'$'}(getprop sys.boot_completed | tr -d '\r')" != "1" ]; do sleep 1; done
+            while [ "${'$'}(getprop sys.boot_completed | tr -d '\r')" != "1" ]; do /data/adb/magisk/busybox sleep 1; done
             
             base_path="$PATH_REVANCED_APP"
             stock_path=${'$'}( pm path $PLACEHOLDER | grep base | sed 's/package://g' )
-            mount -o bind ${'$'}base_path ${'$'}stock_path
+            /data/adb/magisk/busybox mount -o bind ${'$'}base_path ${'$'}stock_path
         """.trimIndent()
 }
