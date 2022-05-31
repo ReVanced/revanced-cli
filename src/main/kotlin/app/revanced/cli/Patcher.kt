@@ -31,7 +31,8 @@ internal class Patcher {
             }
 
             if (MainCommand.patchResources) {
-                for (file in File(MainCommand.cacheDirectory).resolve("build/").listFiles(FileFilter { it.isDirectory })?.first()?.listFiles()!!) {
+                for (file in File(MainCommand.cacheDirectory).resolve("build/").listFiles(FileFilter { it.isDirectory })
+                    ?.first()?.listFiles()!!) {
                     if (!file.isDirectory) {
                         zipFileSystem.replaceFile(file.name, file.readBytes())
                         continue

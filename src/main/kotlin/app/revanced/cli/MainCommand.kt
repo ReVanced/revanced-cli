@@ -1,7 +1,7 @@
 package app.revanced.cli
 
+import app.revanced.patcher.PatcherOptions
 import app.revanced.patcher.annotation.Name
-import app.revanced.patcher.extensions.findAnnotationRecursively
 import app.revanced.patcher.util.patch.implementation.JarPatchBundle
 import app.revanced.utils.adb.Adb
 import app.revanced.utils.patcher.addPatchesFiltered
@@ -54,21 +54,18 @@ internal object MainCommand : Runnable {
 
     override fun run() {
         if (listOnly) {
-            for (patchBundlePath in patchBundles)
-                for (it in JarPatchBundle(patchBundlePath).loadPatches())
-                    println(
-                        "[available] ${
-                            it.findAnnotationRecursively(
-                                Name::class.java
-                            )?.name ?: it::class.java.name
-                        }"
-                    )
+            for (patchBundlePath in patchBundles) for (it in JarPatchBundle(patchBundlePath).loadPatches()) {
+
+                // TODO: adjust extension methods to be able to do this
+                val name = (it.annotations.find { it is Name } as? Name)?.name ?: it.simpleName
+                println(
+                    "[available] $name"
+                )
+            }
             return
         }
 
-        val patcher = app.revanced.patcher.Patcher(
-            inputFile, cacheDirectory, patchResources
-        )
+        val patcher = app.revanced.patcher.Patcher(PatcherOptions(inputFile, cacheDirectory, patchResources))
 
         if (signatureCheck) {
             patcher.addPatchesFiltered()
