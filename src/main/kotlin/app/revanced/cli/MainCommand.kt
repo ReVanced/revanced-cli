@@ -22,11 +22,11 @@ internal object MainCommand : Runnable {
     @Option(names = ["-p", "--patches"], description = ["One or more bundles of patches"])
     internal var patchBundles = arrayOf<String>()
 
-    @Option(names = ["-t", "--temp-dir"], description = ["Temporal resource cache directory"], required = true)
-    internal lateinit var cacheDirectory: String
+    @Option(names = ["-t", "--temp-dir"], description = ["Temporal resource cache directory"])
+    internal var cacheDirectory = "revanced-cache"
 
-    @Option(names = ["-r", "--resource-patcher"], description = ["Enable patching resources"])
-    internal var patchResources: Boolean = false
+    @Option(names = ["-r", "--resource-patcher"], description = ["Disable patching resources"])
+    internal var disableResourcePatching: Boolean = false
 
     @Option(
         names = ["-c", "--clean"],
@@ -65,7 +65,7 @@ internal object MainCommand : Runnable {
             return
         }
 
-        val patcher = app.revanced.patcher.Patcher(PatcherOptions(inputFile, cacheDirectory, patchResources))
+        val patcher = app.revanced.patcher.Patcher(PatcherOptions(inputFile, cacheDirectory, !disableResourcePatching))
 
         if (signatureCheck) {
             patcher.addPatchesFiltered()

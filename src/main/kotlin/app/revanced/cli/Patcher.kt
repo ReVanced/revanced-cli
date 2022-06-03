@@ -30,7 +30,7 @@ internal class Patcher {
                 zipFileSystem.replaceFile(name, data.data)
             }
 
-            if (MainCommand.patchResources) {
+            if (!MainCommand.disableResourcePatching) {
                 for (file in File(MainCommand.cacheDirectory).resolve("build/").listFiles(FileFilter { it.isDirectory })
                     ?.first()?.listFiles()!!) {
                     if (!file.isDirectory) {
