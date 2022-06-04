@@ -1,3 +1,10 @@
+# [1.2.0-dev.1](https://github.com/revanced/revanced-cli/compare/v1.1.6-dev.1...v1.2.0-dev.1) (2022-06-04)
+
+
+### Features
+
+* add path for `cacheDirectory` and enable resource patching by default ([54c0a03](https://github.com/revanced/revanced-cli/commit/54c0a03d44c8d1b586bc487ee1ca71859d6f0b57))
+
 ## [1.1.6-dev.1](https://github.com/revanced/revanced-cli/compare/v1.1.5...v1.1.6-dev.1) (2022-05-31)
 
 
