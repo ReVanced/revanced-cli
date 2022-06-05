@@ -1,3 +1,16 @@
+# [1.2.0](https://github.com/revanced/revanced-cli/compare/v1.1.5...v1.2.0) (2022-06-05)
+
+
+### Bug Fixes
+
+* migrate to latest patcher api changes ([ace70e4](https://github.com/revanced/revanced-cli/commit/ace70e417fdf280c7630a5a89a773879fd240e96))
+
+
+### Features
+
+* add path for `cacheDirectory` and enable resource patching by default ([54c0a03](https://github.com/revanced/revanced-cli/commit/54c0a03d44c8d1b586bc487ee1ca71859d6f0b57))
+* debugging option ([1b645c6](https://github.com/revanced/revanced-cli/commit/1b645c67db58eb4d49b5290fd247507c9b43a9c6))
+
 # [1.2.0-dev.2](https://github.com/revanced/revanced-cli/compare/v1.2.0-dev.1...v1.2.0-dev.2) (2022-06-05)
 
 
