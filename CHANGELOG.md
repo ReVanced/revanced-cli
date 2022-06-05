@@ -1,3 +1,10 @@
+# [1.2.0-dev.2](https://github.com/revanced/revanced-cli/compare/v1.2.0-dev.1...v1.2.0-dev.2) (2022-06-05)
+
+
+### Features
+
+* debugging option ([1b645c6](https://github.com/revanced/revanced-cli/commit/1b645c67db58eb4d49b5290fd247507c9b43a9c6))
+
 # [1.2.0-dev.1](https://github.com/revanced/revanced-cli/compare/v1.1.6-dev.1...v1.2.0-dev.1) (2022-06-04)
 
 
