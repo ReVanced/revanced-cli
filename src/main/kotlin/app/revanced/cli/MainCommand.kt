@@ -1,7 +1,7 @@
 package app.revanced.cli
 
+import app.revanced.patcher.PatcherOptions
 import app.revanced.patcher.annotation.Name
-import app.revanced.patcher.extensions.findAnnotationRecursively
 import app.revanced.patcher.util.patch.implementation.JarPatchBundle
 import app.revanced.utils.adb.Adb
 import app.revanced.utils.patcher.addPatchesFiltered
@@ -22,11 +22,11 @@ internal object MainCommand : Runnable {
     @Option(names = ["-p", "--patches"], description = ["One or more bundles of patches"])
     internal var patchBundles = arrayOf<String>()
 
-    @Option(names = ["-t", "--temp-dir"], description = ["Temporal resource cache directory"], required = true)
-    internal lateinit var cacheDirectory: String
+    @Option(names = ["-t", "--temp-dir"], description = ["Temporal resource cache directory"])
+    internal var cacheDirectory = "revanced-cache"
 
-    @Option(names = ["-r", "--resource-patcher"], description = ["Enable patching resources"])
-    internal var patchResources: Boolean = false
+    @Option(names = ["-r", "--resource-patcher"], description = ["Disable patching resources"])
+    internal var disableResourcePatching: Boolean = false
 
     @Option(
         names = ["-c", "--clean"],
@@ -52,23 +52,23 @@ internal object MainCommand : Runnable {
     @Option(names = ["-d", "--deploy-on"], description = ["If specified, deploy to adb device with given name"])
     internal var deploy: String? = null
 
+    @Option(names = ["-b", "--debugging"], description = ["Disable patch version compatibility"])
+    internal var debugging: Boolean = false
+
     override fun run() {
         if (listOnly) {
-            for (patchBundlePath in patchBundles)
-                for (it in JarPatchBundle(patchBundlePath).loadPatches())
-                    println(
-                        "[available] ${
-                            it.findAnnotationRecursively(
-                                Name::class.java
-                            )?.name ?: it::class.java.name
-                        }"
-                    )
+            for (patchBundlePath in patchBundles) for (it in JarPatchBundle(patchBundlePath).loadPatches()) {
+
+                // TODO: adjust extension methods to be able to do this
+                val name = (it.annotations.find { it is Name } as? Name)?.name ?: it.simpleName
+                println(
+                    "[available] $name"
+                )
+            }
             return
         }
 
-        val patcher = app.revanced.patcher.Patcher(
-            inputFile, cacheDirectory, patchResources
-        )
+        val patcher = app.revanced.patcher.Patcher(PatcherOptions(inputFile, cacheDirectory, !disableResourcePatching))
 
         if (signatureCheck) {
             patcher.addPatchesFiltered()

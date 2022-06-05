@@ -2,29 +2,23 @@ package app.revanced.utils.patcher
 
 import app.revanced.cli.MainCommand
 import app.revanced.patcher.Patcher
-import app.revanced.patcher.annotation.Compatibility
-import app.revanced.patcher.annotation.Name
 import app.revanced.patcher.data.base.Data
-import app.revanced.patcher.extensions.findAnnotationRecursively
+import app.revanced.patcher.extensions.PatchExtensions.compatiblePackages
+import app.revanced.patcher.extensions.PatchExtensions.patchName
 import app.revanced.patcher.patch.base.Patch
 import app.revanced.patcher.util.patch.implementation.JarPatchBundle
 
 fun Patcher.addPatchesFiltered(
-    packageCompatibilityFilter: Boolean = true,
-    packageVersionCompatibilityFilter: Boolean = true,
     includeFilter: Boolean = false
 ) {
     val packageName = this.packageName
     val packageVersion = this.packageVersion
 
     MainCommand.patchBundles.forEach { bundle ->
-        val includedPatches = mutableListOf<Patch<Data>>()
-        JarPatchBundle(bundle).loadPatches().forEach patch@{ p ->
-            val patch = p.getDeclaredConstructor().newInstance()
-
-            val compatibilityAnnotation = patch.javaClass.findAnnotationRecursively(Compatibility::class.java)
-
-            val patchName = patch.javaClass.findAnnotationRecursively(Name::class.java)?.name ?: patch.javaClass.name
+        val includedPatches = mutableListOf<Class<out Patch<Data>>>()
+        JarPatchBundle(bundle).loadPatches().forEach patch@{ patch ->
+            val compatiblePackages = patch.compatiblePackages
+            val patchName = patch.patchName
 
             val prefix = "[skipped] $patchName"
 
@@ -33,24 +27,16 @@ fun Patcher.addPatchesFiltered(
                 return@patch
             }
 
-            if (packageVersionCompatibilityFilter || packageCompatibilityFilter) {
-
-                if (compatibilityAnnotation == null) {
-                    println("$prefix: Missing compatibility annotation.")
+            if (compatiblePackages == null) println("$prefix: Missing compatibility annotation. Continuing.")
+            else compatiblePackages.forEach { compatiblePackage ->
+                if (compatiblePackage.name != packageName) {
+                    println("$prefix: Package name not matching ${compatiblePackage.name}.")
                     return@patch
                 }
 
-
-                compatibilityAnnotation.compatiblePackages.forEach { compatiblePackage ->
-                    if (packageCompatibilityFilter && compatiblePackage.name != packageName) {
-                        println("$prefix: Package name not matching ${compatiblePackage.name}.")
-                        return@patch
-                    }
-
-                    if (packageVersionCompatibilityFilter && !compatiblePackage.versions.any { it == packageVersion }) {
-                        println("$prefix: Unsupported version.")
-                        return@patch
-                    }
+                if (!(MainCommand.debugging || compatiblePackage.versions.any { it == packageVersion })) {
+                    println("$prefix: Unsupported version.")
+                    return@patch
                 }
             }
 
