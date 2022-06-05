@@ -34,7 +34,7 @@ fun Patcher.addPatchesFiltered(
                     return@patch
                 }
 
-                if (!compatiblePackage.versions.any { it == packageVersion }) {
+                if (!(MainCommand.debugging || compatiblePackage.versions.any { it == packageVersion })) {
                     println("$prefix: Unsupported version.")
                     return@patch
                 }

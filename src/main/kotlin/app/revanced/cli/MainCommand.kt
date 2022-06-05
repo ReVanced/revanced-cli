@@ -52,6 +52,9 @@ internal object MainCommand : Runnable {
     @Option(names = ["-d", "--deploy-on"], description = ["If specified, deploy to adb device with given name"])
     internal var deploy: String? = null
 
+    @Option(names = ["-b", "--debugging"], description = ["Disable patch version compatibility"])
+    internal var debugging: Boolean = false
+
     override fun run() {
         if (listOnly) {
             for (patchBundlePath in patchBundles) for (it in JarPatchBundle(patchBundlePath).loadPatches()) {
