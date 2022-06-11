@@ -63,9 +63,6 @@ internal object MainCommand : Runnable {
     )
     var clean: Boolean = false
 
-    @Option(names = ["--sign"], description = ["Sign the apk file"])
-    var signApk: Boolean = false
-
     override fun run() {
         if (listOnly) {
             for (patchBundlePath in patchBundles) for (patch in JarPatchBundle(patchBundlePath).loadPatches()) {
@@ -82,11 +79,11 @@ internal object MainCommand : Runnable {
             Adb(outputFile, patcher.data.packageMetadata.packageName, deploy!!, install)
         }
 
-        val patchedFile = if (signApk) File(cacheDirectory).resolve("raw.apk") else outputFile
+        val patchedFile = if (install) File(cacheDirectory).resolve("raw.apk") else outputFile
 
         Patcher.start(patcher, patchedFile)
 
-        if (signApk) {
+        if (install) {
             Signing.start(
                 patchedFile,
                 outputFile,

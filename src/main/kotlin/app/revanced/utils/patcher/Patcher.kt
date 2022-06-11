@@ -6,7 +6,7 @@ import app.revanced.cli.command.MainCommand.patchBundles
 import app.revanced.patcher.Patcher
 import app.revanced.patcher.data.base.Data
 import app.revanced.patcher.extensions.PatchExtensions.compatiblePackages
-import app.revanced.patcher.extensions.PatchExtensions.excludeByDefault
+import app.revanced.patcher.extensions.PatchExtensions.include
 import app.revanced.patcher.extensions.PatchExtensions.patchName
 import app.revanced.patcher.patch.base.Patch
 import app.revanced.patcher.util.patch.implementation.JarPatchBundle
@@ -25,8 +25,13 @@ fun Patcher.addPatchesFiltered(
 
             val prefix = "[skipped] $patchName"
 
-            if ((includeFilter && !MainCommand.includedPatches.contains(patchName)) || patch.excludeByDefault) {
-                println(prefix)
+            if (includeFilter) {
+                if (!MainCommand.includedPatches.contains(patchName)) {
+                    println("$prefix: Explicitly excluded.")
+                    return@patch
+                }
+            } else if (!patch.include) {
+                println("$prefix: Implicitly excluded.")
                 return@patch
             }
 
