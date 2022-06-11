@@ -28,7 +28,7 @@ internal object Constants {
     internal const val PATH_UMOUNT = "/data/adb/post-fs-data.d/un$NAME_MOUNT_SCRIPT"
 
     // move to revanced apk path & set permissions
-    internal const val COMMAND_INSTALL_APK =
+    internal const val COMMAND_PREPARE_MOUNT_APK =
         "base_path=\"$PATH_REVANCED_APP\" && mv $PATH_INIT_PUSH ${'$'}base_path && chmod 644 ${'$'}base_path && chown system:system ${'$'}base_path && chcon u:object_r:apk_data_file:s0  ${'$'}base_path"
 
     // install mount script & set permissions
@@ -36,6 +36,9 @@ internal object Constants {
 
     // install umount script & set permissions
     internal const val COMMAND_INSTALL_UMOUNT = "mv $PATH_INIT_PUSH $PATH_UMOUNT && $COMMAND_CHMOD_MOUNT $PATH_UMOUNT"
+
+    // install apk & cleanup
+    internal const val COMMAND_INSTALL_APK = "install $PLACEHOLDER"
 
     // unmount script
     internal val CONTENT_UMOUNT_SCRIPT =
