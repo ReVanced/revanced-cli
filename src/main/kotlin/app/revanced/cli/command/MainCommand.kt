@@ -83,6 +83,8 @@ internal object MainCommand : Runnable {
 
         Patcher.start(patcher, patchedFile)
 
+        println("[aligning & signing]")
+
         if (install) {
             Signing.start(
                 patchedFile,
