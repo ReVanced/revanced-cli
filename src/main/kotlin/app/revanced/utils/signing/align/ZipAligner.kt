@@ -2,6 +2,7 @@ package app.revanced.utils.signing.align
 
 import app.revanced.utils.signing.align.stream.MultiOutputStream
 import app.revanced.utils.signing.align.stream.PeekingFakeStream
+import java.io.BufferedOutputStream
 import java.io.File
 import java.util.*
 import java.util.zip.ZipEntry
@@ -18,7 +19,7 @@ internal object ZipAligner {
         val peekingFakeStream = PeekingFakeStream()
         val fakeOutputStream = ZipOutputStream(peekingFakeStream)
         // real
-        val zipOutputStream = ZipOutputStream(output.outputStream())
+        val zipOutputStream = ZipOutputStream(BufferedOutputStream(output.outputStream()))
 
         val multiOutputStream = MultiOutputStream(
             listOf(
@@ -40,8 +41,6 @@ internal object ZipAligner {
                 val newOffset = fileOffset + bias
                 padding = ((alignment - (newOffset % alignment)) % alignment).toInt()
 
-                // fake, used to add the padding, because we add it to real as well in the extra field
-                peekingFakeStream.seek(padding.toLong())
                 // real
                 entry.extra = if (entry.extra == null) ByteArray(padding)
                 else Arrays.copyOf(entry.extra, entry.extra.size + padding)

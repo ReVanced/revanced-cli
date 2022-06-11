@@ -2,16 +2,10 @@ package app.revanced.utils.signing.align.stream
 
 import java.io.OutputStream
 
-internal class PeekingFakeStream :  OutputStream() {
+internal class PeekingFakeStream : OutputStream() {
     private var numberOfBytes: Long = 0
 
-    fun seek(n: Long) {
-        numberOfBytes += n
-    }
-
-    fun peek(): Long {
-        return numberOfBytes
-    }
+    fun peek() = numberOfBytes
 
     override fun write(b: Int) {
         numberOfBytes++
@@ -22,6 +16,6 @@ internal class PeekingFakeStream :  OutputStream() {
     }
 
     override fun write(b: ByteArray, offset: Int, len: Int) {
-        numberOfBytes += len - offset
+        numberOfBytes += len
     }
 }
