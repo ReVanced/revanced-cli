@@ -1,3 +1,21 @@
+# [1.3.0](https://github.com/revanced/revanced-cli/compare/v1.2.0...v1.3.0) (2022-06-11)
+
+
+### Bug Fixes
+
+* `Main-Class` attribute pointing to wrong method ([6e82418](https://github.com/revanced/revanced-cli/commit/6e824189586bfa4f8aaac4a5f33aed8d59261115))
+* `ZipAligner` not correctly calculating the file offset ([2975a47](https://github.com/revanced/revanced-cli/commit/2975a47d0f682a92da7b3ed455f5078298b0cbaa))
+* broken control flow of `includeFilter` ([a0644c7](https://github.com/revanced/revanced-cli/commit/a0644c7045344e6a6c324392cb8f507a6d9dbfad))
+* check for root even though when not needed ([0d7581a](https://github.com/revanced/revanced-cli/commit/0d7581ad750525e59bd6c019d987c640588ead62))
+* overwrite output file ([2bfbbc2](https://github.com/revanced/revanced-cli/commit/2bfbbc2eb9057e66a362d37973a108baf44edf7a))
+* resource patcher ([9da4f70](https://github.com/revanced/revanced-cli/commit/9da4f707ac62d11993021871ef39f4f1709ba89d))
+* sign the aligned file instead of the input file ([22d2535](https://github.com/revanced/revanced-cli/commit/22d2535af8b3ea8fa58b6beb2938d240afa0a17d))
+
+
+### Features
+
+* support for `--install` ([d1ceab4](https://github.com/revanced/revanced-cli/commit/d1ceab45c89901f79d46c62f03186502021afb26))
+
 # [1.2.0](https://github.com/revanced/revanced-cli/compare/v1.1.5...v1.2.0) (2022-06-05)
 
 
