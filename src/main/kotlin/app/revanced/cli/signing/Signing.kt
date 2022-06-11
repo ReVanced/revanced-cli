@@ -19,6 +19,6 @@ object Signing {
         Signer(cn, password).signApk(alignedOutput, signedOutput)
 
         // afterwards copy over the file to the output
-        signedOutput.copyTo(outputFile)
+        signedOutput.copyTo(outputFile, true)
     }
 }
