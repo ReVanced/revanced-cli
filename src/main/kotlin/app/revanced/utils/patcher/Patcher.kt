@@ -1,9 +1,12 @@
 package app.revanced.utils.patcher
 
-import app.revanced.cli.MainCommand
+import app.revanced.cli.command.MainCommand
+import app.revanced.cli.command.MainCommand.debugging
+import app.revanced.cli.command.MainCommand.patchBundles
 import app.revanced.patcher.Patcher
 import app.revanced.patcher.data.base.Data
 import app.revanced.patcher.extensions.PatchExtensions.compatiblePackages
+import app.revanced.patcher.extensions.PatchExtensions.include
 import app.revanced.patcher.extensions.PatchExtensions.patchName
 import app.revanced.patcher.patch.base.Patch
 import app.revanced.patcher.util.patch.implementation.JarPatchBundle
@@ -11,10 +14,10 @@ import app.revanced.patcher.util.patch.implementation.JarPatchBundle
 fun Patcher.addPatchesFiltered(
     includeFilter: Boolean = false
 ) {
-    val packageName = this.packageName
-    val packageVersion = this.packageVersion
+    val packageName = this.data.packageMetadata.packageName
+    val packageVersion = this.data.packageMetadata.packageVersion
 
-    MainCommand.patchBundles.forEach { bundle ->
+    patchBundles.forEach { bundle ->
         val includedPatches = mutableListOf<Class<out Patch<Data>>>()
         JarPatchBundle(bundle).loadPatches().forEach patch@{ patch ->
             val compatiblePackages = patch.compatiblePackages
@@ -22,8 +25,13 @@ fun Patcher.addPatchesFiltered(
 
             val prefix = "[skipped] $patchName"
 
-            if (includeFilter && !MainCommand.includedPatches.contains(patchName)) {
-                println(prefix)
+            if (includeFilter) {
+                if (!MainCommand.includedPatches.contains(patchName)) {
+                    println("$prefix: Explicitly excluded.")
+                    return@patch
+                }
+            } else if (!patch.include) {
+                println("$prefix: Implicitly excluded.")
                 return@patch
             }
 
@@ -34,7 +42,7 @@ fun Patcher.addPatchesFiltered(
                     return@patch
                 }
 
-                if (!(MainCommand.debugging || compatiblePackage.versions.any { it == packageVersion })) {
+                if (!(debugging || compatiblePackage.versions.any { it == packageVersion })) {
                     println("$prefix: Unsupported version.")
                     return@patch
                 }
@@ -47,7 +55,7 @@ fun Patcher.addPatchesFiltered(
     }
 }
 
-fun Patcher.applyPatchesPrint() {
+fun Patcher.applyPatchesVerbose() {
     this.applyPatches().forEach { (patch, result) ->
         if (result.isSuccess) {
             println("[success] $patch")

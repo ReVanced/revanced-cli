@@ -9,6 +9,7 @@ group = "app.revanced"
 
 repositories {
     mavenCentral()
+    google()
     mavenLocal()
     maven {
         url = uri("https://maven.pkg.github.com/revanced/multidexlib2")
@@ -24,11 +25,11 @@ repositories {
 
 dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib:1.6.21")
-    implementation("app.revanced:revanced-patcher:1.0.0")
+    implementation("app.revanced:revanced-patcher:1.1.0")
 
     implementation("info.picocli:picocli:4.6.3")
-
-    implementation("com.github.li-wjohnson:jadb:master-SNAPSHOT") // using a fork instead.
+    implementation("com.android.tools.build:apksig:7.2.1")
+    implementation("com.github.revanced:jadb:master-SNAPSHOT") // updated fork
     implementation("org.bouncycastle:bcpkix-jdk15on:1.70")
     implementation("org.jetbrains.kotlin:kotlin-reflect:1.6.21")
 }
@@ -44,7 +45,7 @@ tasks {
     }
     shadowJar {
         manifest {
-            attributes("Main-Class" to "app.revanced.cli.MainKt")
+            attributes("Main-Class" to "app.revanced.cli.main.MainKt")
             attributes("Implementation-Title" to project.name)
             attributes("Implementation-Version" to project.version)
         }

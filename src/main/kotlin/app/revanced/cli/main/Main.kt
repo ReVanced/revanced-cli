@@ -1,5 +1,6 @@
-package app.revanced.cli
+package app.revanced.cli.main
 
+import app.revanced.cli.command.MainCommand
 import picocli.CommandLine
 
 internal fun main(args: Array<String>) {

@@ -2,13 +2,15 @@ package app.revanced.utils.adb
 
 import se.vidstige.jadb.JadbConnection
 import se.vidstige.jadb.JadbDevice
+import se.vidstige.jadb.managers.PackageManager
 import java.io.File
 import java.util.concurrent.Executors
 
 internal class Adb(
-    private val apk: File,
+    private val file: File,
     private val packageName: String,
     deviceName: String,
+    private val modeInstall: Boolean = false,
     private val logging: Boolean = true
 ) {
     private val device: JadbDevice
@@ -17,49 +19,54 @@ internal class Adb(
         device = JadbConnection().devices.find { it.serial == deviceName }
             ?: throw IllegalArgumentException("No such device with name $deviceName")
 
-        if (device.run("su -h", false) != 0)
+        if (!modeInstall && device.run("su -h", false) != 0)
             throw IllegalArgumentException("Root required on $deviceName. Deploying failed.")
     }
 
-    private fun String.replacePlaceholder(): String {
-        return this.replace(Constants.PLACEHOLDER, packageName)
+    private fun String.replacePlaceholder(with: String? = null): String {
+        return this.replace(Constants.PLACEHOLDER, with ?: packageName)
     }
 
     internal fun deploy() {
-        // create revanced path
-        device.run("${Constants.COMMAND_CREATE_DIR} ${Constants.PATH_REVANCED}")
+        if (modeInstall) {
+            PackageManager(device).install(file)
+        } else {
+            // push patched file
+            device.copy(Constants.PATH_INIT_PUSH, file)
 
-        // push patched file
-        device.copy(Constants.PATH_INIT_PUSH, apk)
-        // install apk
-        device.run(Constants.COMMAND_INSTALL_APK.replacePlaceholder())
+            // create revanced path
+            device.run("${Constants.COMMAND_CREATE_DIR} ${Constants.PATH_REVANCED}")
 
-        // push mount script
-        device.createFile(
-            Constants.PATH_INIT_PUSH,
-            Constants.CONTENT_MOUNT_SCRIPT.replacePlaceholder()
-        )
-        // install mount script
-        device.run(Constants.COMMAND_INSTALL_MOUNT.replacePlaceholder())
+            // prepare mounting the apk
+            device.run(Constants.COMMAND_PREPARE_MOUNT_APK.replacePlaceholder())
 
-        // push umount script
-        device.createFile(
-            Constants.PATH_INIT_PUSH,
-            Constants.CONTENT_UMOUNT_SCRIPT.replacePlaceholder()
-        )
-        // install mount script
-        device.run(Constants.COMMAND_INSTALL_UMOUNT.replacePlaceholder())
+            // push mount script
+            device.createFile(
+                Constants.PATH_INIT_PUSH,
+                Constants.CONTENT_MOUNT_SCRIPT.replacePlaceholder()
+            )
+            // install mount script
+            device.run(Constants.COMMAND_INSTALL_MOUNT.replacePlaceholder())
 
-        // unmount the apk for sanity
-        device.run(Constants.PATH_UMOUNT.replacePlaceholder())
-        // mount the apk
-        device.run(Constants.PATH_MOUNT.replacePlaceholder())
+            // push umount script
+            device.createFile(
+                Constants.PATH_INIT_PUSH,
+                Constants.CONTENT_UMOUNT_SCRIPT.replacePlaceholder()
+            )
+            // install mount script
+            device.run(Constants.COMMAND_INSTALL_UMOUNT.replacePlaceholder())
 
-        // relaunch app
-        device.run(Constants.COMMAND_RESTART.replacePlaceholder())
+            // unmount the apk for sanity
+            device.run(Constants.PATH_UMOUNT.replacePlaceholder())
+            // mount the apk
+            device.run(Constants.PATH_MOUNT.replacePlaceholder())
 
-        // log the app
-        log()
+            // relaunch app
+            device.run(Constants.COMMAND_RESTART.replacePlaceholder())
+
+            // log the app
+            log()
+        }
     }
 
     private fun log() {
