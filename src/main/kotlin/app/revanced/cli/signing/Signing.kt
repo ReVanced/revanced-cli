@@ -7,17 +7,18 @@ import java.io.File
 
 object Signing {
     fun start(inputFile: File, outputFile: File, cn: String, password: String) {
-        // align & sign
         val cacheDirectory = File(cacheDirectory)
         val alignedOutput = cacheDirectory.resolve("aligned.apk")
         val signedOutput = cacheDirectory.resolve("signed.apk")
-        ZipAligner.align(inputFile, alignedOutput)
-        Signer(
-            cn,
-            password
-        ).signApk(inputFile, signedOutput)
 
-        // write to output
+        // align the inputFile and write to alignedOutput
+        ZipAligner.align(inputFile, alignedOutput)
+        // sign the alignedOutput and write to signedOutput
+        // the reason is, in case the signer fails
+        // it does not damage the output file
+        Signer(cn, password).signApk(alignedOutput, signedOutput)
+
+        // afterwards copy over the file to the output
         signedOutput.copyTo(outputFile)
     }
 }
