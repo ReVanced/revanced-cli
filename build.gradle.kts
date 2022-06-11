@@ -25,7 +25,7 @@ repositories {
 
 dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib:1.6.21")
-    implementation("app.revanced:revanced-patcher:1.0.0")
+    implementation("app.revanced:revanced-patcher:1.1.0")
 
     implementation("info.picocli:picocli:4.6.3")
     implementation("com.android.tools.build:apksig:7.2.1")
