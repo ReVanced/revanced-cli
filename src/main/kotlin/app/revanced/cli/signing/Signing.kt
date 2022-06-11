@@ -8,8 +8,8 @@ import java.io.File
 object Signing {
     fun start(inputFile: File, outputFile: File, cn: String, password: String) {
         val cacheDirectory = File(cacheDirectory)
-        val alignedOutput = cacheDirectory.resolve("aligned.apk")
-        val signedOutput = cacheDirectory.resolve("signed.apk")
+        val alignedOutput = cacheDirectory.resolve("${outputFile.nameWithoutExtension}_aligned.apk")
+        val signedOutput = cacheDirectory.resolve("${outputFile.nameWithoutExtension}_signed.apk")
 
         // align the inputFile and write to alignedOutput
         ZipAligner.align(inputFile, alignedOutput)

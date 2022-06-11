@@ -79,7 +79,7 @@ internal object MainCommand : Runnable {
             Adb(outputFile, patcher.data.packageMetadata.packageName, deploy!!, install)
         }
 
-        val patchedFile = if (install) File(cacheDirectory).resolve("raw.apk") else outputFile
+        val patchedFile = if (install) File(cacheDirectory).resolve("${outputFile.nameWithoutExtension}_raw.apk") else outputFile
 
         Patcher.start(patcher, patchedFile)
 
