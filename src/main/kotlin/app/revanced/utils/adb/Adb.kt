@@ -2,11 +2,12 @@ package app.revanced.utils.adb
 
 import se.vidstige.jadb.JadbConnection
 import se.vidstige.jadb.JadbDevice
+import se.vidstige.jadb.managers.PackageManager
 import java.io.File
 import java.util.concurrent.Executors
 
 internal class Adb(
-    private val apk: File,
+    private val file: File,
     private val packageName: String,
     deviceName: String,
     private val install: Boolean = false,
@@ -27,13 +28,11 @@ internal class Adb(
     }
 
     internal fun deploy() {
-
         if (install) {
-            TODO("support installing the apk")
-            device.run(Constants.COMMAND_INSTALL_APK.replacePlaceholder("\"$apk\""))
+            PackageManager(device).install(file)
         } else {
             // push patched file
-            device.copy(Constants.PATH_INIT_PUSH, apk)
+            device.copy(Constants.PATH_INIT_PUSH, file)
 
             // create revanced path
             device.run("${Constants.COMMAND_CREATE_DIR} ${Constants.PATH_REVANCED}")
@@ -61,13 +60,13 @@ internal class Adb(
             device.run(Constants.PATH_UMOUNT.replacePlaceholder())
             // mount the apk
             device.run(Constants.PATH_MOUNT.replacePlaceholder())
+
+            // relaunch app
+            device.run(Constants.COMMAND_RESTART.replacePlaceholder())
+
+            // log the app
+            log()
         }
-
-        // relaunch app
-        device.run(Constants.COMMAND_RESTART.replacePlaceholder())
-
-        // log the app
-        log()
     }
 
     private fun log() {

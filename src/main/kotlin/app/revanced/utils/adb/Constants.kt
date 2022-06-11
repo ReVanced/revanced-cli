@@ -15,7 +15,7 @@ internal object Constants {
     private const val NAME_MOUNT_SCRIPT = "mount_revanced_$PLACEHOLDER.sh"
 
     // initial directory to push files to via adb push
-    internal const val PATH_INIT_PUSH = "/sdcard/revanced.delete"
+    internal const val PATH_INIT_PUSH = "/data/local/tmp/revanced.delete"
 
     // revanced path
     internal const val PATH_REVANCED = "/data/adb/revanced/"
@@ -36,9 +36,6 @@ internal object Constants {
 
     // install umount script & set permissions
     internal const val COMMAND_INSTALL_UMOUNT = "mv $PATH_INIT_PUSH $PATH_UMOUNT && $COMMAND_CHMOD_MOUNT $PATH_UMOUNT"
-
-    // install apk & cleanup
-    internal const val COMMAND_INSTALL_APK = "install $PLACEHOLDER"
 
     // unmount script
     internal val CONTENT_UMOUNT_SCRIPT =
