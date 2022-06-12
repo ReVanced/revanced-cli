@@ -36,14 +36,14 @@ fun Patcher.addPatchesFiltered(
             }
 
             if (compatiblePackages == null) println("$prefix: Missing compatibility annotation. Continuing.")
-            else compatiblePackages.forEach { compatiblePackage ->
-                if (compatiblePackage.name != packageName) {
-                    println("$prefix: Package name not matching ${compatiblePackage.name}.")
+            else {
+                if (!compatiblePackages.any { it.name == packageName }) {
+                    println("$prefix: Incompatible package.")
                     return@patch
                 }
 
-                if (!(debugging || compatiblePackage.versions.any { it == packageVersion })) {
-                    println("$prefix: Unsupported version.")
+                if (!(debugging || compatiblePackages.any { it.versions.isEmpty() || it.versions.any { version -> version == packageVersion }})) {
+                    println("$prefix: The package version is $packageVersion and is incompatible.")
                     return@patch
                 }
             }
