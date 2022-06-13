@@ -29,14 +29,13 @@ repositories {
 }
 
 dependencies {
-    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.7.0")
+    kotlin("stdlib")
+    kotlin("reflect")
     implementation("app.revanced:revanced-patcher:1.1.0")
-
     implementation("info.picocli:picocli:4.6.3")
     implementation("com.android.tools.build:apksig:7.2.1")
     implementation("com.github.revanced:jadb:master-SNAPSHOT") // updated fork
     implementation("org.bouncycastle:bcpkix-jdk15on:1.70")
-    implementation("org.jetbrains.kotlin:kotlin-reflect:1.7.0")
 }
 
 tasks {
