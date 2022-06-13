@@ -1,3 +1,10 @@
+## [1.3.1](https://github.com/revanced/revanced-cli/compare/v1.3.0...v1.3.1) (2022-06-13)
+
+
+### Bug Fixes
+
+* check if `packageVersion` is compatible with any from `compatiblePackages` ([32589c8](https://github.com/revanced/revanced-cli/commit/32589c88e438e0a1375c256e9bb8a93f5a4d319b))
+
 # [1.3.0](https://github.com/revanced/revanced-cli/compare/v1.2.0...v1.3.0) (2022-06-11)
 
 
