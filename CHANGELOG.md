@@ -1,3 +1,10 @@
+## [1.3.2](https://github.com/revanced/revanced-cli/compare/v1.3.1...v1.3.2) (2022-06-13)
+
+
+### Bug Fixes
+
+* only upload `-all.jar` asset ([ca8e1ba](https://github.com/revanced/revanced-cli/commit/ca8e1ba6af00e275c6981476f773b13b103799d1))
+
 ## [1.3.1](https://github.com/revanced/revanced-cli/compare/v1.3.0...v1.3.1) (2022-06-13)
 
 
