@@ -29,8 +29,8 @@ repositories {
 }
 
 dependencies {
-    kotlin("stdlib")
-    kotlin("reflect")
+    implementation(kotlin("stdlib"))
+    implementation(kotlin("reflect"))
     implementation("app.revanced:revanced-patcher:1.1.0")
     implementation("info.picocli:picocli:4.6.3")
     implementation("com.android.tools.build:apksig:7.2.1")
