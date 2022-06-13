@@ -1,3 +1,10 @@
+## [1.3.3](https://github.com/revanced/revanced-cli/compare/v1.3.2...v1.3.3) (2022-06-13)
+
+
+### Bug Fixes
+
+* missing implementation ([48102c6](https://github.com/revanced/revanced-cli/commit/48102c66077c4ae17e3de1076e9da72de5f00366))
+
 ## [1.3.2](https://github.com/revanced/revanced-cli/compare/v1.3.1...v1.3.2) (2022-06-13)
 
 
