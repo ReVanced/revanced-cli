@@ -48,10 +48,11 @@ internal class Signer(
         return JcaX509CertificateConverter().getCertificate(builder.build(signer)) to pair.private
     }
 
-    fun signApk(input: File, output: File) {
+    fun signApk(input: File, output: File): File {
         Security.addProvider(BouncyCastleProvider())
 
-        val ks = File(input.parent, "revanced-cli.keystore")
+        // TODO: keystore should be saved securely
+        val ks = File(input.parent, "${output.nameWithoutExtension}.keystore")
         if (!ks.exists()) newKeystore(ks)
 
         val keyStore = KeyStore.getInstance("BKS", "BC")
@@ -70,5 +71,7 @@ internal class Signer(
         signer.setOutputApk(output)
 
         signer.build().sign()
+
+        return ks
     }
 }
