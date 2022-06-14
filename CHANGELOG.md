@@ -1,3 +1,10 @@
+## [1.4.1](https://github.com/revanced/revanced-cli/compare/v1.4.0...v1.4.1) (2022-06-14)
+
+
+### Bug Fixes
+
+* move the keystore to the output directory ([6ceb449](https://github.com/revanced/revanced-cli/commit/6ceb449cf8539a92d89eeba8136fdc686319e2ef))
+
 # [1.4.0](https://github.com/revanced/revanced-cli/compare/v1.3.3...v1.4.0) (2022-06-14)
 
 
