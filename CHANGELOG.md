@@ -1,3 +1,10 @@
+# [1.4.0](https://github.com/revanced/revanced-cli/compare/v1.3.3...v1.4.0) (2022-06-14)
+
+
+### Features
+
+* chcon on mount ([e1c7d10](https://github.com/revanced/revanced-cli/commit/e1c7d1082a6946d1082c8744a1d0118c1a2263ea))
+
 ## [1.3.3](https://github.com/revanced/revanced-cli/compare/v1.3.2...v1.3.3) (2022-06-13)
 
 
