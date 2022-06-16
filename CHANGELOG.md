@@ -1,3 +1,11 @@
+## [1.4.2](https://github.com/revanced/revanced-cli/compare/v1.4.1...v1.4.2) (2022-06-16)
+
+
+### Bug Fixes
+
+* dummy publish task (1/2) [skip ci] ([afff4c8](https://github.com/revanced/revanced-cli/commit/afff4c8418bd33959440a3ac9e6c46816b3153ad))
+* releases (2/2) ([227d8d9](https://github.com/revanced/revanced-cli/commit/227d8d94c89ec24051bd5bc20808049164d92492))
+
 ## [1.4.1](https://github.com/revanced/revanced-cli/compare/v1.4.0...v1.4.1) (2022-06-14)
 
 
