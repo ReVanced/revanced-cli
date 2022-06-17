@@ -31,6 +31,9 @@ internal class Adb(
         if (modeInstall) {
             PackageManager(device).install(file)
         } else {
+            // delete old files
+            device.run(Constants.COMMAND_REMOVE_OLD_FILES.replacePlaceholder())
+
             // push patched file
             device.copy(Constants.PATH_INIT_PUSH, file)
 
@@ -55,6 +58,14 @@ internal class Adb(
             )
             // install unmount script
             device.run(Constants.COMMAND_INSTALL_UMOUNT.replacePlaceholder())
+
+            // push magisk-module prop
+            device.createFile(
+                Constants.PATH_INIT_PUSH,
+                Constants.CONTENT_MODULE_PROP.replacePlaceholder()
+            )
+            // install magisk-module prop
+            device.run(Constants.COMMAND_INSTALL_PROP.replacePlaceholder())
 
             // unmount the apk for sanity
             device.run(Constants.PATH_UMOUNT.replacePlaceholder())
