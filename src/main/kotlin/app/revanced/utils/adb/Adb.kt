@@ -53,7 +53,7 @@ internal class Adb(
                 Constants.PATH_INIT_PUSH,
                 Constants.CONTENT_UMOUNT_SCRIPT.replacePlaceholder()
             )
-            // install mount script
+            // install unmount script
             device.run(Constants.COMMAND_INSTALL_UMOUNT.replacePlaceholder())
 
             // unmount the apk for sanity
