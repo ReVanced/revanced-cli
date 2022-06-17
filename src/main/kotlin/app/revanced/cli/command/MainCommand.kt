@@ -71,6 +71,26 @@ internal object MainCommand : Runnable {
             return
         }
 
+        if (includedPatches.isEmpty()) {
+            for (patchBundlePath in patchBundles) for (patch in JarPatchBundle(patchBundlePath).loadPatches()) {
+                if (
+                //get key from console
+                    System.console().readLine("\"--include ${patch.patchName}\" ? Y/n: ").let {
+                        when (it) {
+                            "", "y", "Y" -> {
+                                println("Patch Added")
+                                true
+                            }
+                            else -> false
+                        }
+                    }
+                ) {
+                    // Add patch
+                    includedPatches += patch.patchName
+                }
+            }
+        }
+
         val patcher = app.revanced.patcher.Patcher(PatcherOptions(inputFile, cacheDirectory, !disableResourcePatching))
 
         val outputFile = File(outputPath)
