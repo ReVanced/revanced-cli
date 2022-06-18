@@ -1,3 +1,10 @@
+## [1.4.4](https://github.com/revanced/revanced-cli/compare/v1.4.3...v1.4.4) (2022-06-18)
+
+
+### Bug Fixes
+
+* add execute permission to `./gradlew` file ([#36](https://github.com/revanced/revanced-cli/issues/36)) ([072d9e1](https://github.com/revanced/revanced-cli/commit/072d9e15d7e44b1080923f3afeb194eeb4fe4682))
+
 ## [1.4.3](https://github.com/revanced/revanced-cli/compare/v1.4.2...v1.4.3) (2022-06-18)
 
 
