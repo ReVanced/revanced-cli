@@ -1,3 +1,10 @@
+# [1.5.0](https://github.com/revanced/revanced-cli/compare/v1.4.5...v1.5.0) (2022-06-20)
+
+
+### Features
+
+* allow listing patches without other parameters ([#42](https://github.com/revanced/revanced-cli/issues/42)) ([b977d70](https://github.com/revanced/revanced-cli/commit/b977d7039f877be242823a4eef0fb8df6550dd05))
+
 ## [1.4.5](https://github.com/revanced/revanced-cli/compare/v1.4.4...v1.4.5) (2022-06-20)
 
 
