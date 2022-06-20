@@ -1,9 +1,6 @@
 package app.revanced.cli.patcher
 
-import app.revanced.cli.command.MainCommand.cacheDirectory
-import app.revanced.cli.command.MainCommand.disableResourcePatching
-import app.revanced.cli.command.MainCommand
-import app.revanced.cli.command.MainCommand.includedPatches
+import app.revanced.cli.command.MainCommand.args
 import app.revanced.utils.filesystem.ZipFileSystemUtils
 import app.revanced.utils.patcher.addPatchesFiltered
 import app.revanced.utils.patcher.applyPatchesVerbose
@@ -13,16 +10,18 @@ import java.nio.file.Files
 
 internal object Patcher {
     internal fun start(patcher: app.revanced.patcher.Patcher, output: File) {
+		val args = args.pArgs;
+
         // merge files like necessary integrations
         patcher.mergeFiles()
         // add patches, but filter incompatible or excluded patches
-        patcher.addPatchesFiltered(includeFilter = includedPatches.isNotEmpty())
+        patcher.addPatchesFiltered(includeFilter = args.includedPatches.isNotEmpty())
         // apply patches
         patcher.applyPatchesVerbose()
 
         // write output file
         if (output.exists()) Files.delete(output.toPath())
-        MainCommand.inputFile.copyTo(output)
+        args.inputFile.copyTo(output)
 
         ZipFileSystemUtils(output).use { fileSystem ->
             // replace all dex files
@@ -32,8 +31,8 @@ internal object Patcher {
             }
 
             // write resources
-            if (!disableResourcePatching) {
-                fileSystem.writePathRecursively(File(cacheDirectory).resolve("build").toPath())
+            if (!args.disableResourcePatching) {
+                fileSystem.writePathRecursively(File(args.cacheDirectory).resolve("build").toPath())
                 fileSystem.uncompress(*result.doNotCompress!!.toTypedArray())
             }
         }

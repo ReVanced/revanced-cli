@@ -1,13 +1,13 @@
 package app.revanced.cli.signing
 
-import app.revanced.cli.command.MainCommand.cacheDirectory
+import app.revanced.cli.command.MainCommand.args
 import app.revanced.utils.signing.Signer
 import app.revanced.utils.signing.align.ZipAligner
 import java.io.File
 
 object Signing {
     fun start(inputFile: File, outputFile: File, cn: String, password: String) {
-        val cacheDirectory = File(cacheDirectory)
+        val cacheDirectory = File(args.pArgs.cacheDirectory)
         val alignedOutput = cacheDirectory.resolve("${outputFile.nameWithoutExtension}_aligned.apk")
         val signedOutput = cacheDirectory.resolve("${outputFile.nameWithoutExtension}_signed.apk")
 
