@@ -6,9 +6,7 @@ import app.revanced.patcher.PatcherOptions
 import app.revanced.patcher.extensions.PatchExtensions.patchName
 import app.revanced.patcher.util.patch.implementation.JarPatchBundle
 import app.revanced.utils.adb.Adb
-import picocli.CommandLine.Command
-import picocli.CommandLine.Option
-import picocli.CommandLine.ArgGroup
+import picocli.CommandLine.*
 import java.io.File
 import java.nio.file.Files
 
@@ -17,84 +15,87 @@ import java.nio.file.Files
 )
 internal object MainCommand : Runnable {
 
-	@ArgGroup(exclusive = false, multiplicity="1")
-	lateinit var args: Args
+    @ArgGroup(exclusive = false, multiplicity = "1")
+    lateinit var args: Args
 
-	class Args
-	{
-		@Option(names = ["-b", "--bundles"], description = ["One or more bundles of patches"], required = true)
-    	var patchBundles = arrayOf<String>()
-		
-		@ArgGroup(exclusive = false)
-		lateinit var lArgs: ListingArgs
+    class Args {
+        @Option(names = ["-b", "--bundles"], description = ["One or more bundles of patches"], required = true)
+        var patchBundles = arrayOf<String>()
 
-		@ArgGroup(exclusive = false)
-		lateinit var pArgs: PatchingArgs
-	}
+        @ArgGroup(exclusive = false)
+        lateinit var lArgs: ListingArgs
 
-	class ListingArgs {
-    	@Option(names = ["-l", "--list"], description = ["List patches only"], required = true)
-    	public var listOnly: Boolean = false
-	}
+        @ArgGroup(exclusive = false)
+        lateinit var pArgs: PatchingArgs
+    }
 
-	class PatchingArgs {
-    	@Option(names = ["-a", "--apk"], description = ["Input file to be patched"], required = true)
-    	lateinit var inputFile: File
+    class ListingArgs {
+        @Option(names = ["-l", "--list"], description = ["List patches only"], required = true)
+        var listOnly: Boolean = false
+    }
 
-    	@Option(names = ["-o", "--out"], description = ["Output file path"], required = true)
-    	lateinit var outputPath: String
+    class PatchingArgs {
+        @Option(names = ["-a", "--apk"], description = ["Input file to be patched"], required = true)
+        lateinit var inputFile: File
 
-    	@Option(
-    	    names = ["-i", "--include"],
-    	    description = ["Which patches to include. If none is specified, all compatible default patches will be included"]
-    	)
-    	var includedPatches = arrayOf<String>()
+        @Option(names = ["-o", "--out"], description = ["Output file path"], required = true)
+        lateinit var outputPath: String
 
-    	@Option(names = ["-r", "--resource-patcher"], description = ["Disable patching resources"])
-    	var disableResourcePatching: Boolean = false
+        @Option(
+            names = ["-i", "--include"],
+            description = ["Which patches to include. If none is specified, all compatible default patches will be included"]
+        )
+        var includedPatches = arrayOf<String>()
 
-    	@Option(names = ["--debugging"], description = ["Disable patch version compatibility"])
-    	var debugging: Boolean = false
+        @Option(names = ["-r", "--resource-patcher"], description = ["Disable patching resources"])
+        var disableResourcePatching: Boolean = false
 
-    	@Option(names = ["-m", "--merge"], description = ["One or more dex file containers to merge"])
-    	var mergeFiles = listOf<File>()
+        @Option(names = ["--debugging"], description = ["Disable patch version compatibility"])
+        var debugging: Boolean = false
 
-    	@Option(names = ["--install"], description = ["If specified, instead of mounting, install"])
-    	var install: Boolean = false
+        @Option(names = ["-m", "--merge"], description = ["One or more dex file containers to merge"])
+        var mergeFiles = listOf<File>()
 
-    	@Option(names = ["--cn"], description = ["Overwrite the default CN for the signed file"])
-    	var cn = "ReVanced"
+        @Option(names = ["--install"], description = ["If specified, instead of mounting, install"])
+        var install: Boolean = false
 
-    	@Option(names = ["-p", "--password"], description = ["Overwrite the default password for the signed file"])
-    	var password = "ReVanced"
+        @Option(names = ["--cn"], description = ["Overwrite the default CN for the signed file"])
+        var cn = "ReVanced"
 
-    	@Option(names = ["-d", "--deploy-on"], description = ["If specified, deploy to adb device with given name"])
-    	var deploy: String? = null
+        @Option(names = ["-p", "--password"], description = ["Overwrite the default password for the signed file"])
+        var password = "ReVanced"
 
-    	@Option(names = ["-t", "--temp-dir"], description = ["Temporal resource cache directory"])
-    	var cacheDirectory = "revanced-cache"
+        @Option(names = ["-d", "--deploy-on"], description = ["If specified, deploy to adb device with given name"])
+        var deploy: String? = null
 
-    	@Option(
-    	    names = ["-c", "--clean"],
-    	    description = ["Clean the temporal resource cache directory. This will be done anyways when running the patcher"]
-    	)
-    	var clean: Boolean = false
-	}
-    
-	override fun run() {
-		try
-		{
-        	if (args.lArgs.listOnly) {
-        	    for (patchBundlePath in args.patchBundles) for (patch in JarPatchBundle(patchBundlePath).loadPatches()) {
-        	        println("[available] ${patch.patchName}")
-        	    }
-        	    return
-        	}
-		} catch (e: UninitializedPropertyAccessException) {}
+        @Option(names = ["-t", "--temp-dir"], description = ["Temporal resource cache directory"])
+        var cacheDirectory = "revanced-cache"
 
-		val args = args.pArgs;
+        @Option(
+            names = ["-c", "--clean"],
+            description = ["Clean the temporal resource cache directory. This will be done anyways when running the patcher"]
+        )
+        var clean: Boolean = false
+    }
 
-        val patcher = app.revanced.patcher.Patcher(PatcherOptions(args.inputFile, args.cacheDirectory, !args.disableResourcePatching))
+    override fun run() {
+        try {
+            if (args.lArgs.listOnly) {
+                for (patchBundlePath in args.patchBundles) for (patch in JarPatchBundle(patchBundlePath).loadPatches()) {
+                    println("[available] ${patch.patchName}")
+                }
+                return
+            }
+        } catch (_: UninitializedPropertyAccessException) {
+        }
+
+        val args = args.pArgs
+
+        val patcher = app.revanced.patcher.Patcher(
+            PatcherOptions(
+                args.inputFile, args.cacheDirectory, !args.disableResourcePatching
+            )
+        )
 
         val outputFile = File(args.outputPath)
 
@@ -102,7 +103,8 @@ internal object MainCommand : Runnable {
             Adb(outputFile, patcher.data.packageMetadata.packageName, args.deploy!!, args.install)
         }
 
-        val patchedFile = if (args.install) File(args.cacheDirectory).resolve("${outputFile.nameWithoutExtension}_raw.apk") else outputFile
+        val patchedFile =
+            if (args.install) File(args.cacheDirectory).resolve("${outputFile.nameWithoutExtension}_raw.apk") else outputFile
 
         Patcher.start(patcher, patchedFile)
 
