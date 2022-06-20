@@ -1,8 +1,7 @@
 package app.revanced.utils.patcher
 
 import app.revanced.cli.command.MainCommand
-import app.revanced.cli.command.MainCommand.debugging
-import app.revanced.cli.command.MainCommand.patchBundles
+import app.revanced.cli.command.MainCommand.args
 import app.revanced.patcher.Patcher
 import app.revanced.patcher.data.base.Data
 import app.revanced.patcher.extensions.PatchExtensions.compatiblePackages
@@ -17,7 +16,7 @@ fun Patcher.addPatchesFiltered(
     val packageName = this.data.packageMetadata.packageName
     val packageVersion = this.data.packageMetadata.packageVersion
 
-    patchBundles.forEach { bundle ->
+    MainCommand.args.patchBundles.forEach { bundle ->
         val includedPatches = mutableListOf<Class<out Patch<Data>>>()
         JarPatchBundle(bundle).loadPatches().forEach patch@{ patch ->
             val compatiblePackages = patch.compatiblePackages
@@ -25,8 +24,10 @@ fun Patcher.addPatchesFiltered(
 
             val prefix = "[skipped] $patchName"
 
+			val args = MainCommand.args.pArgs
+
             if (includeFilter) {
-                if (!MainCommand.includedPatches.contains(patchName)) {
+                if (!args.includedPatches.contains(patchName)) {
                     println("$prefix: Explicitly excluded.")
                     return@patch
                 }
@@ -42,7 +43,7 @@ fun Patcher.addPatchesFiltered(
                     return@patch
                 }
 
-                if (!(debugging || compatiblePackages.any { it.versions.isEmpty() || it.versions.any { version -> version == packageVersion }})) {
+                if (!(args.debugging || compatiblePackages.any { it.versions.isEmpty() || it.versions.any { version -> version == packageVersion }})) {
                     println("$prefix: The package version is $packageVersion and is incompatible.")
                     return@patch
                 }
@@ -67,5 +68,5 @@ fun Patcher.applyPatchesVerbose() {
 }
 
 fun Patcher.mergeFiles() {
-    this.addFiles(MainCommand.mergeFiles)
+    this.addFiles(MainCommand.args.pArgs.mergeFiles)
 }
