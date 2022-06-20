@@ -1,3 +1,10 @@
+## [1.4.5](https://github.com/revanced/revanced-cli/compare/v1.4.4...v1.4.5) (2022-06-20)
+
+
+### Bug Fixes
+
+* update patcher version (fix apktool) ([496f821](https://github.com/revanced/revanced-cli/commit/496f82121879443609667a792cc1e16441ef5c2f))
+
 ## [1.4.4](https://github.com/revanced/revanced-cli/compare/v1.4.3...v1.4.4) (2022-06-18)
 
 
