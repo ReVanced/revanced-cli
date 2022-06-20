@@ -22,7 +22,7 @@ internal object MainCommand : Runnable {
 
 	class Args
 	{
-		@Option(names = ["-b", "--bundles"], description = ["One or more bundles of patches"])
+		@Option(names = ["-b", "--bundles"], description = ["One or more bundles of patches"], required = true)
     	var patchBundles = arrayOf<String>()
 		
 		@ArgGroup(exclusive = false)
