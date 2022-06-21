@@ -1,3 +1,10 @@
+## [1.6.1](https://github.com/revanced/revanced-cli/compare/v1.6.0...v1.6.1) (2022-06-21)
+
+
+### Bug Fixes
+
+* remove `-e` from `experimental` option ([3829136](https://github.com/revanced/revanced-cli/commit/3829136c49ddce1dc6b01eda04ce013540b213c2))
+
 # [1.6.0](https://github.com/revanced/revanced-cli/compare/v1.5.1...v1.6.0) (2022-06-21)
 
 
