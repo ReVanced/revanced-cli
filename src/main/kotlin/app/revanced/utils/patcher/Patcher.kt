@@ -43,7 +43,7 @@ fun Patcher.addPatchesFiltered(
                     return@patch
                 }
 
-                if (!(args.debugging || compatiblePackages.any { it.versions.isEmpty() || it.versions.any { version -> version == packageVersion }})) {
+                if (!(args.experimental || compatiblePackages.any { it.versions.isEmpty() || it.versions.any { version -> version == packageVersion }})) {
                     println("$prefix: The package version is $packageVersion and is incompatible.")
                     return@patch
                 }
