@@ -98,14 +98,15 @@ internal object MainCommand : Runnable {
             Adb(outputFile, patcher.data.packageMetadata.packageName, args.deploy!!, !args.mount)
         }
 
-        val patchedFile =
-            if (args.mount) outputFile else File(args.cacheDirectory).resolve("${outputFile.nameWithoutExtension}_raw.apk")
+        val patchedFile = if (args.mount) {
+            File(args.cacheDirectory).resolve("${outputFile.nameWithoutExtension}_raw.apk")
+        } else outputFile
 
         Patcher.start(patcher, patchedFile)
 
         println("[aligning & signing]")
 
-        if (args.mount) {
+        if (!args.mount) {
             Signing.start(
                 patchedFile,
                 outputFile,
