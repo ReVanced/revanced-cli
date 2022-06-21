@@ -1,3 +1,11 @@
+## [1.6.2](https://github.com/revanced/revanced-cli/compare/v1.6.1...v1.6.2) (2022-06-21)
+
+
+### Bug Fixes
+
+* CLI not working ([29105ba](https://github.com/revanced/revanced-cli/commit/29105bab3dabd9d16af6b511caef9727f98afd1a))
+* improper use of mount variable ([31853fe](https://github.com/revanced/revanced-cli/commit/31853fe5393af04805857b78a54434e1c51e4c8e))
+
 ## [1.6.1](https://github.com/revanced/revanced-cli/compare/v1.6.0...v1.6.1) (2022-06-21)
 
 
