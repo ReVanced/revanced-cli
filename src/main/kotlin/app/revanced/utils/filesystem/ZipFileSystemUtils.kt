@@ -37,6 +37,8 @@ internal class ZipFileSystemUtils(
         }.close()
 
         Files.walk(path).let { fileStream ->
+            // don't include build directory
+            // by skipping the root node.
             fileStream.skip(1).forEach { filePath ->
                 val relativePath = filePath.getRelativePath(path)
 
