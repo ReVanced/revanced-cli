@@ -41,11 +41,8 @@ internal object MainCommand : Runnable {
         @Option(names = ["-o", "--out"], description = ["Output file path"], required = true)
         lateinit var outputPath: String
 
-        @Option(
-            names = ["-i", "--include"],
-            description = ["Which patches to include. If none is specified, all compatible default patches will be included"]
-        )
-        var includedPatches = arrayOf<String>()
+        @Option(names = ["-e", "--exclude"], description = ["Explicitly exclude patches"])
+        var excludedPatches = arrayOf<String>()
 
         @Option(names = ["-r", "--resource-patcher"], description = ["Disable patching resources"])
         var disableResourcePatching: Boolean = false
@@ -56,8 +53,8 @@ internal object MainCommand : Runnable {
         @Option(names = ["-m", "--merge"], description = ["One or more dex file containers to merge"])
         var mergeFiles = listOf<File>()
 
-        @Option(names = ["--install"], description = ["If specified, instead of mounting, install"])
-        var install: Boolean = false
+        @Option(names = ["--mount"], description = ["If specified, instead of installing, mount"])
+        var mount: Boolean = false
 
         @Option(names = ["--cn"], description = ["Overwrite the default CN for the signed file"])
         var cn = "ReVanced"
@@ -86,7 +83,7 @@ internal object MainCommand : Runnable {
             return
         }
 
-        val args = args.pArgs?: return
+        val args = args.pArgs ?: return
 
         val patcher = app.revanced.patcher.Patcher(
             PatcherOptions(
@@ -97,17 +94,17 @@ internal object MainCommand : Runnable {
         val outputFile = File(args.outputPath)
 
         val adb: Adb? = args.deploy?.let {
-            Adb(outputFile, patcher.data.packageMetadata.packageName, args.deploy!!, args.install)
+            Adb(outputFile, patcher.data.packageMetadata.packageName, args.deploy!!, !args.mount)
         }
 
         val patchedFile =
-            if (args.install) File(args.cacheDirectory).resolve("${outputFile.nameWithoutExtension}_raw.apk") else outputFile
+            if (args.mount) outputFile else File(args.cacheDirectory).resolve("${outputFile.nameWithoutExtension}_raw.apk")
 
         Patcher.start(patcher, patchedFile)
 
         println("[aligning & signing]")
 
-        if (args.install) {
+        if (args.mount) {
             Signing.start(
                 patchedFile,
                 outputFile,
