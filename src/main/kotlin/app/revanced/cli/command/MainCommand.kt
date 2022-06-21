@@ -4,6 +4,7 @@ import app.revanced.cli.patcher.Patcher
 import app.revanced.cli.signing.Signing
 import app.revanced.patcher.PatcherOptions
 import app.revanced.patcher.extensions.PatchExtensions.patchName
+import app.revanced.patcher.extensions.PatchExtensions.description
 import app.revanced.patcher.util.patch.implementation.JarPatchBundle
 import app.revanced.utils.adb.Adb
 import picocli.CommandLine.*
@@ -79,7 +80,7 @@ internal object MainCommand : Runnable {
     override fun run() {
         if (args.lArgs?.listOnly == true) {
             for (patchBundlePath in args.patchBundles) for (patch in JarPatchBundle(patchBundlePath).loadPatches()) {
-                println("[available] ${patch.patchName}")
+                println("[available] ${patch.patchName}: ${patch.description}")
             }
             return
         }
