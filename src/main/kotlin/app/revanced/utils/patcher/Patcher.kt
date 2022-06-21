@@ -16,7 +16,7 @@ fun Patcher.addPatchesFiltered(
     val packageName = this.data.packageMetadata.packageName
     val packageVersion = this.data.packageMetadata.packageVersion
 
-    MainCommand.args.patchBundles.forEach { bundle ->
+    args.patchBundles.forEach { bundle ->
         val includedPatches = mutableListOf<Class<out Patch<Data>>>()
         JarPatchBundle(bundle).loadPatches().forEach patch@{ patch ->
             val compatiblePackages = patch.compatiblePackages
@@ -24,7 +24,7 @@ fun Patcher.addPatchesFiltered(
 
             val prefix = "[skipped] $patchName"
 
-			val args = MainCommand.args.pArgs
+			val args = MainCommand.args.pArgs!!
 
             if (includeFilter) {
                 if (!args.includedPatches.contains(patchName)) {
@@ -68,5 +68,5 @@ fun Patcher.applyPatchesVerbose() {
 }
 
 fun Patcher.mergeFiles() {
-    this.addFiles(MainCommand.args.pArgs.mergeFiles)
+    this.addFiles(args.pArgs!!.mergeFiles)
 }

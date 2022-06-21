@@ -23,10 +23,10 @@ internal object MainCommand : Runnable {
         var patchBundles = arrayOf<String>()
 
         @ArgGroup(exclusive = false)
-        lateinit var lArgs: ListingArgs
+        var lArgs: ListingArgs? = null
 
         @ArgGroup(exclusive = false)
-        lateinit var pArgs: PatchingArgs
+        var pArgs: PatchingArgs? = null
     }
 
     class ListingArgs {
@@ -79,17 +79,14 @@ internal object MainCommand : Runnable {
     }
 
     override fun run() {
-        try {
-            if (args.lArgs.listOnly) {
-                for (patchBundlePath in args.patchBundles) for (patch in JarPatchBundle(patchBundlePath).loadPatches()) {
-                    println("[available] ${patch.patchName}")
-                }
-                return
+        if (args.lArgs?.listOnly == true) {
+            for (patchBundlePath in args.patchBundles) for (patch in JarPatchBundle(patchBundlePath).loadPatches()) {
+                println("[available] ${patch.patchName}")
             }
-        } catch (_: UninitializedPropertyAccessException) {
+            return
         }
 
-        val args = args.pArgs
+        val args = args.pArgs?: return
 
         val patcher = app.revanced.patcher.Patcher(
             PatcherOptions(
