@@ -1,3 +1,10 @@
+## [1.5.1](https://github.com/revanced/revanced-cli/compare/v1.5.0...v1.5.1) (2022-06-21)
+
+
+### Bug Fixes
+
+* update patcher version ([09b9027](https://github.com/revanced/revanced-cli/commit/09b9027e5e28f0483e74b711cf65a7876267a339)), closes [#45](https://github.com/revanced/revanced-cli/issues/45)
+
 # [1.5.0](https://github.com/revanced/revanced-cli/compare/v1.4.5...v1.5.0) (2022-06-20)
 
 
