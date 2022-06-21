@@ -47,7 +47,7 @@ internal object MainCommand : Runnable {
         @Option(names = ["-r", "--resource-patcher"], description = ["Disable patching resources"])
         var disableResourcePatching: Boolean = false
 
-        @Option(names = ["-e", "--experimental"], description = ["Disable patch version compatibility patch"])
+        @Option(names = ["-ex", "--experimental"], description = ["Disable patch version compatibility patch"])
         var experimental: Boolean = false
 
         @Option(names = ["-m", "--merge"], description = ["One or more dex file containers to merge"])
