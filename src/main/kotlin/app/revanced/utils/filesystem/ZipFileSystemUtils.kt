@@ -13,6 +13,10 @@ internal class ZipFileSystemUtils(
     private var zipFileSystem = FileSystems.newFileSystem(file.toPath(), mapOf("noCompression" to true))
 
     private fun Path.deleteRecursively() {
+        if (!Files.exists(this)) {
+            throw IllegalStateException("File exists in real folder but not in zip file system")
+        }
+
         if (Files.isDirectory(this)) {
             Files.list(this).forEach { path ->
                 path.deleteRecursively()
