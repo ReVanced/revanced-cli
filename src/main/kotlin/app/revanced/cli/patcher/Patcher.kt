@@ -23,16 +23,20 @@ internal object Patcher {
         if (output.exists()) Files.delete(output.toPath())
         args.inputFile.copyTo(output)
 
-        ZipFileSystemUtils(output).use { fileSystem ->
+        val result = patcher.save()
+        val inputFile = if (!args.disableResourcePatching && result.resourceFile != null) {
+            result.resourceFile
+        } else null
+        ZipFileSystemUtils(inputFile, output).use { fileSystem ->
             // replace all dex files
-            val result = patcher.save()
             result.dexFiles.forEach {
                 fileSystem.write(it.name, it.memoryDataStore.data)
             }
 
-            // write resources
-            if (!args.disableResourcePatching) {
-                fileSystem.writePathRecursively(File(args.cacheDirectory).resolve("build").toPath())
+            // inputFile being null implies resource patching being disabled
+            if (inputFile != null) {
+                // write resources
+                fileSystem.writeInput()
                 fileSystem.uncompress(*result.doNotCompress!!.toTypedArray())
             }
         }
