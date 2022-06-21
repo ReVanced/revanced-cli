@@ -11,10 +11,11 @@ import java.io.File
 import java.nio.file.Files
 
 @Command(
-    name = "ReVanced-CLI", version = ["1.0.0"], mixinStandardHelpOptions = true,
+    name = "ReVanced-CLI",
+    version = ["1.0.0"],
+    mixinStandardHelpOptions = true
 )
 internal object MainCommand : Runnable {
-
     @ArgGroup(exclusive = false, multiplicity = "1")
     lateinit var args: Args
 
