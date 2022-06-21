@@ -1,3 +1,10 @@
+# [1.7.0](https://github.com/revanced/revanced-cli/compare/v1.6.3...v1.7.0) (2022-06-21)
+
+
+### Features
+
+* show description when listing patches ([af32572](https://github.com/revanced/revanced-cli/commit/af32572f29d0f0a45ee5c3e01ba4cf1f91fe2f10))
+
 ## [1.6.3](https://github.com/revanced/revanced-cli/compare/v1.6.2...v1.6.3) (2022-06-21)
 
 
