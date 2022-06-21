@@ -24,13 +24,11 @@ fun Patcher.addPatchesFiltered(
 
             val prefix = "[skipped] $patchName"
 
-			val args = MainCommand.args.pArgs!!
+            val args = MainCommand.args.pArgs!!
 
-            if (excludePatches) {
-                if (args.excludedPatches.contains(patchName)) {
-                    println("$prefix: Explicitly excluded.")
-                    return@patch
-                }
+            if (excludePatches && args.excludedPatches.contains(patchName)) {
+                println("$prefix: Explicitly excluded.")
+                return@patch
             } else if (!patch.include) {
                 println("$prefix: Implicitly excluded.")
                 return@patch
@@ -43,7 +41,7 @@ fun Patcher.addPatchesFiltered(
                     return@patch
                 }
 
-                if (!(args.experimental || compatiblePackages.any { it.versions.isEmpty() || it.versions.any { version -> version == packageVersion }})) {
+                if (!(args.experimental || compatiblePackages.any { it.versions.isEmpty() || it.versions.any { version -> version == packageVersion } })) {
                     println("$prefix: The package version is $packageVersion and is incompatible.")
                     return@patch
                 }
