@@ -1,3 +1,10 @@
+## [1.9.3](https://github.com/revanced/revanced-cli/compare/v1.9.2...v1.9.3) (2022-06-22)
+
+
+### Bug Fixes
+
+* use absolute file path for key store ([d335846](https://github.com/revanced/revanced-cli/commit/d335846202b991e130882e9ce0ab268deb2e27ab))
+
 ## [1.9.2](https://github.com/revanced/revanced-cli/compare/v1.9.1...v1.9.2) (2022-06-22)
 
 
