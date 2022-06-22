@@ -1,3 +1,11 @@
+# [1.8.0](https://github.com/revanced/revanced-cli/compare/v1.7.1...v1.8.0) (2022-06-22)
+
+
+### Features
+
+* add option to specify keystore file path ([9331594](https://github.com/revanced/revanced-cli/commit/9331594706404df871d170110da753cde5058d02))
+* use of `java.util.logging.Logger` ([07f6bdf](https://github.com/revanced/revanced-cli/commit/07f6bdf33069da4e11fc40090feb726433de703e))
+
 ## [1.7.1](https://github.com/revanced/revanced-cli/compare/v1.7.0...v1.7.1) (2022-06-22)
 
 
