@@ -1,6 +1,7 @@
 package app.revanced.cli.command
 
 import app.revanced.cli.patcher.Patcher
+import app.revanced.cli.patcher.PatcherLogger
 import app.revanced.cli.signing.Signing
 import app.revanced.cli.signing.SigningOptions
 import app.revanced.patcher.PatcherOptions
@@ -91,7 +92,10 @@ internal object MainCommand : Runnable {
 
         val patcher = app.revanced.patcher.Patcher(
             PatcherOptions(
-                args.inputFile, args.cacheDirectory, !args.disableResourcePatching
+                args.inputFile,
+                args.cacheDirectory,
+                !args.disableResourcePatching,
+                logger = PatcherLogger
             )
         )
 
