@@ -2,6 +2,7 @@ package app.revanced.cli.command
 
 import app.revanced.cli.patcher.Patcher
 import app.revanced.cli.signing.Signing
+import app.revanced.cli.signing.SigningOptions
 import app.revanced.patcher.PatcherOptions
 import app.revanced.patcher.extensions.PatchExtensions.description
 import app.revanced.patcher.extensions.PatchExtensions.patchName
@@ -11,6 +12,8 @@ import picocli.CommandLine.*
 import java.io.File
 import java.nio.file.Files
 import java.util.logging.Logger
+import kotlin.io.path.Path
+import kotlin.io.path.name
 
 @Command(
     name = "ReVanced-CLI", version = ["1.0.0"], mixinStandardHelpOptions = true
@@ -62,6 +65,9 @@ internal object MainCommand : Runnable {
         @Option(names = ["--cn"], description = ["Overwrite the default CN for the signed file"])
         var cn = "ReVanced"
 
+        @Option(names = ["--keystore"], description = ["File path to your keystore"])
+        var keystorePath: String? = null
+
         @Option(names = ["-p", "--password"], description = ["Overwrite the default password for the signed file"])
         var password = "ReVanced"
 
@@ -111,10 +117,12 @@ internal object MainCommand : Runnable {
 
         if (!args.mount) {
             Signing.start(
-                patchedFile,
-                outputFile,
-                args.cn,
-                args.password,
+                patchedFile, outputFile, SigningOptions(
+                    args.cn,
+                    args.password,
+                    args.keystorePath
+                        ?: Path(outputFile.parent).resolve("${outputFile.nameWithoutExtension}.keystore").name
+                )
             )
         }
 

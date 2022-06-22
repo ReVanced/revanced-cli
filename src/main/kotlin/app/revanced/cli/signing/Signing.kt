@@ -7,7 +7,7 @@ import app.revanced.utils.signing.align.ZipAligner
 import java.io.File
 
 object Signing {
-    fun start(inputFile: File, outputFile: File, cn: String, password: String) {
+    fun start(inputFile: File, outputFile: File, signingOptions: SigningOptions) {
         val cacheDirectory = File(args.pArgs!!.cacheDirectory)
         val alignedOutput = cacheDirectory.resolve("${outputFile.nameWithoutExtension}_aligned.apk")
         val signedOutput = cacheDirectory.resolve("${outputFile.nameWithoutExtension}_signed.apk")
@@ -22,7 +22,7 @@ object Signing {
         // sign the alignedOutput and write to signedOutput
         // the reason is, in case the signer fails
         // it does not damage the output file
-        val keyStore = Signer(cn, password).signApk(alignedOutput, signedOutput)
+        val keyStore = Signer(signingOptions).signApk(alignedOutput, signedOutput)
 
         // afterwards copy over the file and the keystore to the output
         signedOutput.copyTo(outputFile, true)

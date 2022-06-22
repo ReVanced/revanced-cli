@@ -1,5 +1,7 @@
 package app.revanced.utils.signing
 
+import app.revanced.cli.command.MainCommand.logger
+import app.revanced.cli.signing.SigningOptions
 import com.android.apksig.ApkSigner
 import org.bouncycastle.asn1.x500.X500Name
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo
@@ -17,9 +19,9 @@ import java.security.cert.X509Certificate
 import java.util.*
 
 internal class Signer(
-    private val cn: String, password: String
+    private val signingOptions: SigningOptions
 ) {
-    private val passwordCharArray = password.toCharArray()
+    private val passwordCharArray = signingOptions.password.toCharArray()
     private fun newKeystore(out: File) {
         val (publicKey, privateKey) = createKey()
         val privateKS = KeyStore.getInstance("BKS", "BC")
@@ -34,7 +36,7 @@ internal class Signer(
         val pair = gen.generateKeyPair()
         var serialNumber: BigInteger
         do serialNumber = BigInteger.valueOf(SecureRandom().nextLong()) while (serialNumber < BigInteger.ZERO)
-        val x500Name = X500Name("CN=$cn")
+        val x500Name = X500Name("CN=${signingOptions.cn}")
         val builder = X509v3CertificateBuilder(
             x500Name,
             serialNumber,
@@ -52,21 +54,21 @@ internal class Signer(
         Security.addProvider(BouncyCastleProvider())
 
         // TODO: keystore should be saved securely
-        val ks = File(input.parent, "${output.nameWithoutExtension}.keystore")
-        if (!ks.exists()) newKeystore(ks)
+        val ks = File(signingOptions.keyStoreFilePath)
+        if (!ks.exists()) newKeystore(ks) else logger.info("Found existing keystore ${ks.nameWithoutExtension}")
 
         val keyStore = KeyStore.getInstance("BKS", "BC")
         FileInputStream(ks).use { fis -> keyStore.load(fis, null) }
         val alias = keyStore.aliases().nextElement()
 
         val config = ApkSigner.SignerConfig.Builder(
-            cn,
+            signingOptions.cn,
             keyStore.getKey(alias, passwordCharArray) as PrivateKey,
             listOf(keyStore.getCertificate(alias) as X509Certificate)
         ).build()
 
         val signer = ApkSigner.Builder(listOf(config))
-        signer.setCreatedBy(cn)
+        signer.setCreatedBy(signingOptions.cn)
         signer.setInputApk(input)
         signer.setOutputApk(output)
 
