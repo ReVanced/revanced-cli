@@ -30,7 +30,7 @@ internal object Patcher {
         ZipFileSystemUtils(inputFile, output).use { fileSystem ->
             // replace all dex files
             result.dexFiles.forEach {
-                fileSystem.write(it.name, it.memoryDataStore.data)
+                fileSystem.write(it.name, it.dexFileInputStream.readAllBytes())
             }
 
             // inputFile being null implies resource patching being disabled

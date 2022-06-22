@@ -1,7 +1,6 @@
 package app.revanced.utils.signature
 
 import app.revanced.patcher.Patcher
-import org.jf.dexlib2.iface.Method
 
 object Signature {
 
@@ -49,7 +48,7 @@ object Signature {
          */
     }
 
-    private fun Method.toStr(): String {
-        return "${this.name}(${this.parameterTypes.joinToString("")})${this.returnType}"
-    }
+    //private fun Method.toStr(): String {
+    //    return "${this.name}(${this.parameterTypes.joinToString("")})${this.returnType}"
+    //}
 }
