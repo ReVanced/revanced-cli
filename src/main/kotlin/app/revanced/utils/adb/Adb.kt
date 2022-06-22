@@ -20,7 +20,7 @@ internal class Adb(
             ?: throw IllegalArgumentException("No such device with name $deviceName")
 
         if (!modeInstall && device.run("su -h", false) != 0)
-            throw IllegalArgumentException("Root required on $deviceName. Deploying failed.")
+            throw IllegalArgumentException("Root required on $deviceName. Deploying failed")
     }
 
     private fun String.replacePlaceholder(with: String? = null): String {
