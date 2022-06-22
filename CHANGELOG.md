@@ -1,3 +1,15 @@
+# [1.10.0](https://github.com/revanced/revanced-cli/compare/v1.9.3...v1.10.0) (2022-06-22)
+
+
+### Bug Fixes
+
+* add callback for addFiles ([87ffaa4](https://github.com/revanced/revanced-cli/commit/87ffaa4bdb25cb85c6ba7195f5d3b13b09a5f912))
+
+
+### Features
+
+* add logging back ([4a23cb6](https://github.com/revanced/revanced-cli/commit/4a23cb69bc385158d47b6ea8d3da54b0566a242c))
+
 ## [1.9.3](https://github.com/revanced/revanced-cli/compare/v1.9.2...v1.9.3) (2022-06-22)
 
 
