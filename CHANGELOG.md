@@ -1,3 +1,10 @@
+## [1.10.2](https://github.com/revanced/revanced-cli/compare/v1.10.1...v1.10.2) (2022-06-22)
+
+
+### Bug Fixes
+
+* keystore file not found exception ([#57](https://github.com/revanced/revanced-cli/issues/57)) ([5b8537e](https://github.com/revanced/revanced-cli/commit/5b8537e6b7922f1b44058c3a4fc2f56cb4e15e89))
+
 ## [1.10.1](https://github.com/revanced/revanced-cli/compare/v1.10.0...v1.10.1) (2022-06-22)
 
 
