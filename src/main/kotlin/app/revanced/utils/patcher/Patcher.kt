@@ -66,5 +66,7 @@ fun Patcher.applyPatchesVerbose() {
 }
 
 fun Patcher.mergeFiles() {
-    this.addFiles(args.pArgs!!.mergeFiles)
+    this.addFiles(args.pArgs!!.mergeFiles) {
+        println("[merged] ${it.name}")
+    }
 }
