@@ -35,7 +35,7 @@ fun Patcher.addPatchesFiltered(
                 return@patch
             }
 
-            if (compatiblePackages == null) logger.warning("$prefix: Missing compatibility annotation. Continuing.")
+            if (compatiblePackages == null) logger.warn("$prefix: Missing compatibility annotation. Continuing.")
             else {
                 if (!compatiblePackages.any { it.name == packageName }) {
                     logger.info("$prefix: Incompatible package")
@@ -63,7 +63,7 @@ fun Patcher.applyPatchesVerbose() {
 
             return@forEach
         }
-        logger.severe("Error: $patch")
+        logger.error("Error: $patch")
 
         result.exceptionOrNull()!!.printStackTrace()
     }

@@ -8,10 +8,11 @@ import app.revanced.patcher.extensions.PatchExtensions.description
 import app.revanced.patcher.extensions.PatchExtensions.patchName
 import app.revanced.patcher.util.patch.implementation.JarPatchBundle
 import app.revanced.utils.adb.Adb
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import picocli.CommandLine.*
 import java.io.File
 import java.nio.file.Files
-import java.util.logging.Logger
 import kotlin.io.path.Path
 import kotlin.io.path.name
 
@@ -19,7 +20,7 @@ import kotlin.io.path.name
     name = "ReVanced-CLI", version = ["1.0.0"], mixinStandardHelpOptions = true
 )
 internal object MainCommand : Runnable {
-    val logger: Logger = Logger.getLogger(MainCommand.javaClass.name)
+    val logger: Logger = LoggerFactory.getLogger(MainCommand::class.java)
 
     @ArgGroup(exclusive = false, multiplicity = "1")
     lateinit var args: Args
@@ -85,8 +86,6 @@ internal object MainCommand : Runnable {
     }
 
     override fun run() {
-        System.setProperty("java.util.logging.SimpleFormatter.format", "%4\$s: %5\$s %n")
-
         if (args.lArgs?.listOnly == true) {
             for (patchBundlePath in args.patchBundles) for (patch in JarPatchBundle(patchBundlePath).loadPatches()) {
                 logger.info("${patch.patchName}: ${patch.description}")
