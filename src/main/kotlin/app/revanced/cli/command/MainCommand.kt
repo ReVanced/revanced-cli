@@ -99,7 +99,7 @@ internal object MainCommand : Runnable {
             Adb(outputFile, patcher.data.packageMetadata.packageName, args.deploy!!, !args.mount)
         }
 
-        val patchedFile = if (args.mount) {
+        val patchedFile = if (!args.mount) {
             File(args.cacheDirectory).resolve("${outputFile.nameWithoutExtension}_raw.apk")
         } else outputFile
 
