@@ -3,8 +3,8 @@ package app.revanced.cli.command
 import app.revanced.cli.patcher.Patcher
 import app.revanced.cli.signing.Signing
 import app.revanced.patcher.PatcherOptions
-import app.revanced.patcher.extensions.PatchExtensions.patchName
 import app.revanced.patcher.extensions.PatchExtensions.description
+import app.revanced.patcher.extensions.PatchExtensions.patchName
 import app.revanced.patcher.util.patch.implementation.JarPatchBundle
 import app.revanced.utils.adb.Adb
 import picocli.CommandLine.*
@@ -12,9 +12,7 @@ import java.io.File
 import java.nio.file.Files
 
 @Command(
-    name = "ReVanced-CLI",
-    version = ["1.0.0"],
-    mixinStandardHelpOptions = true
+    name = "ReVanced-CLI", version = ["1.0.0"], mixinStandardHelpOptions = true
 )
 internal object MainCommand : Runnable {
     @ArgGroup(exclusive = false, multiplicity = "1")
@@ -99,9 +97,8 @@ internal object MainCommand : Runnable {
             Adb(outputFile, patcher.data.packageMetadata.packageName, args.deploy!!, !args.mount)
         }
 
-        val patchedFile = if (!args.mount) {
-            File(args.cacheDirectory).resolve("${outputFile.nameWithoutExtension}_raw.apk")
-        } else outputFile
+        val patchedFile = if (args.mount) outputFile
+        else File(args.cacheDirectory).resolve("${outputFile.nameWithoutExtension}_raw.apk")
 
         Patcher.start(patcher, patchedFile)
 
