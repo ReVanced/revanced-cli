@@ -10,11 +10,14 @@ import app.revanced.utils.adb.Adb
 import picocli.CommandLine.*
 import java.io.File
 import java.nio.file.Files
+import java.util.logging.Logger
 
 @Command(
     name = "ReVanced-CLI", version = ["1.0.0"], mixinStandardHelpOptions = true
 )
 internal object MainCommand : Runnable {
+    val logger: Logger = Logger.getLogger(MainCommand.javaClass.name)
+
     @ArgGroup(exclusive = false, multiplicity = "1")
     lateinit var args: Args
 
@@ -76,14 +79,18 @@ internal object MainCommand : Runnable {
     }
 
     override fun run() {
+        System.setProperty("java.util.logging.SimpleFormatter.format", "%4\$s: %5\$s %n")
+
         if (args.lArgs?.listOnly == true) {
             for (patchBundlePath in args.patchBundles) for (patch in JarPatchBundle(patchBundlePath).loadPatches()) {
-                println("[available] ${patch.patchName}: ${patch.description}")
+                logger.info("${patch.patchName}: ${patch.description}")
             }
             return
         }
 
         val args = args.pArgs ?: return
+
+        logger.info("Initialize patcher")
 
         val patcher = app.revanced.patcher.Patcher(
             PatcherOptions(
@@ -102,8 +109,6 @@ internal object MainCommand : Runnable {
 
         Patcher.start(patcher, patchedFile)
 
-        println("[aligning & signing]")
-
         if (!args.mount) {
             Signing.start(
                 patchedFile,
@@ -115,13 +120,10 @@ internal object MainCommand : Runnable {
 
         if (args.clean) File(args.cacheDirectory).deleteRecursively()
 
-        adb?.let {
-            println("[deploying]")
-            it.deploy()
-        }
+        adb?.deploy()
 
         if (args.clean && args.deploy != null) Files.delete(outputFile.toPath())
 
-        println("[done]")
+        logger.info("Done")
     }
 }

@@ -2,6 +2,7 @@ package app.revanced.utils.patcher
 
 import app.revanced.cli.command.MainCommand
 import app.revanced.cli.command.MainCommand.args
+import app.revanced.cli.command.MainCommand.logger
 import app.revanced.patcher.Patcher
 import app.revanced.patcher.data.base.Data
 import app.revanced.patcher.extensions.PatchExtensions.compatiblePackages
@@ -22,33 +23,34 @@ fun Patcher.addPatchesFiltered(
             val compatiblePackages = patch.compatiblePackages
             val patchName = patch.patchName
 
-            val prefix = "[skipped] $patchName"
+            val prefix = "Skip $patchName"
 
             val args = MainCommand.args.pArgs!!
 
             if (excludePatches && args.excludedPatches.contains(patchName)) {
-                println("$prefix: Explicitly excluded.")
+                logger.info("$prefix: Explicitly excluded")
                 return@patch
             } else if (!patch.include) {
-                println("$prefix: Implicitly excluded.")
+                logger.info("$prefix: Implicitly excluded")
                 return@patch
             }
 
-            if (compatiblePackages == null) println("$prefix: Missing compatibility annotation. Continuing.")
+            if (compatiblePackages == null) logger.warning("$prefix: Missing compatibility annotation. Continuing.")
             else {
                 if (!compatiblePackages.any { it.name == packageName }) {
-                    println("$prefix: Incompatible package.")
+                    logger.info("$prefix: Incompatible package")
                     return@patch
                 }
 
                 if (!(args.experimental || compatiblePackages.any { it.versions.isEmpty() || it.versions.any { version -> version == packageVersion } })) {
-                    println("$prefix: The package version is $packageVersion and is incompatible.")
+                    logger.info("$prefix: The package version is $packageVersion and is incompatible")
                     return@patch
                 }
             }
 
+            logger.info("Add $patchName")
+
             includedPatches.add(patch)
-            println("[added] $patchName")
         }
         this.addPatches(includedPatches)
     }
@@ -57,10 +59,12 @@ fun Patcher.addPatchesFiltered(
 fun Patcher.applyPatchesVerbose() {
     this.applyPatches().forEach { (patch, result) ->
         if (result.isSuccess) {
-            println("[success] $patch")
+            logger.info("Success: $patch")
+
             return@forEach
         }
-        println("[error] $patch:")
+        logger.severe("Error: $patch")
+
         result.exceptionOrNull()!!.printStackTrace()
     }
 }
