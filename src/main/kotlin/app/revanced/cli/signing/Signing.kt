@@ -20,8 +20,8 @@ object Signing {
         println("[signing]")
         val keyStore = Signer(signingOptions).signApk(alignedOutput, signedOutput)
 
-        // afterwards copy over the file and the keystore to the output
+        // afterwards copy over the file to the output
+        println(outputFile.absolutePath)
         signedOutput.copyTo(outputFile, true)
-        keyStore.copyTo(outputFile.resolveSibling(keyStore.name), true)
     }
 }
