@@ -12,10 +12,12 @@ object Signing {
         val signedOutput = cacheDirectory.resolve("${outputFile.nameWithoutExtension}_signed.apk")
 
         // align the inputFile and write to alignedOutput
+        println("[aligning]")
         ZipAligner.align(inputFile, alignedOutput)
         // sign the alignedOutput and write to signedOutput
         // the reason is, in case the signer fails
         // it does not damage the output file
+        println("[signing]")
         val keyStore = Signer(signingOptions).signApk(alignedOutput, signedOutput)
 
         // afterwards copy over the file and the keystore to the output

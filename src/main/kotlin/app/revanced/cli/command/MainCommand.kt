@@ -106,8 +106,6 @@ internal object MainCommand : Runnable {
 
         Patcher.start(patcher, patchedFile)
 
-        println("[aligning & signing]")
-
         if (!args.mount) {
             Signing.start(
                 patchedFile,
