@@ -1,3 +1,10 @@
+## [1.10.1](https://github.com/revanced/revanced-cli/compare/v1.10.0...v1.10.1) (2022-06-22)
+
+
+### Bug Fixes
+
+* show actual version in CLI ([1dcdbc9](https://github.com/revanced/revanced-cli/commit/1dcdbc9fe9e3ad2fe232ad3baa76d186817532a4))
+
 # [1.10.0](https://github.com/revanced/revanced-cli/compare/v1.9.3...v1.10.0) (2022-06-22)
 
 
