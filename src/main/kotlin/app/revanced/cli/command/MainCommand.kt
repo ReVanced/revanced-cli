@@ -2,6 +2,7 @@ package app.revanced.cli.command
 
 import app.revanced.cli.patcher.Patcher
 import app.revanced.cli.signing.Signing
+import app.revanced.cli.signing.SigningOptions
 import app.revanced.patcher.PatcherOptions
 import app.revanced.patcher.extensions.PatchExtensions.description
 import app.revanced.patcher.extensions.PatchExtensions.patchName
@@ -59,6 +60,9 @@ internal object MainCommand : Runnable {
         @Option(names = ["--cn"], description = ["Overwrite the default CN for the signed file"])
         var cn = "ReVanced"
 
+        @Option(names = ["--keystore"], description = ["File path to your keystore"])
+        var keystorePath: String? = null
+
         @Option(names = ["-p", "--password"], description = ["Overwrite the default password for the signed file"])
         var password = "ReVanced"
 
@@ -108,8 +112,13 @@ internal object MainCommand : Runnable {
             Signing.start(
                 patchedFile,
                 outputFile,
-                args.cn,
-                args.password,
+                SigningOptions(
+                    args.cn,
+                    args.password,
+                    args.keystorePath ?: outputFile.parentFile
+                        .resolve("${outputFile.nameWithoutExtension}.keystore")
+                        .name
+                )
             )
         }
 
