@@ -33,7 +33,6 @@ dependencies {
     implementation(kotlin("reflect"))
 
     implementation("app.revanced:revanced-patcher:1.6.0")
-    implementation("org.slf4j:slf4j-api:1.7.36")
     implementation("info.picocli:picocli:4.6.3")
     implementation("com.android.tools.build:apksig:7.2.1")
     implementation("com.github.revanced:jadb:master-SNAPSHOT") // updated fork

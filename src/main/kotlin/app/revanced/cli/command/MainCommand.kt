@@ -2,26 +2,19 @@ package app.revanced.cli.command
 
 import app.revanced.cli.patcher.Patcher
 import app.revanced.cli.signing.Signing
-import app.revanced.cli.signing.SigningOptions
 import app.revanced.patcher.PatcherOptions
 import app.revanced.patcher.extensions.PatchExtensions.description
 import app.revanced.patcher.extensions.PatchExtensions.patchName
 import app.revanced.patcher.util.patch.implementation.JarPatchBundle
 import app.revanced.utils.adb.Adb
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import picocli.CommandLine.*
 import java.io.File
 import java.nio.file.Files
-import kotlin.io.path.Path
-import kotlin.io.path.name
 
 @Command(
     name = "ReVanced-CLI", version = ["1.0.0"], mixinStandardHelpOptions = true
 )
 internal object MainCommand : Runnable {
-    val logger: Logger = LoggerFactory.getLogger(MainCommand::class.java)
-
     @ArgGroup(exclusive = false, multiplicity = "1")
     lateinit var args: Args
 
@@ -66,9 +59,6 @@ internal object MainCommand : Runnable {
         @Option(names = ["--cn"], description = ["Overwrite the default CN for the signed file"])
         var cn = "ReVanced"
 
-        @Option(names = ["--keystore"], description = ["File path to your keystore"])
-        var keystorePath: String? = null
-
         @Option(names = ["-p", "--password"], description = ["Overwrite the default password for the signed file"])
         var password = "ReVanced"
 
@@ -88,14 +78,12 @@ internal object MainCommand : Runnable {
     override fun run() {
         if (args.lArgs?.listOnly == true) {
             for (patchBundlePath in args.patchBundles) for (patch in JarPatchBundle(patchBundlePath).loadPatches()) {
-                logger.info("${patch.patchName}: ${patch.description}")
+                println("[available] ${patch.patchName}: ${patch.description}")
             }
             return
         }
 
         val args = args.pArgs ?: return
-
-        logger.info("Initialize patcher")
 
         val patcher = app.revanced.patcher.Patcher(
             PatcherOptions(
@@ -114,23 +102,26 @@ internal object MainCommand : Runnable {
 
         Patcher.start(patcher, patchedFile)
 
+        println("[aligning & signing]")
+
         if (!args.mount) {
             Signing.start(
-                patchedFile, outputFile, SigningOptions(
-                    args.cn,
-                    args.password,
-                    args.keystorePath
-                        ?: Path(outputFile.parent).resolve("${outputFile.nameWithoutExtension}.keystore").name
-                )
+                patchedFile,
+                outputFile,
+                args.cn,
+                args.password,
             )
         }
 
         if (args.clean) File(args.cacheDirectory).deleteRecursively()
 
-        adb?.deploy()
+        adb?.let {
+            println("[deploying]")
+            it.deploy()
+        }
 
         if (args.clean && args.deploy != null) Files.delete(outputFile.toPath())
 
-        logger.info("Done")
+        println("[done]")
     }
 }

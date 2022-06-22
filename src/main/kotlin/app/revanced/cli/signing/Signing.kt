@@ -1,7 +1,6 @@
 package app.revanced.cli.signing
 
 import app.revanced.cli.command.MainCommand.args
-import app.revanced.cli.command.MainCommand.logger
 import app.revanced.utils.signing.Signer
 import app.revanced.utils.signing.align.ZipAligner
 import java.io.File
@@ -12,13 +11,8 @@ object Signing {
         val alignedOutput = cacheDirectory.resolve("${outputFile.nameWithoutExtension}_aligned.apk")
         val signedOutput = cacheDirectory.resolve("${outputFile.nameWithoutExtension}_signed.apk")
 
-        logger.info("Align zip entries")
-
         // align the inputFile and write to alignedOutput
         ZipAligner.align(inputFile, alignedOutput)
-
-        logger.info("Sign zip file")
-
         // sign the alignedOutput and write to signedOutput
         // the reason is, in case the signer fails
         // it does not damage the output file

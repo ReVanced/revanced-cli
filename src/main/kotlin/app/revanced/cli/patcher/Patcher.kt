@@ -1,7 +1,6 @@
 package app.revanced.cli.patcher
 
 import app.revanced.cli.command.MainCommand.args
-import app.revanced.cli.command.MainCommand.logger
 import app.revanced.utils.filesystem.ZipFileSystemUtils
 import app.revanced.utils.patcher.addPatchesFiltered
 import app.revanced.utils.patcher.applyPatchesVerbose
@@ -31,12 +30,8 @@ internal object Patcher {
         ZipFileSystemUtils(inputFile, output).use { fileSystem ->
             // replace all dex files
             result.dexFiles.forEach {
-                logger.info("Write ${it.name}")
-
                 fileSystem.write(it.name, it.dexFileInputStream.readAllBytes())
             }
-
-            logger.info("Write resources")
 
             // inputFile being null implies resource patching being disabled
             if (inputFile != null) {

@@ -1,6 +1,5 @@
 package app.revanced.utils.adb
 
-import app.revanced.cli.command.MainCommand.logger
 import se.vidstige.jadb.JadbConnection
 import se.vidstige.jadb.JadbDevice
 import se.vidstige.jadb.managers.PackageManager
@@ -30,12 +29,8 @@ internal class Adb(
 
     internal fun deploy() {
         if (modeInstall) {
-            logger.info("Install without mount")
-
             PackageManager(device).install(file)
         } else {
-            logger.info("Install by mount")
-
             // push patched file
             device.copy(Constants.PATH_INIT_PUSH, file)
 
