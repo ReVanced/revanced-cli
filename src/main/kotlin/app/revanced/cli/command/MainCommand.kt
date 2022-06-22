@@ -13,8 +13,16 @@ import picocli.CommandLine.*
 import java.io.File
 import java.nio.file.Files
 
+private class CLIVersionProvider : IVersionProvider {
+    override fun getVersion() = arrayOf(
+        MainCommand::class.java.`package`.implementationVersion ?: "unknown"
+    )
+}
+
 @Command(
-    name = "ReVanced-CLI", version = ["1.0.0"], mixinStandardHelpOptions = true
+    name = "ReVanced-CLI",
+    mixinStandardHelpOptions = true,
+    versionProvider = CLIVersionProvider::class
 )
 internal object MainCommand : Runnable {
     @ArgGroup(exclusive = false, multiplicity = "1")
