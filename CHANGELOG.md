@@ -1,3 +1,11 @@
+## [1.7.1](https://github.com/revanced/revanced-cli/compare/v1.7.0...v1.7.1) (2022-06-22)
+
+
+### Bug Fixes
+
+* migrate to changes of patcher ([b30c737](https://github.com/revanced/revanced-cli/commit/b30c7375a7ea61184be5dca19062ee74d1f97692))
+* wrong variable inverted ([f694542](https://github.com/revanced/revanced-cli/commit/f694542d64ccb06bfa4d042f26b6b7192d1e912e))
+
 # [1.7.0](https://github.com/revanced/revanced-cli/compare/v1.6.3...v1.7.0) (2022-06-21)
 
 
