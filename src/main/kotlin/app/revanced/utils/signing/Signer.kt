@@ -55,7 +55,7 @@ internal class Signer(
         // TODO: keystore should be saved securely
         val ks = File(signingOptions.keyStoreFilePath)
         if (!ks.exists()) newKeystore(ks) else {
-            println("found existing keystore: ${ks.nameWithoutExtension}")
+            println("[found] existing keystore: ${ks.nameWithoutExtension}")
         }
 
         val keyStore = KeyStore.getInstance("BKS", "BC")
