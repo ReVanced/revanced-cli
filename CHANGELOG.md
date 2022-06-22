@@ -1,3 +1,10 @@
+# [1.9.0](https://github.com/revanced/revanced-cli/compare/v1.8.0...v1.9.0) (2022-06-22)
+
+
+### Features
+
+* migrate logger to `slf4j` ([6c4c192](https://github.com/revanced/revanced-cli/commit/6c4c1924ee9ae75af3449749a6a82b7ae5572129))
+
 # [1.8.0](https://github.com/revanced/revanced-cli/compare/v1.7.1...v1.8.0) (2022-06-22)
 
 
