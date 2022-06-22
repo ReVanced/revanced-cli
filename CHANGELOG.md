@@ -1,3 +1,16 @@
+## [1.9.1](https://github.com/revanced/revanced-cli/compare/v1.9.0...v1.9.1) (2022-06-22)
+
+
+### Bug Fixes
+
+* add back in: option to specify keystore file path ([c94471f](https://github.com/revanced/revanced-cli/commit/c94471f4643e44b2b472ff0d826db0d2743bdc86))
+* remove logger from Signer.kt ([51e091c](https://github.com/revanced/revanced-cli/commit/51e091ce4021418508044029aa5af6aa7d5162a3))
+
+
+### Reverts
+
+* "feat: use of `java.util.logging.Logger`" ([2c8a106](https://github.com/revanced/revanced-cli/commit/2c8a10615192635202ddc137fc02f175c5914d8f))
+
 # [1.9.0](https://github.com/revanced/revanced-cli/compare/v1.8.0...v1.9.0) (2022-06-22)
 
 
