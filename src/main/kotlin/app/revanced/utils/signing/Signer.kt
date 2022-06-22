@@ -49,7 +49,7 @@ internal class Signer(
         return JcaX509CertificateConverter().getCertificate(builder.build(signer)) to pair.private
     }
 
-    fun signApk(input: File, output: File): File {
+    fun signApk(input: File, output: File) {
         Security.addProvider(BouncyCastleProvider())
 
         // TODO: keystore should be saved securely
@@ -74,7 +74,5 @@ internal class Signer(
         signer.setOutputApk(output)
 
         signer.build().sign()
-
-        return ks
     }
 }

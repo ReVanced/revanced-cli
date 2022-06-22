@@ -18,10 +18,9 @@ object Signing {
         // the reason is, in case the signer fails
         // it does not damage the output file
         println("[signing]")
-        val keyStore = Signer(signingOptions).signApk(alignedOutput, signedOutput)
+        Signer(signingOptions).signApk(alignedOutput, signedOutput)
 
-        // afterwards copy over the file and the keystore to the output
+        // afterwards copy over the file to the output
         signedOutput.copyTo(outputFile, true)
-        keyStore.copyTo(outputFile.resolveSibling(keyStore.name), true)
     }
 }
