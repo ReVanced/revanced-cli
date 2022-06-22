@@ -117,7 +117,7 @@ internal object MainCommand : Runnable {
                 SigningOptions(
                     args.cn,
                     args.password,
-                    args.keystorePath ?: outputFile.parentFile
+                    args.keystorePath ?: outputFile.absoluteFile.parentFile
                         .resolve("${outputFile.nameWithoutExtension}.keystore")
                         .name
                 )
