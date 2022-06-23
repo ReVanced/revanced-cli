@@ -1,6 +1,7 @@
 package app.revanced.cli.signing
 
 import app.revanced.cli.command.MainCommand.args
+import app.revanced.cli.command.MainCommand.logger
 import app.revanced.utils.signing.Signer
 import app.revanced.utils.signing.align.ZipAligner
 import java.io.File
@@ -12,15 +13,16 @@ object Signing {
         val signedOutput = cacheDirectory.resolve("${outputFile.nameWithoutExtension}_signed.apk")
 
         // align the inputFile and write to alignedOutput
-        println("[aligning]")
+        logger.info("Aligning ${inputFile.name}")
         ZipAligner.align(inputFile, alignedOutput)
         // sign the alignedOutput and write to signedOutput
         // the reason is, in case the signer fails
         // it does not damage the output file
-        println("[signing]")
+        logger.info("Signing ${alignedOutput.name}")
         Signer(signingOptions).signApk(alignedOutput, signedOutput)
 
         // afterwards copy over the file to the output
+        logger.info("Copying ${signedOutput.name} to ${outputFile.name}")
         signedOutput.copyTo(outputFile, true)
     }
 }

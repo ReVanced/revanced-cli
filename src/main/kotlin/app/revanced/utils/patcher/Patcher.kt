@@ -2,6 +2,7 @@ package app.revanced.utils.patcher
 
 import app.revanced.cli.command.MainCommand
 import app.revanced.cli.command.MainCommand.args
+import app.revanced.cli.command.MainCommand.logger
 import app.revanced.patcher.Patcher
 import app.revanced.patcher.data.base.Data
 import app.revanced.patcher.extensions.PatchExtensions.compatiblePackages
@@ -22,33 +23,40 @@ fun Patcher.addPatchesFiltered(
             val compatiblePackages = patch.compatiblePackages
             val patchName = patch.patchName
 
-            val prefix = "[skipped] $patchName"
+            val prefix = "Skipping $patchName"
 
             val args = MainCommand.args.pArgs!!
 
             if (excludePatches && args.excludedPatches.contains(patchName)) {
-                println("$prefix: Explicitly excluded.")
+                logger.info("$prefix: Explicitly excluded")
                 return@patch
             } else if (!patch.include) {
-                println("$prefix: Implicitly excluded.")
+                logger.info("$prefix: Explicitly excluded")
                 return@patch
             }
 
-            if (compatiblePackages == null) println("$prefix: Missing compatibility annotation. Continuing.")
+            if (compatiblePackages == null) logger.warn("$prefix: Missing compatibility annotation. Continuing.")
             else {
                 if (!compatiblePackages.any { it.name == packageName }) {
-                    println("$prefix: Incompatible package.")
+                    logger.warn("$prefix: Incompatible with $packageName. This patch is only compatible with ${
+                        compatiblePackages.joinToString(
+                            ", "
+                        ) { it.name }
+                    }")
                     return@patch
                 }
 
                 if (!(args.experimental || compatiblePackages.any { it.versions.isEmpty() || it.versions.any { version -> version == packageVersion } })) {
-                    println("$prefix: The package version is $packageVersion and is incompatible.")
+                    val compatibleWith = compatiblePackages.map { _package ->
+                        "${_package.name}: ${_package.versions.joinToString(", ")}"
+                    }.joinToString(";")
+                    logger.warn("$prefix: Incompatible with version $packageVersion. This patch is only compatible with version $compatibleWith")
                     return@patch
                 }
             }
 
+            logger.trace("Adding $patchName")
             includedPatches.add(patch)
-            println("[added] $patchName")
         }
         this.addPatches(includedPatches)
     }
@@ -57,16 +65,16 @@ fun Patcher.addPatchesFiltered(
 fun Patcher.applyPatchesVerbose() {
     this.applyPatches().forEach { (patch, result) ->
         if (result.isSuccess) {
-            println("[success] $patch")
+            logger.info("$patch succeeded")
             return@forEach
         }
-        println("[error] $patch:")
+        logger.error("$patch failed:")
         result.exceptionOrNull()!!.printStackTrace()
     }
 }
 
 fun Patcher.mergeFiles() {
-    this.addFiles(args.pArgs!!.mergeFiles) {
-        println("[merged] ${it.name}")
+    this.addFiles(args.pArgs!!.mergeFiles) { file ->
+        logger.info("Merging $file")
     }
 }

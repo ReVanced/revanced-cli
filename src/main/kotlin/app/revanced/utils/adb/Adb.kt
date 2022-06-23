@@ -1,5 +1,6 @@
 package app.revanced.utils.adb
 
+import app.revanced.cli.command.MainCommand.logger
 import se.vidstige.jadb.JadbConnection
 import se.vidstige.jadb.JadbDevice
 import se.vidstige.jadb.managers.PackageManager
@@ -29,8 +30,12 @@ internal class Adb(
 
     internal fun deploy() {
         if (modeInstall) {
+            logger.info("Installing without mounting")
+
             PackageManager(device).install(file)
         } else {
+            logger.info("Installing by mounting")
+
             // push patched file
             device.copy(Constants.PATH_INIT_PUSH, file)
 
@@ -91,10 +96,10 @@ internal class Adb(
                 }
                 break
             } catch (e: Exception) {
-                throw RuntimeException("An error occurred while monitoring state of app", e)
+                throw RuntimeException("An error occurred while monitoring the state of app", e)
             }
         }
-        println("App closed, continuing.")
+        logger.info("Stopped logging because the app was closed")
         process.destroy()
         executor.shutdown()
     }

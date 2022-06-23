@@ -1,5 +1,6 @@
 package app.revanced.utils.signing
 
+import app.revanced.cli.command.MainCommand.logger
 import app.revanced.cli.signing.SigningOptions
 import com.android.apksig.ApkSigner
 import org.bouncycastle.asn1.x500.X500Name
@@ -55,7 +56,7 @@ internal class Signer(
         // TODO: keystore should be saved securely
         val ks = File(signingOptions.keyStoreFilePath)
         if (!ks.exists()) newKeystore(ks) else {
-            println("[found] existing keystore: ${ks.nameWithoutExtension}")
+            logger.info("Found existing keystore: ${ks.nameWithoutExtension}")
         }
 
         val keyStore = KeyStore.getInstance("BKS", "BC")

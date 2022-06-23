@@ -1,7 +1,8 @@
 package app.revanced.cli.command
 
+import app.revanced.cli.logging.impl.DefaultCliLogger
 import app.revanced.cli.patcher.Patcher
-import app.revanced.cli.patcher.PatcherLogger
+import app.revanced.cli.patcher.logging.impl.PatcherLogger
 import app.revanced.cli.signing.Signing
 import app.revanced.cli.signing.SigningOptions
 import app.revanced.patcher.PatcherOptions
@@ -25,6 +26,8 @@ private class CLIVersionProvider : IVersionProvider {
     versionProvider = CLIVersionProvider::class
 )
 internal object MainCommand : Runnable {
+    val logger = DefaultCliLogger()
+
     @ArgGroup(exclusive = false, multiplicity = "1")
     lateinit var args: Args
 
@@ -91,7 +94,7 @@ internal object MainCommand : Runnable {
     override fun run() {
         if (args.lArgs?.listOnly == true) {
             for (patchBundlePath in args.patchBundles) for (patch in JarPatchBundle(patchBundlePath).loadPatches()) {
-                println("[available] ${patch.patchName}: ${patch.description}")
+                logger.info("${patch.patchName}: ${patch.description}")
             }
             return
         }
@@ -134,13 +137,10 @@ internal object MainCommand : Runnable {
 
         if (args.clean) File(args.cacheDirectory).deleteRecursively()
 
-        adb?.let {
-            println("[deploying]")
-            it.deploy()
-        }
+        adb?.deploy()
 
         if (args.clean && args.deploy != null) Files.delete(outputFile.toPath())
 
-        println("[done]")
+        logger.info("Finished")
     }
 }
