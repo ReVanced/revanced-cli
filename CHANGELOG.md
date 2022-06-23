@@ -1,3 +1,10 @@
+# [1.11.0](https://github.com/revanced/revanced-cli/compare/v1.10.2...v1.11.0) (2022-06-23)
+
+
+### Features
+
+* improve logging ([df85fa3](https://github.com/revanced/revanced-cli/commit/df85fa37ef067681a027e6fe9212c8a065d4981b))
+
 ## [1.10.2](https://github.com/revanced/revanced-cli/compare/v1.10.1...v1.10.2) (2022-06-22)
 
 
