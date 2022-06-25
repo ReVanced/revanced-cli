@@ -5,6 +5,7 @@ import se.vidstige.jadb.RemoteFile
 import se.vidstige.jadb.ShellProcessBuilder
 import java.io.File
 
+
 internal fun JadbDevice.buildCommand(command: String, su: Boolean = true): ShellProcessBuilder {
     if (su) {
         return shellProcessBuilder("su -c \'$command\'")
@@ -17,7 +18,19 @@ internal fun JadbDevice.buildCommand(command: String, su: Boolean = true): Shell
 }
 
 internal fun JadbDevice.run(command: String, su: Boolean = true): Int {
-    return this.buildCommand(command, su).start().waitFor()
+    if (su) {
+        return this.buildCommand(command, su).start().waitFor()
+    }
+
+    // Avoid deadlock whilst checking for root access
+    val adbCommand = this.buildCommand(command, su).start()
+    val byteArray = ByteArray(512)
+    val inputStream = adbCommand.inputStream
+    while (inputStream.read(byteArray) != -1){
+        Constants.SUPERSU = true
+    }
+    inputStream.close()
+    return adbCommand.waitFor()
 }
 
 internal fun JadbDevice.copy(targetPath: String, file: File) {
