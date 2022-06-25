@@ -1,3 +1,10 @@
+## [1.11.2](https://github.com/Itroublve/revanced-cli/compare/v1.11.1...v1.11.2) (2022-06-25)
+
+
+### Bug Fixes
+
+* deadlock when executing `su -h` using SuperSU ([6c38984](https://github.com/Itroublve/revanced-cli/commit/6c38984b3af2a1f8136af133ceec8ba22b5c0924))
+
 ## [1.11.1](https://github.com/revanced/revanced-cli/compare/v1.11.0...v1.11.1) (2022-06-25)
 
 
