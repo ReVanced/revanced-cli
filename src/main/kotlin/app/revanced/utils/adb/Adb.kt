@@ -34,7 +34,7 @@ internal class Adb(
 
             PackageManager(device).install(file)
         } else {
-            logger.info("Installing by mounting | Root method: ${if (Constants.SUPERSU) "SuperSU" else "Magisk"}")
+            logger.info("Installing by mounting (method: ${if (Constants.SUPERSU) "SuperSU" else "Magisk"})")
 
             // push patched file
             device.copy(Constants.PATH_INIT_PUSH, file)
