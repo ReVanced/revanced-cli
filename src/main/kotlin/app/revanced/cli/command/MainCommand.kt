@@ -6,6 +6,7 @@ import app.revanced.cli.patcher.logging.impl.PatcherLogger
 import app.revanced.cli.signing.Signing
 import app.revanced.cli.signing.SigningOptions
 import app.revanced.patcher.PatcherOptions
+import app.revanced.patcher.extensions.PatchExtensions.compatiblePackages
 import app.revanced.patcher.extensions.PatchExtensions.description
 import app.revanced.patcher.extensions.PatchExtensions.patchName
 import app.revanced.patcher.util.patch.implementation.JarPatchBundle
@@ -43,8 +44,11 @@ internal object MainCommand : Runnable {
     }
 
     class ListingArgs {
-        @Option(names = ["-l", "--list"], description = ["List patches only"], required = true)
+        @Option(names = ["-l", "--list"], description = ["List patches only"])
         var listOnly: Boolean = false
+
+        @Option(names = ["--compatibility"], description = ["List patches compatibilities"])
+        var compatibility: Boolean = false
     }
 
     class PatchingArgs {
@@ -99,6 +103,11 @@ internal object MainCommand : Runnable {
             return
         }
 
+        if (args.lArgs?.compatibility == true){
+            printCompatibilities()
+            return
+        }
+
         val args = args.pArgs ?: return
 
         val patcher = app.revanced.patcher.Patcher(
@@ -142,5 +151,16 @@ internal object MainCommand : Runnable {
         if (args.clean && args.deploy != null) Files.delete(outputFile.toPath())
 
         logger.info("Finished")
+    }
+
+    private fun printCompatibilities() {
+        for (patchBundlePath in args.patchBundles) for (patch in JarPatchBundle(patchBundlePath).loadPatches()) {
+            for (compatiblePackage in patch.compatiblePackages!!) {
+                val packageName = compatiblePackage.name.substringAfterLast(".").padStart(10)
+                val patchName = patch.patchName.padStart(25)
+                val compatibleVersions = compatiblePackage.versions.joinToString(separator = ", ")
+                logger.info("$packageName\t$patchName\t$compatibleVersions")
+            }
+        }
     }
 }
