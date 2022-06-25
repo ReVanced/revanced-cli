@@ -44,11 +44,17 @@ internal object MainCommand : Runnable {
     }
 
     class ListingArgs {
-        @Option(names = ["-l", "--list"], description = ["List patches only"])
+        @Option(names = ["-l", "--list"], description = ["List patches only"], required = true)
         var listOnly: Boolean = false
 
-        @Option(names = ["--compatibility"], description = ["List patches compatibilities"])
-        var compatibility: Boolean = false
+        @Option(names = ["--with-versions"], description = ["List patches with compatible versions"])
+        var withVersions: Boolean = false
+
+        @Option(names = ["--with-packages"], description = ["List patches with compatible packages"])
+        var withPackages: Boolean = false
+
+        @Option(names = ["--with-descriptions"], description = ["List patches with their descriptions"])
+        var withDescriptions: Boolean = true
     }
 
     class PatchingArgs {
@@ -97,14 +103,7 @@ internal object MainCommand : Runnable {
 
     override fun run() {
         if (args.lArgs?.listOnly == true) {
-            for (patchBundlePath in args.patchBundles) for (patch in JarPatchBundle(patchBundlePath).loadPatches()) {
-                logger.info("${patch.patchName}: ${patch.description}")
-            }
-            return
-        }
-
-        if (args.lArgs?.compatibility == true){
-            printCompatibilities()
+            printListOfPatches()
             return
         }
 
@@ -153,13 +152,33 @@ internal object MainCommand : Runnable {
         logger.info("Finished")
     }
 
-    private fun printCompatibilities() {
+    private fun printListOfPatches() {
         for (patchBundlePath in args.patchBundles) for (patch in JarPatchBundle(patchBundlePath).loadPatches()) {
             for (compatiblePackage in patch.compatiblePackages!!) {
-                val packageName = compatiblePackage.name.substringAfterLast(".").padStart(10)
-                val patchName = patch.patchName.padStart(25)
-                val compatibleVersions = compatiblePackage.versions.joinToString(separator = ", ")
-                logger.info("$packageName\t$patchName\t$compatibleVersions")
+                val packageEntryStr = buildString {
+                    // Add package if flag is set
+                    if (args.lArgs?.withPackages == true) {
+                        val packageName = compatiblePackage.name.substringAfterLast(".").padStart(10)
+                        append(packageName)
+                        append("\t")
+                    }
+                    // Add patch name
+                    val patchName = patch.patchName.padStart(25)
+                    append(patchName)
+                    // Add description if flag is set.
+                    if (args.lArgs?.withDescriptions == true) {
+                        append("\t")
+                        append(patch.description)
+                    }
+                    // Add compatible versions, if flag is set
+                    if (args.lArgs?.withVersions == true) {
+                        val compatibleVersions = compatiblePackage.versions.joinToString(separator = ", ")
+                        append("\t")
+                        append(compatibleVersions)
+                    }
+
+                }
+                logger.info(packageEntryStr)
             }
         }
     }
