@@ -1,3 +1,10 @@
+## [1.11.1](https://github.com/revanced/revanced-cli/compare/v1.11.0...v1.11.1) (2022-06-25)
+
+
+### Bug Fixes
+
+* update patcher version ([499ce0a](https://github.com/revanced/revanced-cli/commit/499ce0a6fb1993ad48ffdd9c9e8307e8d0c179c6))
+
 # [1.11.0](https://github.com/revanced/revanced-cli/compare/v1.10.2...v1.11.0) (2022-06-23)
 
 
