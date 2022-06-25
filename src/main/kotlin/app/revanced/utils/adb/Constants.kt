@@ -48,6 +48,7 @@ internal object Constants {
             
             base_path="$PATH_REVANCED_APP"
             stock_path=${'$'}( pm path $PLACEHOLDER | grep base | sed 's/package://g' )
+            
             chcon u:object_r:apk_data_file:s0  ${'$'}base_path
             mount -o bind ${'$'}base_path ${'$'}stock_path
         """.trimIndent()

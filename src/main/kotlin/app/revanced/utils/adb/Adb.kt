@@ -1,7 +1,6 @@
 package app.revanced.utils.adb
 
 import app.revanced.cli.command.MainCommand.logger
-import app.revanced.utils.adb.Constants.SUPERSU
 import se.vidstige.jadb.JadbConnection
 import se.vidstige.jadb.JadbDevice
 import se.vidstige.jadb.managers.PackageManager
@@ -35,7 +34,7 @@ internal class Adb(
 
             PackageManager(device).install(file)
         } else {
-            logger.info("Installing by mounting | Root method: ${if (SUPERSU) "SuperSU" else "Magisk"}")
+            logger.info("Installing by mounting | Root method: ${if (Constants.SUPERSU) "SuperSU" else "Magisk"}")
 
             // push patched file
             device.copy(Constants.PATH_INIT_PUSH, file)

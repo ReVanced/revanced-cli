@@ -5,7 +5,6 @@ import se.vidstige.jadb.RemoteFile
 import se.vidstige.jadb.ShellProcessBuilder
 import java.io.File
 
-
 internal fun JadbDevice.buildCommand(command: String, su: Boolean = true): ShellProcessBuilder {
     if (su) {
         return shellProcessBuilder("su -c \'$command\'")
