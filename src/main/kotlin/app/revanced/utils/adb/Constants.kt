@@ -8,7 +8,8 @@ internal object Constants {
     internal var SUPERSU: Boolean = false
 
     // utility commands
-    private val COMMAND_CHMOD_MOUNT = if (SUPERSU) "chmod 700" else "chmod +x"
+    private val COMMAND_CHMOD_MOUNT: String
+        get() = if (this.SUPERSU) "chmod 700" else "chmod +x"
     internal const val COMMAND_PID_OF = "pidof -s"
     internal const val COMMAND_CREATE_DIR = "mkdir -p"
     internal const val COMMAND_LOGCAT = "logcat -c && logcat | grep AndroidRuntime"
@@ -26,8 +27,9 @@ internal object Constants {
     // revanced apk path
     private const val PATH_REVANCED_APP = "$PATH_REVANCED$PLACEHOLDER.apk"
 
-    // (un)mount script paths
-    internal val PATH_MOUNT = if (SUPERSU) "/su/su.d/$NAME_MOUNT_SCRIPT" else "/data/adb/service.d/$NAME_MOUNT_SCRIPT"
+    // mount script path
+    internal val PATH_MOUNT: String
+        get() = if (SUPERSU) "/su/su.d/$NAME_MOUNT_SCRIPT" else "/data/adb/service.d/$NAME_MOUNT_SCRIPT"
 
     // move to revanced apk path & set permissions
     internal const val COMMAND_PREPARE_MOUNT_APK =
@@ -38,7 +40,8 @@ internal object Constants {
         "stock_path=${'$'}( pm path $PLACEHOLDER | grep base | sed 's/package://g' ) && umount -l ${'$'}stock_path"
 
     // install mount script & set permissions
-    internal val COMMAND_INSTALL_MOUNT = "mv $PATH_INIT_PUSH $PATH_MOUNT && $COMMAND_CHMOD_MOUNT $PATH_MOUNT"
+    internal val COMMAND_INSTALL_MOUNT : String
+        get() = "mv $PATH_INIT_PUSH $PATH_MOUNT && $COMMAND_CHMOD_MOUNT $PATH_MOUNT"
 
     // mount script
     internal val CONTENT_MOUNT_SCRIPT =

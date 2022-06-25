@@ -1,5 +1,6 @@
 package app.revanced.utils.adb
 
+import app.revanced.cli.command.MainCommand.logger
 import se.vidstige.jadb.JadbDevice
 import se.vidstige.jadb.RemoteFile
 import se.vidstige.jadb.ShellProcessBuilder
@@ -18,17 +19,24 @@ internal fun JadbDevice.buildCommand(command: String, su: Boolean = true): Shell
 
 internal fun JadbDevice.run(command: String, su: Boolean = true): Int {
     if (su) {
-        return this.buildCommand(command, su).start().waitFor()
+        return this.buildCommand(command, true).start().waitFor()
     }
 
     // Avoid deadlock whilst checking for root access
-    val adbCommand = this.buildCommand(command, su).start()
-    val byteArray = ByteArray(512)
-    val inputStream = adbCommand.inputStream
-    while (inputStream.read(byteArray) != -1){
+    val byteArray = ByteArray(8) // Length of 'MagiskSU'
+    val adbCommand = this.buildCommand(command, false).start()
+    val adbInputStream = adbCommand.inputStream
+    adbInputStream.read(byteArray)
+
+    // Check if SuperSU or some other unsupported SU
+    if (String(byteArray).filter { !it.isWhitespace() } == "SuperSU") {
         Constants.SUPERSU = true
     }
-    inputStream.close()
+    else if (String(byteArray).filter { !it.isWhitespace() }.contains("SU") && String(byteArray) != "MagiskSU") {
+        logger.warn("Unsupported SU.")
+    }
+
+    adbInputStream.close()
     return adbCommand.waitFor()
 }
 
