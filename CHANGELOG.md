@@ -1,3 +1,15 @@
+# [2.0.0](https://github.com/revanced/revanced-cli/compare/v1.11.1...v2.0.0) (2022-06-26)
+
+
+### Code Refactoring
+
+* migrate from `Signature` to `Fingerprint` ([88852a4](https://github.com/revanced/revanced-cli/commit/88852a45ac90ad9419c18f0cb3395745e62eadbf))
+
+
+### BREAKING CHANGES
+
+* Not backwards compatible, since a lot of classes where renamed.
+
 ## [1.11.1](https://github.com/revanced/revanced-cli/compare/v1.11.0...v1.11.1) (2022-06-25)
 
 
