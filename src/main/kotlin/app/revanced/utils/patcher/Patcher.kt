@@ -4,11 +4,11 @@ import app.revanced.cli.command.MainCommand
 import app.revanced.cli.command.MainCommand.args
 import app.revanced.cli.command.MainCommand.logger
 import app.revanced.patcher.Patcher
-import app.revanced.patcher.data.base.Data
+import app.revanced.patcher.data.Data
 import app.revanced.patcher.extensions.PatchExtensions.compatiblePackages
 import app.revanced.patcher.extensions.PatchExtensions.include
 import app.revanced.patcher.extensions.PatchExtensions.patchName
-import app.revanced.patcher.patch.base.Patch
+import app.revanced.patcher.patch.Patch
 import app.revanced.patcher.util.patch.implementation.JarPatchBundle
 
 fun Patcher.addPatchesFiltered(
