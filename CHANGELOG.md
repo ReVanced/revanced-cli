@@ -1,3 +1,10 @@
+## [2.0.3](https://github.com/revanced/revanced-cli/compare/v2.0.2...v2.0.3) (2022-06-27)
+
+
+### Bug Fixes
+
+* wrong keystore output path ([20fa179](https://github.com/revanced/revanced-cli/commit/20fa17957e3e454b9755bc7b9b473b6c578cc593))
+
 ## [2.0.2](https://github.com/revanced/revanced-cli/compare/v2.0.1...v2.0.2) (2022-06-27)
 
 
