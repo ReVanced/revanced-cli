@@ -1,3 +1,10 @@
+## [2.0.2](https://github.com/revanced/revanced-cli/compare/v2.0.1...v2.0.2) (2022-06-27)
+
+
+### Bug Fixes
+
+* wrong separator when using `ZipFileSystemUtils` ([20e15de](https://github.com/revanced/revanced-cli/commit/20e15defc2b90aa5e79bad41c097bd0db8d5e12a))
+
 ## [2.0.1](https://github.com/revanced/revanced-cli/compare/v2.0.0...v2.0.1) (2022-06-26)
 
 # [2.0.0](https://github.com/revanced/revanced-cli/compare/v1.11.1...v2.0.0) (2022-06-26)
