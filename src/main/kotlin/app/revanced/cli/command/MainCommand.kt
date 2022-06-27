@@ -130,7 +130,7 @@ internal object MainCommand : Runnable {
                     args.password,
                     args.keystorePath ?: outputFile.absoluteFile.parentFile
                         .resolve("${outputFile.nameWithoutExtension}.keystore")
-                        .name
+                        .canonicalPath
                 )
             )
         }
