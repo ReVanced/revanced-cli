@@ -56,6 +56,7 @@ internal class ZipFileSystemUtils(
 
     private fun Path.getRelativePath(path: Path): Path = zipFileSystem.getPath(path.relativize(this).toString())
 
+    // TODO: figure out why the file system is uncompressed by default and how to fix it
     internal fun uncompress(vararg paths: String) =
         paths.forEach { Files.setAttribute(zipFileSystem.getPath(it), "zip:method", ZipEntry.STORED) }
 

@@ -36,7 +36,7 @@ internal object Patcher {
                 logger.info("Writing resources...")
 
                 ZipFileSystemUtils(result.resourceFile!!).use { resourceFileSystem ->
-                    val resourceFiles = resourceFileSystem.getFile(File.pathSeparator)
+                    val resourceFiles = resourceFileSystem.getFile(File.separator)
                     outputFileSystem.writePathRecursively(resourceFiles)
                 }
             }
