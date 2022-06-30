@@ -50,7 +50,7 @@ internal class Adb(
                 Constants.PATH_INIT_PUSH,
                 Constants.CONTENT_MOUNT_SCRIPT.replacePlaceholder()
             )
-            // install mount script
+            // install unmount script
             device.run(Constants.COMMAND_INSTALL_MOUNT.replacePlaceholder())
 
             // push umount script
