@@ -1,3 +1,10 @@
+# [2.1.0](https://github.com/revanced/revanced-cli/compare/v2.0.5...v2.1.0) (2022-07-03)
+
+
+### Features
+
+* `--include` option ([#76](https://github.com/revanced/revanced-cli/issues/76)) ([57a1e7c](https://github.com/revanced/revanced-cli/commit/57a1e7c27fb0c4292e08332b88ccd57d69fa02c6))
+
 ## [2.0.5](https://github.com/revanced/revanced-cli/compare/v2.0.4...v2.0.5) (2022-06-29)
 
 ## [2.0.4](https://github.com/revanced/revanced-cli/compare/v2.0.3...v2.0.4) (2022-06-28)
