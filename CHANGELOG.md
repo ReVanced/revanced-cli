@@ -1,3 +1,10 @@
+# [2.2.0](https://github.com/revanced/revanced-cli/compare/v2.1.0...v2.2.0) (2022-07-03)
+
+
+### Features
+
+* separate options for `--list` ([#60](https://github.com/revanced/revanced-cli/issues/60)) ([52b3161](https://github.com/revanced/revanced-cli/commit/52b316150de397ebdee979caf51d4cb20961cf70))
+
 # [2.1.0](https://github.com/revanced/revanced-cli/compare/v2.0.5...v2.1.0) (2022-07-03)
 
 
