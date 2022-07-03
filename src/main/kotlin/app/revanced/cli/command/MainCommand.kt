@@ -6,6 +6,7 @@ import app.revanced.cli.patcher.logging.impl.PatcherLogger
 import app.revanced.cli.signing.Signing
 import app.revanced.cli.signing.SigningOptions
 import app.revanced.patcher.PatcherOptions
+import app.revanced.patcher.extensions.PatchExtensions.compatiblePackages
 import app.revanced.patcher.extensions.PatchExtensions.description
 import app.revanced.patcher.extensions.PatchExtensions.patchName
 import app.revanced.patcher.util.patch.implementation.JarPatchBundle
@@ -45,6 +46,15 @@ internal object MainCommand : Runnable {
     class ListingArgs {
         @Option(names = ["-l", "--list"], description = ["List patches only"], required = true)
         var listOnly: Boolean = false
+
+        @Option(names = ["--with-versions"], description = ["List patches with compatible versions"])
+        var withVersions: Boolean = false
+
+        @Option(names = ["--with-packages"], description = ["List patches with compatible packages"])
+        var withPackages: Boolean = false
+
+        @Option(names = ["--with-descriptions"], description = ["List patches with their descriptions"])
+        var withDescriptions: Boolean = true
     }
 
     class PatchingArgs {
@@ -96,9 +106,7 @@ internal object MainCommand : Runnable {
 
     override fun run() {
         if (args.lArgs?.listOnly == true) {
-            for (patchBundlePath in args.patchBundles) for (patch in JarPatchBundle(patchBundlePath).loadPatches()) {
-                logger.info("${patch.patchName}: ${patch.description}")
-            }
+            printListOfPatches()
             return
         }
 
@@ -145,5 +153,36 @@ internal object MainCommand : Runnable {
         if (args.clean && args.deploy != null) Files.delete(outputFile.toPath())
 
         logger.info("Finished")
+    }
+
+    private fun printListOfPatches() {
+        for (patchBundlePath in args.patchBundles) for (patch in JarPatchBundle(patchBundlePath).loadPatches()) {
+            for (compatiblePackage in patch.compatiblePackages!!) {
+                val packageEntryStr = buildString {
+                    // Add package if flag is set
+                    if (args.lArgs?.withPackages == true) {
+                        val packageName = compatiblePackage.name.substringAfterLast(".").padStart(10)
+                        append(packageName)
+                        append("\t")
+                    }
+                    // Add patch name
+                    val patchName = patch.patchName.padStart(25)
+                    append(patchName)
+                    // Add description if flag is set.
+                    if (args.lArgs?.withDescriptions == true) {
+                        append("\t")
+                        append(patch.description)
+                    }
+                    // Add compatible versions, if flag is set
+                    if (args.lArgs?.withVersions == true) {
+                        val compatibleVersions = compatiblePackage.versions.joinToString(separator = ", ")
+                        append("\t")
+                        append(compatibleVersions)
+                    }
+
+                }
+                logger.info(packageEntryStr)
+            }
+        }
     }
 }
