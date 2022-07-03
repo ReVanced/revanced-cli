@@ -5,11 +5,11 @@ internal object Constants {
     internal const val PLACEHOLDER = "TEMPLATE_PACKAGE_NAME"
 
     // SU type is SuperSU
-    internal var SUPERSU: Boolean = false
+    internal var IS_SUPERSU: Boolean = false
 
     // utility commands
     private val COMMAND_CHMOD_MOUNT: String
-        get() = if (this.SUPERSU) "chmod 700" else "chmod +x"
+        get() = if (this.IS_SUPERSU) "chmod 700" else "chmod +x"
     internal const val COMMAND_PID_OF = "pidof -s"
     internal const val COMMAND_CREATE_DIR = "mkdir -p"
     internal const val COMMAND_LOGCAT = "logcat -c && logcat | grep AndroidRuntime"
@@ -27,21 +27,31 @@ internal object Constants {
     // revanced apk path
     private const val PATH_REVANCED_APP = "$PATH_REVANCED$PLACEHOLDER.apk"
 
-    // mount script path
+    // (un)mount script paths
     internal val PATH_MOUNT: String
-        get() = if (SUPERSU) "/su/su.d/$NAME_MOUNT_SCRIPT" else "/data/adb/service.d/$NAME_MOUNT_SCRIPT"
+        get() = if (IS_SUPERSU) "/su/su.d/$NAME_MOUNT_SCRIPT" else "/data/adb/service.d/$NAME_MOUNT_SCRIPT"
+    internal const val PATH_UMOUNT = "/data/adb/post-fs-data.d/un$NAME_MOUNT_SCRIPT"
 
     // move to revanced apk path & set permissions
     internal const val COMMAND_PREPARE_MOUNT_APK =
         "base_path=\"$PATH_REVANCED_APP\" && mv $PATH_INIT_PUSH ${'$'}base_path && chmod 644 ${'$'}base_path && chown system:system ${'$'}base_path && chcon u:object_r:apk_data_file:s0  ${'$'}base_path"
 
-    // Unmount command
-    internal const val COMMAND_EXECUTE_UMOUNT =
-        "stock_path=${'$'}( pm path $PLACEHOLDER | grep base | sed 's/package://g' ) && umount -l ${'$'}stock_path"
-
     // install mount script & set permissions
     internal val COMMAND_INSTALL_MOUNT : String
         get() = "mv $PATH_INIT_PUSH $PATH_MOUNT && $COMMAND_CHMOD_MOUNT $PATH_MOUNT"
+
+    // install umount script & set permissions
+    internal val COMMAND_INSTALL_UMOUNT : String
+        get() = "mv $PATH_INIT_PUSH $PATH_UMOUNT && $COMMAND_CHMOD_MOUNT $PATH_UMOUNT"
+
+    // unmount script
+    internal val CONTENT_UMOUNT_SCRIPT =
+        """
+            #!/system/bin/sh
+            
+            stock_path=${'$'}( pm path $PLACEHOLDER | grep base | sed 's/package://g' )
+            umount -l ${'$'}stock_path
+        """.trimIndent()
 
     // mount script
     internal val CONTENT_MOUNT_SCRIPT =
@@ -51,7 +61,7 @@ internal object Constants {
             
             base_path="$PATH_REVANCED_APP"
             stock_path=${'$'}( pm path $PLACEHOLDER | grep base | sed 's/package://g' )
-            
+
             chcon u:object_r:apk_data_file:s0  ${'$'}base_path
             mount -o bind ${'$'}base_path ${'$'}stock_path
         """.trimIndent()

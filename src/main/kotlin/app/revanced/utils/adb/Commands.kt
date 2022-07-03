@@ -1,6 +1,5 @@
 package app.revanced.utils.adb
 
-import app.revanced.cli.command.MainCommand.logger
 import se.vidstige.jadb.JadbDevice
 import se.vidstige.jadb.RemoteFile
 import se.vidstige.jadb.ShellProcess
@@ -27,18 +26,18 @@ internal fun JadbDevice.run(command: String, su: Boolean = true): Int {
 }
 
 private fun JadbDevice.CheckSU(command: String): ShellProcess? {
-    val byteArray = ByteArray(8) // Length of 'MagiskSU'
+    val byteArray = ByteArray(8)
     val adbCommand = this.buildCommand(command, false).start()
 
     // fix: deadlock with SuperSU
     val adbInputStream = adbCommand.inputStream
     adbInputStream.read(byteArray)
 
-    if (String(byteArray).filter { !it.isWhitespace() } == "SuperSU") {
-        Constants.SUPERSU = true
-    } else if (String(byteArray).filter { !it.isWhitespace() }.contains("SU") && String(byteArray) != "MagiskSU") {
-        logger.warn("Unsupported SU, this process may fail...")
+    val SuperUserType = String(byteArray).filter { !it.isWhitespace() }
+    if (SuperUserType == "SuperSU") {
+        Constants.IS_SUPERSU = true
     }
+
     adbInputStream.close()
     return adbCommand
 }

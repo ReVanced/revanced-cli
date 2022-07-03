@@ -34,7 +34,7 @@ internal class Adb(
 
             PackageManager(device).install(file)
         } else {
-            logger.info("Installing by mounting (method: ${if (Constants.SUPERSU) "SuperSU" else "Magisk"})")
+            logger.info("Installing by mounting (method: ${if (Constants.IS_SUPERSU) "SuperSU" else "Magisk"})")
 
             // push patched file
             device.copy(Constants.PATH_INIT_PUSH, file)
@@ -53,15 +53,21 @@ internal class Adb(
             // install mount script
             device.run(Constants.COMMAND_INSTALL_MOUNT.replacePlaceholder())
 
+            // push umount script
+            device.createFile(
+                Constants.PATH_INIT_PUSH,
+                Constants.CONTENT_UMOUNT_SCRIPT.replacePlaceholder()
+            )
+            // install unmount script
+            device.run(Constants.COMMAND_INSTALL_UMOUNT.replacePlaceholder())
+
             // unmount the apk for sanity
-            device.run(Constants.COMMAND_EXECUTE_UMOUNT.replacePlaceholder())
+            device.run(Constants.PATH_UMOUNT.replacePlaceholder())
             // mount the apk
             device.run(Constants.PATH_MOUNT.replacePlaceholder())
 
             // relaunch app
             device.run(Constants.COMMAND_RESTART.replacePlaceholder())
-
-            logger.info("Started logging app")
 
             // log the app
             log()
