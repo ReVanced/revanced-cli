@@ -57,6 +57,9 @@ internal object MainCommand : Runnable {
         @Option(names = ["-e", "--exclude"], description = ["Explicitly exclude patches"])
         var excludedPatches = arrayOf<String>()
 
+        @Option(names = ["-i", "--include"], description = ["Include patches"])
+        var includedPatches = arrayOf<String>()
+
         @Option(names = ["-r", "--resource-patcher"], description = ["Disable patching resources"])
         var disableResourcePatching: Boolean = false
 
