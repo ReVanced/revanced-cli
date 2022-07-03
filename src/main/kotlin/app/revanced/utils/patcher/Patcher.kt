@@ -12,7 +12,6 @@ import app.revanced.patcher.patch.Patch
 import app.revanced.patcher.util.patch.implementation.JarPatchBundle
 
 fun Patcher.addPatchesFiltered(
-    excludePatches: Boolean = false
 ) {
     val packageName = this.data.packageMetadata.packageName
     val packageVersion = this.data.packageMetadata.packageVersion
@@ -27,10 +26,10 @@ fun Patcher.addPatchesFiltered(
 
             val args = MainCommand.args.pArgs!!
 
-            if (excludePatches && args.excludedPatches.contains(patchName)) {
+            if (args.excludedPatches.contains(patchName)) {
                 logger.info("$prefix: Explicitly excluded")
                 return@patch
-            } else if (!patch.include && !args.includedPatches.contains(patchName)) {
+            } else if ((!patch.include || args.defaultExclude) && !args.includedPatches.contains(patchName)) {
                 logger.info("$prefix: Explicitly excluded")
                 return@patch
             }
