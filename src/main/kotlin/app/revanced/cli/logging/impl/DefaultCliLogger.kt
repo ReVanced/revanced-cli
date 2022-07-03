@@ -7,13 +7,13 @@ import java.util.logging.SimpleFormatter
 import java.util.logging.StreamHandler
 
 internal class DefaultCliLogger(
-    private val stdOutLogger: Logger = Logger.getLogger(MainCommand::javaClass.name),
-    private val stdErrLogger: Logger = Logger.getLogger(MainCommand::javaClass.name + "Err")
+    private val logger: Logger = Logger.getLogger(MainCommand::javaClass.name),
+    private val errorLogger: Logger = Logger.getLogger(MainCommand::javaClass.name + "Err")
 ) : CliLogger {
 
     init {
-        stdOutLogger.useParentHandlers = false
-        stdOutLogger.addHandler(StreamHandler(System.out, SimpleFormatter()))
+        logger.useParentHandlers = false
+        logger.addHandler(StreamHandler(System.out, SimpleFormatter()))
     }
     companion object {
         init {
@@ -21,8 +21,8 @@ internal class DefaultCliLogger(
         }
     }
 
-    override fun error(msg: String) = stdErrLogger.severe(msg)
-    override fun info(msg: String) = stdOutLogger.info(msg)
-    override fun trace(msg: String) = stdOutLogger.finest(msg)
-    override fun warn(msg: String) = stdErrLogger.warning(msg)
+    override fun error(msg: String) = errorLogger.severe(msg)
+    override fun info(msg: String) = logger.info(msg)
+    override fun trace(msg: String) = logger.finest(msg)
+    override fun warn(msg: String) = errorLogger.warning(msg)
 }
