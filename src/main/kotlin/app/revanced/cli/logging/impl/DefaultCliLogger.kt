@@ -4,7 +4,6 @@ import app.revanced.cli.command.MainCommand
 import app.revanced.cli.logging.CliLogger
 import java.util.logging.Logger
 import java.util.logging.SimpleFormatter
-import java.util.logging.StreamHandler
 
 internal class DefaultCliLogger(
     private val logger: Logger = Logger.getLogger(MainCommand::javaClass.name),
@@ -13,7 +12,7 @@ internal class DefaultCliLogger(
 
     init {
         logger.useParentHandlers = false
-        logger.addHandler(StreamHandler(System.out, SimpleFormatter()))
+        logger.addHandler(FlushingStreamHandler(System.out, SimpleFormatter()))
     }
     companion object {
         init {
