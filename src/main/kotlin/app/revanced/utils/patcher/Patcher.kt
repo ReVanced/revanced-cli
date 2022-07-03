@@ -11,8 +11,7 @@ import app.revanced.patcher.extensions.PatchExtensions.patchName
 import app.revanced.patcher.patch.Patch
 import app.revanced.patcher.util.patch.implementation.JarPatchBundle
 
-fun Patcher.addPatchesFiltered(
-) {
+fun Patcher.addPatchesFiltered() {
     val packageName = this.data.packageMetadata.packageName
     val packageVersion = this.data.packageMetadata.packageVersion
 
