@@ -1,3 +1,10 @@
+# [2.3.0](https://github.com/revanced/revanced-cli/compare/v2.2.0...v2.3.0) (2022-07-03)
+
+
+### Features
+
+* separate logger to stdout & stderr ([#63](https://github.com/revanced/revanced-cli/issues/63)) ([0ddc2b5](https://github.com/revanced/revanced-cli/commit/0ddc2b54b739dae3e8ccc983bab73fc84e72be0a))
+
 # [2.2.0](https://github.com/revanced/revanced-cli/compare/v2.1.0...v2.2.0) (2022-07-03)
 
 
