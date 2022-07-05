@@ -6,6 +6,7 @@ import se.vidstige.jadb.JadbDevice
 import se.vidstige.jadb.JadbException
 import se.vidstige.jadb.managers.Package
 import se.vidstige.jadb.managers.PackageManager
+import sun.util.logging.resources.logging
 import java.io.File
 import java.util.concurrent.Executors
 
@@ -22,8 +23,8 @@ internal class Adb(
         device = JadbConnection().devices.find { it.serial == deviceName }
             ?: throw IllegalArgumentException("No such device with name $deviceName")
 
-        if (modeInstall && device.run("su -h", false) != 0)
-            throw IllegalArgumentException("Root required on $deviceName. Task failed")
+        /*if (modeInstall && device.run("su -h", false) != 0)
+            throw IllegalArgumentException("Root required on $deviceName. Task failed")*/
     }
 
     private fun String.replacePlaceholder(with: String? = null): String {
@@ -68,30 +69,17 @@ internal class Adb(
         }
     }
 
-    internal fun uninstall() : Int {
-        if (modeInstall) {
-            logger.info("Uninstalling by unmounting")
+    internal fun uninstall() {
+        logger.info("Uninstalling by unmounting")
 
-            // unmount the apk for sanity
-            device.run(Constants.COMMAND_UMOUNT.replacePlaceholder())
+        // unmount the apk for sanity
+        device.run(Constants.COMMAND_UMOUNT.replacePlaceholder())
 
-            // delete revanced folder
-            device.run(Constants.COMMAND_DELETE.replacePlaceholder(Constants.PATH_REVANCED))
+        // delete revanced folder
+        device.run(Constants.COMMAND_DELETE.replacePlaceholder(Constants.PATH_REVANCED))
 
-            // delete mount script
-            device.run(Constants.COMMAND_DELETE.replacePlaceholder(Constants.PATH_MOUNT))
-        } else {
-            logger.info("Uninstalling without unmounting")
-
-            try{
-                PackageManager(device).uninstall(Package(packageName.replace("google", "revanced")))
-            }
-            catch (e: JadbException) {
-                logger.error("Application not installed on $device\nExiting")
-                return -1
-            }
-        }
-        return 0
+        // delete mount script
+        device.run(Constants.COMMAND_DELETE.replacePlaceholder(Constants.PATH_MOUNT))
     }
 
     private fun log() {
