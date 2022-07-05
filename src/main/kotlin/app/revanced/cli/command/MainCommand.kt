@@ -33,7 +33,7 @@ internal object MainCommand : Runnable {
     lateinit var args: Args
 
     class Args {
-        @Option(names = ["-b", "--bundles"], description = ["One or more bundles of patches"])
+        @Option(names = ["-b", "--bundles"], description = ["One or more bundles of patches"], required = true)
         var patchBundles = arrayOf<String>()
 
         @ArgGroup(exclusive = false)
@@ -41,9 +41,6 @@ internal object MainCommand : Runnable {
 
         @ArgGroup(exclusive = false)
         var pArgs: PatchingArgs? = null
-
-        @ArgGroup(exclusive = false)
-        var uArgs: UninstallArgs? = null
     }
 
     class ListingArgs {
@@ -105,17 +102,9 @@ internal object MainCommand : Runnable {
             description = ["Clean the temporal resource cache directory. This will be done anyways when running the patcher"]
         )
         var clean: Boolean = false
-    }
 
-    class UninstallArgs{
-        @Option(names = ["--un"], description = ["Completely uninstall ReVanced"])
+        @Option(names = ["--uninstall"], description = ["Completely uninstall ReVanced"])
         var uninstall: Boolean = false
-
-        @Option(names = ["--device"], description = ["ADB device to uninstall ReVanced from"], required = true)
-        var device: String? = null
-
-        @Option(names = ["--app"], description = ["Package name of app to uninstall"], required = true)
-        var packageName: String? = null
     }
 
     override fun run() {
@@ -123,55 +112,61 @@ internal object MainCommand : Runnable {
             printListOfPatches()
             return
         }
-
-        if (args.uArgs?.uninstall == true) {
-            uninstallPatchedApp()
-            return
-        }
-
         val args = args.pArgs ?: return
-
-        val patcher = app.revanced.patcher.Patcher(
-            PatcherOptions(
-                args.inputFile,
-                args.cacheDirectory,
-                !args.disableResourcePatching,
-                logger = PatcherLogger
-            )
-        )
-
-        val outputFile = File(args.outputPath)
-
-        val adb: Adb? = args.deploy?.let {
-            Adb(outputFile, patcher.data.packageMetadata.packageName, args.deploy!!, args.mount)
-        }
-
-        val patchedFile = if (args.mount) outputFile
-        else File(args.cacheDirectory).resolve("${outputFile.nameWithoutExtension}_raw.apk")
-
-        Patcher.start(patcher, patchedFile)
-
-        if (!args.mount) {
-            Signing.start(
-                patchedFile,
-                outputFile,
-                SigningOptions(
-                    args.cn,
-                    args.password,
-                    args.keystorePath ?: outputFile.absoluteFile.parentFile
-                        .resolve("${outputFile.nameWithoutExtension}.keystore")
-                        .canonicalPath
+        if (!args.uninstall) {
+            val patcher = app.revanced.patcher.Patcher(
+                PatcherOptions(
+                    args.inputFile,
+                    args.cacheDirectory,
+                    !args.disableResourcePatching,
+                    logger = PatcherLogger
                 )
             )
+
+            val outputFile = File(args.outputPath)
+
+            val adb: Adb? = args.deploy?.let {
+                Adb(outputFile, patcher.data.packageMetadata.packageName, args.deploy!!, args.mount)
+            }
+            val patchedFile = if (args.mount) outputFile
+            else File(args.cacheDirectory).resolve("${outputFile.nameWithoutExtension}_raw.apk")
+
+            Patcher.start(patcher, patchedFile)
+
+            if (!args.mount) {
+                Signing.start(
+                    patchedFile,
+                    outputFile,
+                    SigningOptions(
+                        args.cn,
+                        args.password,
+                        args.keystorePath ?: outputFile.absoluteFile.parentFile
+                            .resolve("${outputFile.nameWithoutExtension}.keystore")
+                            .canonicalPath
+                    )
+                )
+            }
+
+            if (args.clean) File(args.cacheDirectory).deleteRecursively()
+
+            adb?.deploy()
+
+            if (args.clean && args.deploy != null) Files.delete(outputFile.toPath())
+            logger.info("Finished")
         }
-
-        if (args.clean) File(args.cacheDirectory).deleteRecursively()
-
-        adb?.deploy()
-
-        if (args.clean && args.deploy != null) Files.delete(outputFile.toPath())
-
-        logger.info("Finished")
+        else {
+            val patcher = app.revanced.patcher.Patcher(
+                PatcherOptions(
+                    args.inputFile,
+                    args.cacheDirectory,
+                    false,
+                )
+            )
+            val adb: Adb? = args.deploy?.let {
+                Adb(File("placeholder_file"), patcher.data.packageMetadata.packageName, args.deploy!!, args.mount)
+            }
+            if (adb?.uninstall() == 0) logger.info("Finished")
+        }
     }
 
     private fun printListOfPatches() {
@@ -203,16 +198,5 @@ internal object MainCommand : Runnable {
                 logger.info(packageEntryStr)
             }
         }
-    }
-
-    private fun uninstallPatchedApp() {
-        val args = args.uArgs ?: return
-
-        val adb: Adb? = args.device?.let {
-            Adb(packageName = args.packageName!!, deviceName = args.device!!, modeInstall = true)
-        }
-        adb?.uninstall()
-
-        logger.info("Finished")
     }
 }
