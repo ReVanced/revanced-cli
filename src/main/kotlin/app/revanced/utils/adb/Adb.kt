@@ -3,10 +3,7 @@ package app.revanced.utils.adb
 import app.revanced.cli.command.MainCommand.logger
 import se.vidstige.jadb.JadbConnection
 import se.vidstige.jadb.JadbDevice
-import se.vidstige.jadb.JadbException
-import se.vidstige.jadb.managers.Package
 import se.vidstige.jadb.managers.PackageManager
-import sun.util.logging.resources.logging
 import java.io.File
 import java.util.concurrent.Executors
 
@@ -23,8 +20,8 @@ internal class Adb(
         device = JadbConnection().devices.find { it.serial == deviceName }
             ?: throw IllegalArgumentException("No such device with name $deviceName")
 
-        /*if (modeInstall && device.run("su -h", false) != 0)
-            throw IllegalArgumentException("Root required on $deviceName. Task failed")*/
+        if (modeInstall && device.run("su -h", false) != 0)
+            throw IllegalArgumentException("Root required on $deviceName. Task failed")
     }
 
     private fun String.replacePlaceholder(with: String? = null): String {
