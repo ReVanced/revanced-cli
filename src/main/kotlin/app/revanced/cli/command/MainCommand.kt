@@ -41,6 +41,9 @@ internal object MainCommand : Runnable {
 
         @ArgGroup(exclusive = false)
         var pArgs: PatchingArgs? = null
+
+        @ArgGroup(exclusive = false)
+        var uArgs: UninstallArgs? = null
     }
 
     class ListingArgs {
@@ -104,9 +107,25 @@ internal object MainCommand : Runnable {
         var clean: Boolean = false
     }
 
+    class UninstallArgs{
+        @Option(names = ["--uninstall"], description = ["Completely uninstall ReVanced"])
+        var uninstall: Boolean = false
+
+        @Option(names = ["--device"], description = ["ADB device to uninstall ReVanced from"], required = true)
+        var device: String? = null
+
+        @Option(names = ["--app"], description = ["Package name of app to uninstall"], required = true)
+        var appName: String? = null
+    }
+
     override fun run() {
         if (args.lArgs?.listOnly == true) {
             printListOfPatches()
+            return
+        }
+
+        if (args.uArgs?.uninstall == true) {
+            val args = args.uArgs ?: return
             return
         }
 

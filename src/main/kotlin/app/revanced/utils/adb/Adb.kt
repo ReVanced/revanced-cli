@@ -3,6 +3,7 @@ package app.revanced.utils.adb
 import app.revanced.cli.command.MainCommand.logger
 import se.vidstige.jadb.JadbConnection
 import se.vidstige.jadb.JadbDevice
+import se.vidstige.jadb.managers.Package
 import se.vidstige.jadb.managers.PackageManager
 import java.io.File
 import java.util.concurrent.Executors
@@ -53,16 +54,8 @@ internal class Adb(
             // install mount script
             device.run(Constants.COMMAND_INSTALL_MOUNT.replacePlaceholder())
 
-            // push umount script
-            device.createFile(
-                Constants.PATH_INIT_PUSH,
-                Constants.CONTENT_UMOUNT_SCRIPT.replacePlaceholder()
-            )
-            // install unmount script
-            device.run(Constants.COMMAND_INSTALL_UMOUNT.replacePlaceholder())
-
             // unmount the apk for sanity
-            device.run(Constants.PATH_UMOUNT.replacePlaceholder())
+            device.run(Constants.COMMAND_UMOUNT.replacePlaceholder())
             // mount the apk
             device.run(Constants.PATH_MOUNT.replacePlaceholder())
 
@@ -71,6 +64,25 @@ internal class Adb(
 
             // log the app
             log()
+        }
+    }
+
+    internal fun uninstall() {
+        if (modeInstall) {
+            logger.info("Uninstalling without unmounting")
+
+            PackageManager(device).uninstall(Package(packageName))
+        } else {
+            logger.info("Uninstalling by unmounting")
+
+            // unmount the apk for sanity
+            device.run(Constants.COMMAND_UMOUNT.replacePlaceholder())
+
+            // delete revanced folder
+            device.run(Constants.COMMAND_DELETE.replacePlaceholder(Constants.PATH_REVANCED))
+
+            // delete mount script
+            device.run(Constants.COMMAND_DELETE.replacePlaceholder(Constants.PATH_MOUNT))
         }
     }
 
