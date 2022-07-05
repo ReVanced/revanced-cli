@@ -11,7 +11,7 @@ internal class Adb(
     private val file: File,
     private val packageName: String,
     deviceName: String,
-    private val modeInstall: Boolean = true,
+    private val modeInstall: Boolean = false,
     private val logging: Boolean = true
 ) {
     private val device: JadbDevice
@@ -20,7 +20,7 @@ internal class Adb(
         device = JadbConnection().devices.find { it.serial == deviceName }
             ?: throw IllegalArgumentException("No such device with name $deviceName")
 
-        if (modeInstall && device.run("su -h", false) != 0)
+        if (!modeInstall && device.run("su -h", false) != 0)
             throw IllegalArgumentException("Root required on $deviceName. Task failed")
     }
 
@@ -30,6 +30,10 @@ internal class Adb(
 
     internal fun deploy() {
         if (modeInstall) {
+            logger.info("Installing without mounting")
+
+            PackageManager(device).install(file)
+        } else {
             logger.info("Installing by mounting")
 
             // push patched file
@@ -59,10 +63,6 @@ internal class Adb(
 
             // log the app
             log()
-        } else {
-            logger.info("Installing without mounting")
-
-            PackageManager(device).install(file)
         }
     }
 

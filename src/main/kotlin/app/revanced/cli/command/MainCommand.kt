@@ -127,7 +127,7 @@ internal object MainCommand : Runnable {
             val outputFile = File(args.outputPath)
 
             val adb: Adb? = args.deploy?.let {
-                Adb(outputFile, patcher.data.packageMetadata.packageName, args.deploy!!, args.mount)
+                Adb(outputFile, patcher.data.packageMetadata.packageName, args.deploy!!, !args.mount)
             }
             val patchedFile = if (args.mount) outputFile
             else File(args.cacheDirectory).resolve("${outputFile.nameWithoutExtension}_raw.apk")
@@ -165,7 +165,7 @@ internal object MainCommand : Runnable {
             )
 
             val adb: Adb? = args.deploy?.let {
-                Adb(File("placeholder_file"), patcher.data.packageMetadata.packageName, args.deploy!!, true)
+                Adb(File("placeholder_file"), patcher.data.packageMetadata.packageName, args.deploy!!, false)
             }
 
             adb?.uninstall()
