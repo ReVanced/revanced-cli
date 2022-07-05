@@ -14,6 +14,7 @@ import app.revanced.utils.adb.Adb
 import picocli.CommandLine.*
 import java.io.File
 import java.nio.file.Files
+import javax.sound.midi.Patch
 
 private class CLIVersionProvider : IVersionProvider {
     override fun getVersion() = arrayOf(
@@ -153,14 +154,13 @@ internal object MainCommand : Runnable {
             adb?.deploy()
 
             if (args.clean && args.deploy != null) Files.delete(outputFile.toPath())
-            logger.info("Finished")
         }
         else {
             val patcher = app.revanced.patcher.Patcher(
                 PatcherOptions(
                     args.inputFile,
                     args.cacheDirectory,
-                    false,
+                    false
                 )
             )
 
@@ -169,8 +169,8 @@ internal object MainCommand : Runnable {
             }
 
             adb?.uninstall()
-            logger.info("Finished")
         }
+        logger.info("Finished")
     }
 
     private fun printListOfPatches() {
