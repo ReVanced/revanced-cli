@@ -3,13 +3,14 @@ package app.revanced.utils.adb
 import app.revanced.cli.command.MainCommand.logger
 import se.vidstige.jadb.JadbConnection
 import se.vidstige.jadb.JadbDevice
+import se.vidstige.jadb.JadbException
 import se.vidstige.jadb.managers.Package
 import se.vidstige.jadb.managers.PackageManager
 import java.io.File
 import java.util.concurrent.Executors
 
 internal class Adb(
-    private val file: File = File("placeholder_file"),
+    private val file: File,
     private val packageName: String,
     deviceName: String,
     private val modeInstall: Boolean = true,
@@ -22,7 +23,7 @@ internal class Adb(
             ?: throw IllegalArgumentException("No such device with name $deviceName")
 
         if (modeInstall && device.run("su -h", false) != 0)
-            throw IllegalArgumentException("Root required on $deviceName. Deploying failed")
+            throw IllegalArgumentException("Root required on $deviceName. Task failed")
     }
 
     private fun String.replacePlaceholder(with: String? = null): String {
@@ -67,7 +68,7 @@ internal class Adb(
         }
     }
 
-    internal fun uninstall() {
+    internal fun uninstall() : Int {
         if (modeInstall) {
             logger.info("Uninstalling by unmounting")
 
@@ -82,8 +83,15 @@ internal class Adb(
         } else {
             logger.info("Uninstalling without unmounting")
 
-            PackageManager(device).uninstall(Package(packageName))
+            try{
+                PackageManager(device).uninstall(Package(packageName.replace("google", "revanced")))
+            }
+            catch (e: JadbException) {
+                logger.error("Application not installed on $device\nExiting")
+                return -1
+            }
         }
+        return 0
     }
 
     private fun log() {
