@@ -13,8 +13,7 @@ internal class DefaultCliLogger(
 
     init {
         logger.useParentHandlers = false
-        logger.handlers.forEach { logger.removeHandler(it) }
-        logger.addHandler(FlushingStreamHandler(System.out, SimpleFormatter()))
+        logger.addHandler(StreamHandler(System.out, SimpleFormatter()))
     }
     companion object {
         init {
