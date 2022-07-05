@@ -9,10 +9,10 @@ import java.io.File
 import java.util.concurrent.Executors
 
 internal class Adb(
-    private val file: File,
+    private val file: File = File("placeholder_file"),
     private val packageName: String,
     deviceName: String,
-    private val modeInstall: Boolean = false,
+    private val modeInstall: Boolean = true,
     private val logging: Boolean = true
 ) {
     private val device: JadbDevice
@@ -21,7 +21,7 @@ internal class Adb(
         device = JadbConnection().devices.find { it.serial == deviceName }
             ?: throw IllegalArgumentException("No such device with name $deviceName")
 
-        if (!modeInstall && device.run("su -h", false) != 0)
+        if (modeInstall && device.run("su -h", false) != 0)
             throw IllegalArgumentException("Root required on $deviceName. Deploying failed")
     }
 
@@ -31,16 +31,12 @@ internal class Adb(
 
     internal fun deploy() {
         if (modeInstall) {
-            logger.info("Installing without mounting")
-
-            PackageManager(device).install(file)
-        } else {
             logger.info("Installing by mounting")
 
             // push patched file
             device.copy(Constants.PATH_INIT_PUSH, file)
 
-            // create revanced path
+            // create revanced folder path
             device.run("${Constants.COMMAND_CREATE_DIR} ${Constants.PATH_REVANCED}")
 
             // prepare mounting the apk
@@ -64,15 +60,15 @@ internal class Adb(
 
             // log the app
             log()
+        } else {
+            logger.info("Installing without mounting")
+
+            PackageManager(device).install(file)
         }
     }
 
     internal fun uninstall() {
         if (modeInstall) {
-            logger.info("Uninstalling without unmounting")
-
-            PackageManager(device).uninstall(Package(packageName))
-        } else {
             logger.info("Uninstalling by unmounting")
 
             // unmount the apk for sanity
@@ -83,6 +79,10 @@ internal class Adb(
 
             // delete mount script
             device.run(Constants.COMMAND_DELETE.replacePlaceholder(Constants.PATH_MOUNT))
+        } else {
+            logger.info("Uninstalling without unmounting")
+
+            PackageManager(device).uninstall(Package(packageName))
         }
     }
 

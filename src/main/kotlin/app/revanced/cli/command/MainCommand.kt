@@ -33,7 +33,7 @@ internal object MainCommand : Runnable {
     lateinit var args: Args
 
     class Args {
-        @Option(names = ["-b", "--bundles"], description = ["One or more bundles of patches"], required = true)
+        @Option(names = ["-b", "--bundles"], description = ["One or more bundles of patches"])
         var patchBundles = arrayOf<String>()
 
         @ArgGroup(exclusive = false)
@@ -108,14 +108,14 @@ internal object MainCommand : Runnable {
     }
 
     class UninstallArgs{
-        @Option(names = ["--uninstall"], description = ["Completely uninstall ReVanced"])
+        @Option(names = ["--un"], description = ["Completely uninstall ReVanced"])
         var uninstall: Boolean = false
 
         @Option(names = ["--device"], description = ["ADB device to uninstall ReVanced from"], required = true)
         var device: String? = null
 
         @Option(names = ["--app"], description = ["Package name of app to uninstall"], required = true)
-        var appName: String? = null
+        var packageName: String? = null
     }
 
     override fun run() {
@@ -125,7 +125,7 @@ internal object MainCommand : Runnable {
         }
 
         if (args.uArgs?.uninstall == true) {
-            val args = args.uArgs ?: return
+            uninstallPatchedApp()
             return
         }
 
@@ -143,7 +143,7 @@ internal object MainCommand : Runnable {
         val outputFile = File(args.outputPath)
 
         val adb: Adb? = args.deploy?.let {
-            Adb(outputFile, patcher.data.packageMetadata.packageName, args.deploy!!, !args.mount)
+            Adb(outputFile, patcher.data.packageMetadata.packageName, args.deploy!!, args.mount)
         }
 
         val patchedFile = if (args.mount) outputFile
@@ -203,5 +203,16 @@ internal object MainCommand : Runnable {
                 logger.info(packageEntryStr)
             }
         }
+    }
+
+    private fun uninstallPatchedApp() {
+        val args = args.uArgs ?: return
+
+        val adb: Adb? = args.device?.let {
+            Adb(packageName = args.packageName!!, deviceName = args.device!!, modeInstall = true)
+        }
+        adb?.uninstall()
+
+        logger.info("Finished")
     }
 }
