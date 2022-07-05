@@ -1,3 +1,10 @@
+## [2.3.2](https://github.com/revanced/revanced-cli/compare/v2.3.1...v2.3.2) (2022-07-05)
+
+
+### Bug Fixes
+
+* fix noSuchMethodError ([00fec25](https://github.com/revanced/revanced-cli/commit/00fec2508a3421b7b5a246254e0cb08850eab6ea))
+
 ## [2.3.1](https://github.com/revanced/revanced-cli/compare/v2.3.0...v2.3.1) (2022-07-04)
 
 # [2.3.0](https://github.com/revanced/revanced-cli/compare/v2.2.0...v2.3.0) (2022-07-03)
