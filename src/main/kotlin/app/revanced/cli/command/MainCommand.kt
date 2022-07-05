@@ -103,7 +103,7 @@ internal object MainCommand : Runnable {
         )
         var clean: Boolean = false
 
-        @Option(names = ["--uninstall"], description = ["Completely uninstall ReVanced"])
+        @Option(names = ["--uninstall"], description = ["Completely uninstall root variant"])
         var uninstall: Boolean = false
     }
 
@@ -112,6 +112,7 @@ internal object MainCommand : Runnable {
             printListOfPatches()
             return
         }
+
         val args = args.pArgs ?: return
         if (!args.uninstall) {
             val patcher = app.revanced.patcher.Patcher(
@@ -162,10 +163,13 @@ internal object MainCommand : Runnable {
                     false,
                 )
             )
+
             val adb: Adb? = args.deploy?.let {
-                Adb(File("placeholder_file"), patcher.data.packageMetadata.packageName, args.deploy!!, args.mount)
+                Adb(File("placeholder_file"), patcher.data.packageMetadata.packageName, args.deploy!!, true)
             }
-            if (adb?.uninstall() == 0) logger.info("Finished")
+
+            adb?.uninstall()
+            logger.info("Finished")
         }
     }
 
