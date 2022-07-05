@@ -20,8 +20,8 @@ internal class Adb(
         device = JadbConnection().devices.find { it.serial == deviceName }
             ?: throw IllegalArgumentException("No such device with name $deviceName")
 
-        if (!modeInstall && device.run("su -h", false) != 0)
-            throw IllegalArgumentException("Root required on $deviceName. Task failed")
+        //if (!modeInstall && device.run("su -h", false) != 0)
+        //    throw IllegalArgumentException("Root required on $deviceName. Task failed")
     }
 
     private fun String.replacePlaceholder(with: String? = null): String {
@@ -69,14 +69,14 @@ internal class Adb(
     internal fun uninstall() {
         logger.info("Uninstalling by unmounting")
 
-        // unmount the apk for sanity
+        // unmount the apk
         device.run(Constants.COMMAND_UMOUNT.replacePlaceholder())
 
-        // delete revanced folder
-        device.run(Constants.COMMAND_DELETE.replacePlaceholder(Constants.PATH_REVANCED))
+        // delete revanced app
+        device.run(Constants.COMMAND_DELETE.replacePlaceholder(Constants.PATH_REVANCED_APP).replacePlaceholder())
 
         // delete mount script
-        device.run(Constants.COMMAND_DELETE.replacePlaceholder(Constants.PATH_MOUNT))
+        device.run(Constants.COMMAND_DELETE.replacePlaceholder(Constants.PATH_MOUNT).replacePlaceholder())
     }
 
     private fun log() {
