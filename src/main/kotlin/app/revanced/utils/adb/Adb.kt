@@ -34,7 +34,7 @@ internal class Adb(
 
             PackageManager(device).install(file)
         } else {
-            logger.info("Installing by mounting (method: ${if (Constants.IS_SUPERSU) "SuperSU" else "Magisk"})")
+            logger.info("Installing by mounting (method: ${if (Constants.IS_SUPERSU) "SuperSU" else "MagiskSU"})")
 
             // push patched file
             device.copy(Constants.PATH_INIT_PUSH, file)
@@ -68,6 +68,8 @@ internal class Adb(
 
             // relaunch app
             device.run(Constants.COMMAND_RESTART.replacePlaceholder())
+
+            logger.info("Started logging app")
 
             // log the app
             log()

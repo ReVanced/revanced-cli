@@ -22,7 +22,7 @@ internal fun JadbDevice.run(command: String, su: Boolean = true): Int {
         return this.buildCommand(command).start().waitFor()
     }
     
-    return CheckSU(command)!!.waitFor()
+    return this.CheckSU(command)!!.waitFor()
 }
 
 private fun JadbDevice.CheckSU(command: String): ShellProcess? {
