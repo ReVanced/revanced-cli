@@ -14,7 +14,6 @@ import app.revanced.utils.adb.Adb
 import picocli.CommandLine.*
 import java.io.File
 import java.nio.file.Files
-import javax.sound.midi.Patch
 
 private class CLIVersionProvider : IVersionProvider {
     override fun getVersion() = arrayOf(
@@ -34,8 +33,17 @@ internal object MainCommand : Runnable {
     lateinit var args: Args
 
     class Args {
-        @Option(names = ["-b", "--bundles"], description = ["One or more bundles of patches"], required = true)
+        @Option(names = ["-b", "--bundles"], description = ["One or more bundles of patches"])
         var patchBundles = arrayOf<String>()
+
+        @Option(names = ["-a", "--apk"], description = ["Input file to be patched"], required = true)
+        lateinit var inputFile: File
+
+        @Option(names = ["--uninstall"], description = ["Completely uninstall root variant"])
+        var uninstall: Boolean = false
+
+        @Option(names = ["-d", "--deploy-on"], description = ["If specified, deploy to adb device with given name"])
+        var deploy: String? = null
 
         @ArgGroup(exclusive = false)
         var lArgs: ListingArgs? = null
@@ -59,9 +67,6 @@ internal object MainCommand : Runnable {
     }
 
     class PatchingArgs {
-        @Option(names = ["-a", "--apk"], description = ["Input file to be patched"], required = true)
-        lateinit var inputFile: File
-
         @Option(names = ["-o", "--out"], description = ["Output file path"], required = true)
         lateinit var outputPath: String
 
@@ -92,9 +97,6 @@ internal object MainCommand : Runnable {
         @Option(names = ["-p", "--password"], description = ["Overwrite the default password for the signed file"])
         var password = "ReVanced"
 
-        @Option(names = ["-d", "--deploy-on"], description = ["If specified, deploy to adb device with given name"])
-        var deploy: String? = null
-
         @Option(names = ["-t", "--temp-dir"], description = ["Temporal resource cache directory"])
         var cacheDirectory = "revanced-cache"
 
@@ -103,9 +105,6 @@ internal object MainCommand : Runnable {
             description = ["Clean the temporal resource cache directory. This will be done anyways when running the patcher"]
         )
         var clean: Boolean = false
-
-        @Option(names = ["--uninstall"], description = ["Completely uninstall root variant"])
-        var uninstall: Boolean = false
     }
 
     override fun run() {
@@ -114,52 +113,15 @@ internal object MainCommand : Runnable {
             return
         }
 
-        val args = args.pArgs ?: return
-        if (!args.uninstall) {
+        val Oargs = args
+
+        if (args.uninstall) {
+            // temporarily get package name using Patcher method
+            // fix: abstract options in patcher
             val patcher = app.revanced.patcher.Patcher(
                 PatcherOptions(
                     args.inputFile,
-                    args.cacheDirectory,
-                    !args.disableResourcePatching,
-                    logger = PatcherLogger
-                )
-            )
-
-            val outputFile = File(args.outputPath)
-
-            val adb: Adb? = args.deploy?.let {
-                Adb(outputFile, patcher.data.packageMetadata.packageName, args.deploy!!, !args.mount)
-            }
-            val patchedFile = if (args.mount) outputFile
-            else File(args.cacheDirectory).resolve("${outputFile.nameWithoutExtension}_raw.apk")
-
-            Patcher.start(patcher, patchedFile)
-
-            if (!args.mount) {
-                Signing.start(
-                    patchedFile,
-                    outputFile,
-                    SigningOptions(
-                        args.cn,
-                        args.password,
-                        args.keystorePath ?: outputFile.absoluteFile.parentFile
-                            .resolve("${outputFile.nameWithoutExtension}.keystore")
-                            .canonicalPath
-                    )
-                )
-            }
-
-            if (args.clean) File(args.cacheDirectory).deleteRecursively()
-
-            adb?.deploy()
-
-            if (args.clean && args.deploy != null) Files.delete(outputFile.toPath())
-        }
-        else {
-            val patcher = app.revanced.patcher.Patcher(
-                PatcherOptions(
-                    args.inputFile,
-                    args.cacheDirectory,
+                    "uninstaller-cache",
                     false
                 )
             )
@@ -167,9 +129,52 @@ internal object MainCommand : Runnable {
             val adb: Adb? = args.deploy?.let {
                 Adb(File("placeholder_file"), patcher.data.packageMetadata.packageName, args.deploy!!, false)
             }
-
             adb?.uninstall()
+            File("uninstaller-cache").deleteRecursively()
+            return
         }
+
+        val args = args.pArgs ?: return
+
+        val patcher = app.revanced.patcher.Patcher(
+            PatcherOptions(
+                Oargs.inputFile,
+                args.cacheDirectory,
+                !args.disableResourcePatching,
+                logger = PatcherLogger
+            )
+        )
+
+        val outputFile = File(args.outputPath)
+
+        val adb: Adb? = Oargs.deploy?.let {
+            Adb(outputFile, patcher.data.packageMetadata.packageName, Oargs.deploy!!, !args.mount)
+        }
+        val patchedFile = if (args.mount) outputFile
+        else File(args.cacheDirectory).resolve("${outputFile.nameWithoutExtension}_raw.apk")
+
+        Patcher.start(patcher, patchedFile)
+
+        if (!args.mount) {
+            Signing.start(
+                patchedFile,
+                outputFile,
+                SigningOptions(
+                    args.cn,
+                    args.password,
+                    args.keystorePath ?: outputFile.absoluteFile.parentFile
+                        .resolve("${outputFile.nameWithoutExtension}.keystore")
+                        .canonicalPath
+                )
+            )
+        }
+
+        if (args.clean) File(args.cacheDirectory).deleteRecursively()
+
+        adb?.deploy()
+
+        if (args.clean && Oargs.deploy != null) Files.delete(outputFile.toPath())
+
         logger.info("Finished")
     }
 

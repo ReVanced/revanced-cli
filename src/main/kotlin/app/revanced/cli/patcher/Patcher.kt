@@ -11,6 +11,7 @@ import java.nio.file.Files
 
 internal object Patcher {
     internal fun start(patcher: app.revanced.patcher.Patcher, output: File) {
+        val inputFile = args.inputFile
         val args = args.pArgs!!
 
         // merge files like necessary integrations
@@ -22,7 +23,7 @@ internal object Patcher {
 
         // write output file
         if (output.exists()) Files.delete(output.toPath())
-        args.inputFile.copyTo(output)
+        inputFile.copyTo(output)
 
         val result = patcher.save()
         ZipFileSystemUtils(output).use { outputFileSystem ->
