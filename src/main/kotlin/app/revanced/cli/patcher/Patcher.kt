@@ -12,7 +12,7 @@ import java.nio.file.Files
 internal object Patcher {
     internal fun start(patcher: app.revanced.patcher.Patcher, output: File) {
         val inputFile = args.inputFile
-        val args = args.pArgs!!
+        val args = args.uArgs?.pArgs!!
 
         // merge files like necessary integrations
         patcher.mergeFiles()
