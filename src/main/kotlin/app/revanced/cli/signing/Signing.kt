@@ -8,7 +8,7 @@ import java.io.File
 
 object Signing {
     fun start(inputFile: File, outputFile: File, signingOptions: SigningOptions) {
-        val cacheDirectory = File(args.uArgs?.pArgs?.cacheDirectory)
+        val cacheDirectory = File(args.sArgs?.pArgs?.cacheDirectory)
         val alignedOutput = cacheDirectory.resolve("${outputFile.nameWithoutExtension}_aligned.apk")
         val signedOutput = cacheDirectory.resolve("${outputFile.nameWithoutExtension}_signed.apk")
 

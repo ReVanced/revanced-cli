@@ -43,10 +43,10 @@ internal object MainCommand : Runnable {
         var deploy: String? = null
 
         @ArgGroup(exclusive = false)
-        var uArgs: renameLater? = null
+        var sArgs: StartPatcherArgs? = null
     }
 
-    class renameLater {
+    class StartPatcherArgs {
         @Option(names = ["-b", "--bundles"], description = ["One or more bundles of patches"], required = true)
         var patchBundles = arrayOf<String>()
 
@@ -113,7 +113,7 @@ internal object MainCommand : Runnable {
     }
 
     override fun run() {
-        if (args.uArgs?.lArgs?.listOnly == true) {
+        if (args.sArgs?.lArgs?.listOnly == true) {
             printListOfPatches()
             return
         }
@@ -139,7 +139,7 @@ internal object MainCommand : Runnable {
         }
 
         val _args = args
-        val args = args.uArgs?.pArgs ?: return
+        val args = args.sArgs?.pArgs ?: return
 
         val patcher = app.revanced.patcher.Patcher(
             PatcherOptions(
@@ -184,11 +184,11 @@ internal object MainCommand : Runnable {
     }
 
     private fun printListOfPatches() {
-        for (patchBundlePath in args.uArgs?.patchBundles!!) for (patch in JarPatchBundle(patchBundlePath).loadPatches()) {
+        for (patchBundlePath in args.sArgs?.patchBundles!!) for (patch in JarPatchBundle(patchBundlePath).loadPatches()) {
             for (compatiblePackage in patch.compatiblePackages!!) {
                 val packageEntryStr = buildString {
                     // Add package if flag is set
-                    if (args.uArgs?.lArgs?.withPackages == true) {
+                    if (args.sArgs?.lArgs?.withPackages == true) {
                         val packageName = compatiblePackage.name.substringAfterLast(".").padStart(10)
                         append(packageName)
                         append("\t")
@@ -197,12 +197,12 @@ internal object MainCommand : Runnable {
                     val patchName = patch.patchName.padStart(25)
                     append(patchName)
                     // Add description if flag is set.
-                    if (args.uArgs?.lArgs?.withDescriptions == true) {
+                    if (args.sArgs?.lArgs?.withDescriptions == true) {
                         append("\t")
                         append(patch.description)
                     }
                     // Add compatible versions, if flag is set
-                    if (args.uArgs?.lArgs?.withVersions == true) {
+                    if (args.sArgs?.lArgs?.withVersions == true) {
                         val compatibleVersions = compatiblePackage.versions.joinToString(separator = ", ")
                         append("\t")
                         append(compatibleVersions)
