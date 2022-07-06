@@ -8,7 +8,7 @@ import java.io.File
 
 internal fun JadbDevice.buildCommand(command: String, su: Boolean = true): ShellProcessBuilder {
     if (su) {
-        return shellProcessBuilder("su -c \'$command\'")
+        return shellProcessBuilder("su -mm -c \'$command\'")
     }
 
     val args = command.split(" ") as ArrayList<String>
