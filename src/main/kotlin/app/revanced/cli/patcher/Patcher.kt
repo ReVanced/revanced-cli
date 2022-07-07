@@ -41,7 +41,7 @@ internal object Patcher {
                 }
             }
 
-            outputFileSystem.uncompress(*result.doNotCompress!!.toTypedArray())
+            result.doNotCompress?.let { outputFileSystem.uncompress(*it.toTypedArray()) }
         }
     }
 }
