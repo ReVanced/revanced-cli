@@ -2,7 +2,7 @@
 name: Feature request
 about: Suggest a change to the CLI. Do not submit suggestions for patches here.
 title: 'feat: some feature'
-labels: bug
+labels: feature-request
 assignees: TheJeterLP, oSumAtrIX, Sculas, epicsampler
 
 ---
