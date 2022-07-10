@@ -36,7 +36,7 @@ internal object MainCommand : Runnable {
         @Option(names = ["-a", "--apk"], description = ["Input file to be patched"], required = true)
         lateinit var inputFile: File
 
-        @Option(names = ["--uninstall"], description = ["Completely uninstall root variant"])
+        @Option(names = ["--uninstall"], description = ["Uninstall the mount variant"])
         var uninstall: Boolean = false
 
         @Option(names = ["-d", "--deploy-on"], description = ["If specified, deploy to adb device with given name"])
