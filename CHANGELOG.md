@@ -1,3 +1,10 @@
+## [2.5.2](https://github.com/revanced/revanced-cli/compare/v2.5.1...v2.5.2) (2022-07-10)
+
+
+### Bug Fixes
+
+* `defaultExclude` unused ([2015c2a](https://github.com/revanced/revanced-cli/commit/2015c2a1dcc0290af237e2eb1ab4aaf5fc84d382))
+
 ## [2.5.1](https://github.com/revanced/revanced-cli/compare/v2.5.0...v2.5.1) (2022-07-10)
 
 
