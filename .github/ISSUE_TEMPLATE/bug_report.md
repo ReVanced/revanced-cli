@@ -3,7 +3,6 @@ name: Bug report
 about: Create a bug report on the CLI. Do not submit suggestions for patches here.
 title: 'problem: some problem'
 labels: bug
-assignees: TheJeterLP, oSumAtrIX, Sculas, epicsampler
 
 ---
 
