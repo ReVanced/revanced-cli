@@ -16,7 +16,7 @@ internal object Patcher {
         // merge files like necessary integrations
         patcher.mergeFiles()
         // add patches, but filter incompatible or excluded patches
-        patcher.addPatchesFiltered(excludePatches = args.excludedPatches.isNotEmpty())
+        patcher.addPatchesFiltered()
         // apply patches
         patcher.applyPatchesVerbose()
 

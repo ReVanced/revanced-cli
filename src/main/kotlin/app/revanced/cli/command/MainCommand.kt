@@ -67,6 +67,9 @@ internal object MainCommand : Runnable {
         @Option(names = ["-e", "--exclude"], description = ["Explicitly exclude patches"])
         var excludedPatches = arrayOf<String>()
 
+        @Option(names = ["--exclusive"], description = ["Exclusively include patches"])
+        var defaultExclude = false
+
         @Option(names = ["-i", "--include"], description = ["Include patches"])
         var includedPatches = arrayOf<String>()
 
