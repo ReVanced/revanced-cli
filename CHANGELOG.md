@@ -1,3 +1,16 @@
+# [2.4.0](https://github.com/revanced/revanced-cli/compare/v2.3.3...v2.4.0) (2022-07-10)
+
+
+### Bug Fixes
+
+* wrong label in additional items [skip ci] ([cd3ded1](https://github.com/revanced/revanced-cli/commit/cd3ded1fbdb0c8eb7485912d5cbd6a2dd7455658))
+
+
+### Features
+
+* better output for excluded patches ([#77](https://github.com/revanced/revanced-cli/issues/77)) ([ac7c7a9](https://github.com/revanced/revanced-cli/commit/ac7c7a9a1a5c08322e3b206780d4f31104d8b570))
+* issue templates [skip ci] ([bac8c67](https://github.com/revanced/revanced-cli/commit/bac8c67d6f7bc10a38bb98a2f6e3f5cf6fa2e3e1))
+
 ## [2.3.3](https://github.com/revanced/revanced-cli/compare/v2.3.2...v2.3.3) (2022-07-09)
 
 ## [2.3.2](https://github.com/revanced/revanced-cli/compare/v2.3.1...v2.3.2) (2022-07-05)
