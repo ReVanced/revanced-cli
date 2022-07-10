@@ -28,7 +28,7 @@ fun Patcher.addPatchesFiltered(
             val args = MainCommand.args.pArgs!!
 
             if (excludePatches && args.excludedPatches.contains(patchName)) {
-                logger.info("$prefix: Excluded by user")
+                logger.info("$prefix: Explicitely excluded")
                 return@patch
             } else if (!patch.include && !args.includedPatches.contains(patchName)) {
                 logger.info("$prefix: Not explicitely included")
