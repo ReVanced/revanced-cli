@@ -1,3 +1,17 @@
+# [2.5.0](https://github.com/revanced/revanced-cli/compare/v2.4.0...v2.5.0) (2022-07-10)
+
+
+### Bug Fixes
+
+* null exception when resource patching is disabled ([#85](https://github.com/revanced/revanced-cli/issues/85)) ([125fa06](https://github.com/revanced/revanced-cli/commit/125fa06ca6bac66f790e4aba66887464189b3a63))
+* remove `excludePatches` check ([eb83cab](https://github.com/revanced/revanced-cli/commit/eb83cabfff6fbc28dd892f15b8e28278e284caa9))
+
+
+### Features
+
+* `--exclusive` switch ([#78](https://github.com/revanced/revanced-cli/issues/78)) ([8e91c12](https://github.com/revanced/revanced-cli/commit/8e91c12c5e3864c369005ef9fe7d9db668e86701))
+* `--uninstall` switch ([#84](https://github.com/revanced/revanced-cli/issues/84)) ([131100e](https://github.com/revanced/revanced-cli/commit/131100ef0043924a9c11eb9886b4f6b0373690d9))
+
 # [2.4.0](https://github.com/revanced/revanced-cli/compare/v2.3.3...v2.4.0) (2022-07-10)
 
 
