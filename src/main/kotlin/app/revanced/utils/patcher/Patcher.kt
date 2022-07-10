@@ -28,8 +28,8 @@ fun Patcher.addPatchesFiltered() {
             if (args.excludedPatches.contains(patchName)) {
                 logger.info("$prefix: Explicitely excluded")
                 return@patch
-            } else if (!patch.include && !args.includedPatches.contains(patchName)) {
-                logger.info("$prefix: Not explicitely included")
+            } else if ((!patch.include || args.defaultExclude) && !args.includedPatches.contains(patchName)) {
+                logger.info("$prefix: Not explicitly included")
                 return@patch
             }
 
