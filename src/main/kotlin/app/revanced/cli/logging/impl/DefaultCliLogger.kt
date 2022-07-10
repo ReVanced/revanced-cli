@@ -7,13 +7,14 @@ import java.util.logging.SimpleFormatter
 
 internal class DefaultCliLogger(
     private val logger: Logger = Logger.getLogger(MainCommand::javaClass.name),
-    private val errorLogger: Logger = Logger.getLogger(MainCommand::javaClass.name + "Err")
+    private val errorLogger: Logger = Logger.getLogger(logger.name + "Err")
 ) : CliLogger {
 
     init {
         logger.useParentHandlers = false
-        logger.handlers.forEach { logger.removeHandler(it) }
-        logger.addHandler(FlushingStreamHandler(System.out, SimpleFormatter()))
+        if (logger.handlers.isEmpty()) {
+            logger.addHandler(FlushingStreamHandler(System.out, SimpleFormatter()))
+        }
     }
 
     companion object {
