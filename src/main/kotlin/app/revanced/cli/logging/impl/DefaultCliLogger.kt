@@ -12,8 +12,10 @@ internal class DefaultCliLogger(
 
     init {
         logger.useParentHandlers = false
+        logger.handlers.forEach { logger.removeHandler(it) }
         logger.addHandler(FlushingStreamHandler(System.out, SimpleFormatter()))
     }
+
     companion object {
         init {
             System.setProperty("java.util.logging.SimpleFormatter.format", "%4\$s: %5\$s %n")
