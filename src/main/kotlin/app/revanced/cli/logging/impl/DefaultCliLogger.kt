@@ -4,17 +4,19 @@ import app.revanced.cli.command.MainCommand
 import app.revanced.cli.logging.CliLogger
 import java.util.logging.Logger
 import java.util.logging.SimpleFormatter
-import java.util.logging.StreamHandler
 
 internal class DefaultCliLogger(
-    private val logger: Logger = Logger.getLogger(MainCommand::javaClass.name),
-    private val errorLogger: Logger = Logger.getLogger(MainCommand::javaClass.name + "Err")
+    private val logger: Logger = Logger.getLogger(MainCommand::class.java.name),
+    private val errorLogger: Logger = Logger.getLogger(logger.name + "Err")
 ) : CliLogger {
 
     init {
         logger.useParentHandlers = false
-        logger.addHandler(StreamHandler(System.out, SimpleFormatter()))
+        if (logger.handlers.isEmpty()) {
+            logger.addHandler(FlushingStreamHandler(System.out, SimpleFormatter()))
+        }
     }
+
     companion object {
         init {
             System.setProperty("java.util.logging.SimpleFormatter.format", "%4\$s: %5\$s %n")
