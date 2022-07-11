@@ -1,3 +1,10 @@
+## [2.5.3](https://github.com/revanced/revanced-cli/compare/v2.5.2...v2.5.3) (2022-07-11)
+
+
+### Bug Fixes
+
+* Log not showing in CLI  ([#80](https://github.com/revanced/revanced-cli/issues/80)) ([d9c5a17](https://github.com/revanced/revanced-cli/commit/d9c5a179c529c386f66df4fa63cd321d396836b5)), closes [#79](https://github.com/revanced/revanced-cli/issues/79)
+
 ## [2.5.2](https://github.com/revanced/revanced-cli/compare/v2.5.1...v2.5.2) (2022-07-10)
 
 
