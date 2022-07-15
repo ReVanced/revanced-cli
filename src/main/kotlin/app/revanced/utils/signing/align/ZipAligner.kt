@@ -1,63 +1,29 @@
 package app.revanced.utils.signing.align
 
-import app.revanced.utils.signing.align.stream.MultiOutputStream
-import app.revanced.utils.signing.align.stream.PeekingFakeStream
-import java.io.BufferedOutputStream
+import app.revanced.utils.signing.align.zip.ZipFile
 import java.io.File
 import java.util.*
-import java.util.zip.ZipEntry
-import java.util.zip.ZipFile
-import java.util.zip.ZipOutputStream
 
 internal object ZipAligner {
-    fun align(input: File, output: File, alignment: Int = 4) {
-        val zipFile = ZipFile(input)
+    const val DEFAULT_ALIGNMENT = 4
+    const val LIBRARY_ALIGNEMNT = 4096
 
-        val entries: Enumeration<out ZipEntry?> = zipFile.entries()
+    fun align(input: File, output: File) {
+        val inputZip = ZipFile(input)
+        val outputZip = ZipFile(output)
 
-        // fake
-        val peekingFakeStream = PeekingFakeStream()
-        val fakeOutputStream = ZipOutputStream(peekingFakeStream)
-        // real
-        val zipOutputStream = ZipOutputStream(BufferedOutputStream(output.outputStream()))
+        for (entry in inputZip.entries) {
+            val data = inputZip.getDataForEntry(entry)
 
-        val multiOutputStream = MultiOutputStream(
-            listOf(
-                fakeOutputStream, // fake, used to add the data to the fake stream
-                zipOutputStream // real
-            )
-        )
+            if (entry.compression == 0.toUShort()) {
+                val alignment = if (entry.fileName.endsWith(".so")) LIBRARY_ALIGNEMNT else DEFAULT_ALIGNMENT
 
-        var bias = 0
-        while (entries.hasMoreElements()) {
-            var padding = 0
-
-            val entry: ZipEntry = entries.nextElement()!!
-            // fake, used to calculate the file offset of the entry
-            fakeOutputStream.putNextEntry(entry)
-
-            if (entry.size == entry.compressedSize) {
-                val fileOffset = peekingFakeStream.peek()
-                val newOffset = fileOffset + bias
-                padding = ((alignment - (newOffset % alignment)) % alignment).toInt()
-
-                // real
-                entry.extra = if (entry.extra == null) ByteArray(padding)
-                else Arrays.copyOf(entry.extra, entry.extra.size + padding)
+                outputZip.addEntryAligned(entry, data, alignment)
+            } else {
+                outputZip.addEntry(entry, data)
             }
-
-            zipOutputStream.putNextEntry(entry)
-            zipFile.getInputStream(entry).copyTo(multiOutputStream)
-
-            // fake, used to add remaining bytes
-            fakeOutputStream.closeEntry()
-            // real
-            zipOutputStream.closeEntry()
-
-            bias += padding
         }
 
-        zipFile.close()
-        zipOutputStream.close()
+        outputZip.finish()
     }
 }
