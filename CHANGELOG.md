@@ -1,3 +1,10 @@
+# [2.6.0](https://github.com/revanced/revanced-cli/compare/v2.5.3...v2.6.0) (2022-07-18)
+
+
+### Features
+
+* more efficient zipalign ([a942a57](https://github.com/revanced/revanced-cli/commit/a942a57364777d6ab6fcb11e6171cc4b496c8540))
+
 ## [2.5.3](https://github.com/revanced/revanced-cli/compare/v2.5.2...v2.5.3) (2022-07-11)
 
 
