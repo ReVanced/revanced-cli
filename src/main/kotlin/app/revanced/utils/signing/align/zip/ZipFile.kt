@@ -75,11 +75,13 @@ class ZipFile(val file: File) {
             filePointer.channel.write(it.toCDE())
         }
 
+        val entriesCount = entries.size.toUShort()
+
         val endRecord = ZipEndRecord(
             0u,
             0u,
-            entries.count().toUShort(),
-            entries.count().toUShort(),
+            entriesCount,
+            entriesCount,
             filePointer.channel.position().toUInt() - CDEStart,
             CDEStart,
             ""
