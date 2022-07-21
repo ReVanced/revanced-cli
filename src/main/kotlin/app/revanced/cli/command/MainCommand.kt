@@ -152,7 +152,7 @@ internal object MainCommand : Runnable {
                 _args.inputFile,
                 args.cacheDirectory,
                 !args.disableResourcePatching,
-                args.aaptPath ?: "",
+                args.aaptPath,
                 logger = PatcherLogger
             )
         )
