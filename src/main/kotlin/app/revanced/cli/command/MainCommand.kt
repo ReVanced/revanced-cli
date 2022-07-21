@@ -1,5 +1,6 @@
 package app.revanced.cli.command
 
+import app.revanced.cli.aligning.Aligning
 import app.revanced.cli.logging.impl.DefaultCliLogger
 import app.revanced.cli.patcher.Patcher
 import app.revanced.cli.patcher.logging.impl.PatcherLogger
@@ -162,8 +163,7 @@ internal object MainCommand : Runnable {
         val adb: Adb? = _args.deploy?.let {
             Adb(outputFile, patcher.data.packageMetadata.packageName, _args.deploy!!, !args.mount)
         }
-        val patchedFile = if (args.mount) outputFile
-        else File(args.cacheDirectory).resolve("${outputFile.nameWithoutExtension}_raw.apk")
+        val patchedFile = File(args.cacheDirectory).resolve("${outputFile.nameWithoutExtension}_raw.apk")
 
         Patcher.start(patcher, patchedFile)
 
@@ -179,6 +179,9 @@ internal object MainCommand : Runnable {
                         .canonicalPath
                 )
             )
+        }
+        else {
+            Aligning.align(patchedFile, outputFile)
         }
 
         if (args.clean) File(args.cacheDirectory).deleteRecursively()

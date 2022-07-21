@@ -7,14 +7,14 @@ import app.revanced.utils.signing.align.ZipAligner
 import java.io.File
 
 object Signing {
-    fun start(inputFile: File, outputFile: File, signingOptions: SigningOptions) {
+    fun start(patchedFile: File, outputFile: File, signingOptions: SigningOptions) {
         val cacheDirectory = File(args.sArgs?.pArgs?.cacheDirectory)
-        val alignedOutput = cacheDirectory.resolve("${outputFile.nameWithoutExtension}_aligned.apk")
         val signedOutput = cacheDirectory.resolve("${outputFile.nameWithoutExtension}_signed.apk")
+        val alignedOutput = cacheDirectory.resolve("${outputFile.nameWithoutExtension}_aligned.apk")
 
-        // align the inputFile and write to alignedOutput
-        logger.info("Aligning ${inputFile.name}")
-        ZipAligner.align(inputFile, alignedOutput)
+        // align the patchedFile and write to alignedFile
+        ZipAligner.align(patchedFile, alignedOutput)
+
         // sign the alignedOutput and write to signedOutput
         // the reason is, in case the signer fails
         // it does not damage the output file
