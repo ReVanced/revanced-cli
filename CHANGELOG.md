@@ -1,3 +1,10 @@
+# [2.7.0](https://github.com/reisxd/revanced-cli-termux/compare/v2.6.0...v2.7.0) (2022-07-21)
+
+
+### Features
+
+* please work bot ([b1c5d6e](https://github.com/reisxd/revanced-cli-termux/commit/b1c5d6e3a19ae63c90d3b6820b035cb0a621ac61))
+
 # [2.6.0](https://github.com/revanced/revanced-cli/compare/v2.5.3...v2.6.0) (2022-07-18)
 
 
