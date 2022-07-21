@@ -149,7 +149,8 @@ internal object MainCommand : Runnable {
                 _args.inputFile,
                 args.cacheDirectory,
                 !args.disableResourcePatching,
-                logger = PatcherLogger
+                logger = PatcherLogger,
+                aaptPath = "/data/data/com.termux/files/usr/bin/aapt2"
             )
         )
 
