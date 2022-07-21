@@ -1,6 +1,6 @@
 package app.revanced.cli.command
 
-import app.revanced.cli.aligning.ZipAligning
+import app.revanced.cli.aligning.Aligning
 import app.revanced.cli.logging.impl.DefaultCliLogger
 import app.revanced.cli.patcher.Patcher
 import app.revanced.cli.patcher.logging.impl.PatcherLogger
@@ -177,7 +177,7 @@ internal object MainCommand : Runnable {
             )
         }
         else {
-            ZipAligning.align(patchedFile, outputFile)
+            Aligning.align(patchedFile, outputFile)
         }
 
         if (args.clean) File(args.cacheDirectory).deleteRecursively()

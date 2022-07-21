@@ -5,7 +5,7 @@ import app.revanced.cli.command.MainCommand.logger
 import app.revanced.utils.signing.align.ZipAligner
 import java.io.File
 
-object ZipAligning {
+object Aligning {
     fun align(inputFile: File, outputFile: File) {
         val cacheDirectory = File(MainCommand.args.sArgs?.pArgs?.cacheDirectory)
         val alignedOutput = cacheDirectory.resolve("${outputFile.nameWithoutExtension}_aligned.apk")
