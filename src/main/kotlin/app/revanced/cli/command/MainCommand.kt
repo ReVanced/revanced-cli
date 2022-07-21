@@ -115,7 +115,7 @@ internal object MainCommand : Runnable {
         var clean: Boolean = false
 
         @Option(names = ["--custom-aapt2-binary"], description = ["Path to custom aapt2 binary"])
-        var aaptPath: String? = null
+        var aaptPath: String = ""
     }
 
     override fun run() {
