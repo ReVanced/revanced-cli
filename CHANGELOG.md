@@ -1,3 +1,10 @@
+# [2.7.0](https://github.com/revanced/revanced-cli/compare/v2.6.0...v2.7.0) (2022-07-21)
+
+
+### Features
+
+* `--custom-aapt2-binary` option ([#104](https://github.com/revanced/revanced-cli/issues/104)) ([d8dbffd](https://github.com/revanced/revanced-cli/commit/d8dbffd7a7ebc583476d368d2ae78853cbb40382))
+
 # [2.6.0](https://github.com/revanced/revanced-cli/compare/v2.5.3...v2.6.0) (2022-07-18)
 
 

@@ -114,6 +114,9 @@ internal object MainCommand : Runnable {
             description = ["Clean the temporal resource cache directory. This will be done anyways when running the patcher"]
         )
         var clean: Boolean = false
+
+        @Option(names = ["--custom-aapt2-binary"], description = ["Path to custom aapt2 binary"])
+        var aaptPath: String = ""
     }
 
     override fun run() {
@@ -150,6 +153,7 @@ internal object MainCommand : Runnable {
                 _args.inputFile,
                 args.cacheDirectory,
                 !args.disableResourcePatching,
+                args.aaptPath,
                 logger = PatcherLogger
             )
         )
