@@ -44,18 +44,18 @@ internal object MainCommand : Runnable {
         var deploy: String? = null
 
         @ArgGroup(exclusive = false)
-        var sArgs: StartPatcherArgs? = null
+        var patchArgs: PatchArgs? = null
     }
 
-    class StartPatcherArgs {
+    class PatchArgs {
         @Option(names = ["-b", "--bundles"], description = ["One or more bundles of patches"], required = true)
         var patchBundles = arrayOf<String>()
 
         @ArgGroup(exclusive = false)
-        var lArgs: ListingArgs? = null
+        var listingArgs: ListingArgs? = null
 
         @ArgGroup(exclusive = false)
-        var pArgs: PatchingArgs? = null
+        var patchingArgs: PatchingArgs? = null
     }
 
     class ListingArgs {
@@ -79,7 +79,10 @@ internal object MainCommand : Runnable {
         @Option(names = ["-e", "--exclude"], description = ["Explicitly exclude patches"])
         var excludedPatches = arrayOf<String>()
 
-        @Option(names = ["--exclusive"], description = ["Only installs the patches you include, not including any patch by default"])
+        @Option(
+            names = ["--exclusive"],
+            description = ["Only installs the patches you include, not including any patch by default"]
+        )
         var defaultExclude = false
 
         @Option(names = ["-i", "--include"], description = ["Include patches"])
@@ -120,85 +123,114 @@ internal object MainCommand : Runnable {
     }
 
     override fun run() {
-        if (args.sArgs?.lArgs?.listOnly == true) {
+        if (args.patchArgs?.listingArgs?.listOnly == true) {
             printListOfPatches()
             return
         }
 
         if (args.uninstall) {
-            // temporarily get package name using Patcher method
-            // fix: abstract options in patcher
-            val patcher = app.revanced.patcher.Patcher(
-                PatcherOptions(
-                    args.inputFile,
-                    "uninstaller-cache",
-                    false
-                )
-            )
-            File("uninstaller-cache").deleteRecursively()
-
-            val adb: Adb? = args.deploy?.let {
-                Adb(File("placeholder_file"), patcher.data.packageMetadata.packageName, args.deploy!!, false)
-            }
-            adb?.uninstall()
-
+            uninstall()
             return
         }
 
-        val _args = args
-        val args = args.sArgs?.pArgs ?: return
+        val pArgs = this.args.patchArgs?.patchingArgs ?: return
+
+        // the file to write to
+        val outputFile = File(pArgs.outputPath)
 
         val patcher = app.revanced.patcher.Patcher(
             PatcherOptions(
-                _args.inputFile,
-                args.cacheDirectory,
-                !args.disableResourcePatching,
-                args.aaptPath,
+                args.inputFile,
+                pArgs.cacheDirectory,
+                !pArgs.disableResourcePatching,
+                pArgs.aaptPath,
                 logger = PatcherLogger
             )
         )
 
-        val outputFile = File(args.outputPath)
-
-        val adb: Adb? = _args.deploy?.let {
-            Adb(outputFile, patcher.data.packageMetadata.packageName, _args.deploy!!, !args.mount)
+        // prepare adb
+        val adb: Adb? = args.deploy?.let {
+            Adb(outputFile, patcher.data.packageMetadata.packageName, args.deploy!!, !pArgs.mount)
         }
-        val patchedFile = File(args.cacheDirectory).resolve("${outputFile.nameWithoutExtension}_raw.apk")
 
+        val patchedFile = File(pArgs.cacheDirectory).resolve("${outputFile.nameWithoutExtension}_raw.apk")
+
+        // start the patcher
         Patcher.start(patcher, patchedFile)
 
-        if (!args.mount) {
-            Signing.start(
-                patchedFile,
-                outputFile,
+        val cacheDirectory = File(pArgs.cacheDirectory)
+
+        // align the file
+        val alignedFile = cacheDirectory.resolve("${outputFile.nameWithoutExtension}_aligned.apk")
+        Aligning.align(patchedFile, alignedFile)
+
+        // sign the file
+        val finalFile = if (!pArgs.mount) {
+            val signedOutput = cacheDirectory.resolve("${outputFile.nameWithoutExtension}_signed.apk")
+            Signing.sign(
+                alignedFile,
+                signedOutput,
                 SigningOptions(
-                    args.cn,
-                    args.password,
-                    args.keystorePath ?: outputFile.absoluteFile.parentFile
+                    pArgs.cn,
+                    pArgs.password,
+                    pArgs.keystorePath ?: outputFile.absoluteFile.parentFile
                         .resolve("${outputFile.nameWithoutExtension}.keystore")
                         .canonicalPath
                 )
             )
-        }
-        else {
-            Aligning.align(patchedFile, outputFile)
-        }
 
-        if (args.clean) File(args.cacheDirectory).deleteRecursively()
+            signedOutput
+        } else
+            alignedFile
 
+        // finally copy to the specified output file
+        logger.info("Copying ${finalFile.name} to ${outputFile.name}")
+        finalFile.copyTo(outputFile, overwrite = true)
+
+        // clean up the cache directory if needed
+        if (pArgs.clean)
+            cleanUp(pArgs.cacheDirectory)
+
+        // deploy if specified
         adb?.deploy()
 
-        if (args.clean && _args.deploy != null) Files.delete(outputFile.toPath())
+        if (pArgs.clean && args.deploy != null) Files.delete(outputFile.toPath())
 
         logger.info("Finished")
     }
 
+    private fun cleanUp(cacheDirectory: String) {
+        val result = if (File(cacheDirectory).deleteRecursively())
+            "Cleaned up cache directory"
+        else
+            "Failed to clean up cache directory"
+        logger.info(result)
+    }
+
+    private fun uninstall() {
+        // temporarily get package name using Patcher method
+        // fix: abstract options in patcher
+        val patcher = app.revanced.patcher.Patcher(
+            PatcherOptions(
+                args.inputFile,
+                "uninstaller-cache",
+                false
+            )
+        )
+        File("uninstaller-cache").deleteRecursively()
+
+        val adb: Adb? = args.deploy?.let {
+            Adb(File("placeholder_file"), patcher.data.packageMetadata.packageName, args.deploy!!, false)
+        }
+        adb?.uninstall()
+    }
+
     private fun printListOfPatches() {
-        for (patchBundlePath in args.sArgs?.patchBundles!!) for (patch in JarPatchBundle(patchBundlePath).loadPatches()) {
+        for (patchBundlePath in args.patchArgs?.patchBundles!!) for (patch in JarPatchBundle(patchBundlePath).loadPatches()) {
             for (compatiblePackage in patch.compatiblePackages!!) {
                 val packageEntryStr = buildString {
                     // Add package if flag is set
-                    if (args.sArgs?.lArgs?.withPackages == true) {
+                    if (args.patchArgs?.listingArgs?.withPackages == true) {
                         val packageName = compatiblePackage.name.substringAfterLast(".").padStart(10)
                         append(packageName)
                         append("\t")
@@ -207,12 +239,12 @@ internal object MainCommand : Runnable {
                     val patchName = patch.patchName.padStart(25)
                     append(patchName)
                     // Add description if flag is set.
-                    if (args.sArgs?.lArgs?.withDescriptions == true) {
+                    if (args.patchArgs?.listingArgs?.withDescriptions == true) {
                         append("\t")
                         append(patch.description)
                     }
                     // Add compatible versions, if flag is set
-                    if (args.sArgs?.lArgs?.withVersions == true) {
+                    if (args.patchArgs?.listingArgs?.withVersions == true) {
                         val compatibleVersions = compatiblePackage.versions.joinToString(separator = ", ")
                         append("\t")
                         append(compatibleVersions)
