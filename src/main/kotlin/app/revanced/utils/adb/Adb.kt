@@ -21,7 +21,7 @@ internal class Adb(
             ?: throw IllegalArgumentException("No such device with name $deviceName")
 
         if (!modeInstall && device.run("su -h", false) != 0)
-            throw IllegalArgumentException("Root required on $deviceName. Deploying failed")
+            throw IllegalArgumentException("Root required on $deviceName. Task failed")
     }
 
     private fun String.replacePlaceholder(with: String? = null): String {
@@ -39,7 +39,7 @@ internal class Adb(
             // push patched file
             device.copy(Constants.PATH_INIT_PUSH, file)
 
-            // create revanced path
+            // create revanced folder path
             device.run("${Constants.COMMAND_CREATE_DIR} ${Constants.PATH_REVANCED}")
 
             // prepare mounting the apk
@@ -53,16 +53,8 @@ internal class Adb(
             // install mount script
             device.run(Constants.COMMAND_INSTALL_MOUNT.replacePlaceholder())
 
-            // push umount script
-            device.createFile(
-                Constants.PATH_INIT_PUSH,
-                Constants.CONTENT_UMOUNT_SCRIPT.replacePlaceholder()
-            )
-            // install unmount script
-            device.run(Constants.COMMAND_INSTALL_UMOUNT.replacePlaceholder())
-
             // unmount the apk for sanity
-            device.run(Constants.PATH_UMOUNT.replacePlaceholder())
+            device.run(Constants.COMMAND_UMOUNT.replacePlaceholder())
             // mount the apk
             device.run(Constants.PATH_MOUNT.replacePlaceholder())
 
@@ -74,6 +66,21 @@ internal class Adb(
             // log the app
             log()
         }
+    }
+
+    internal fun uninstall() {
+        logger.info("Uninstalling by unmounting")
+
+        // unmount the apk
+        device.run(Constants.COMMAND_UMOUNT.replacePlaceholder())
+
+        // delete revanced app
+        device.run(Constants.COMMAND_DELETE.replacePlaceholder(Constants.PATH_REVANCED_APP).replacePlaceholder())
+
+        // delete mount script
+        device.run(Constants.COMMAND_DELETE.replacePlaceholder(Constants.PATH_MOUNT).replacePlaceholder())
+
+        logger.info("Finished uninstalling")
     }
 
     private fun log() {

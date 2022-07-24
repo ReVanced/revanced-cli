@@ -21,20 +21,20 @@ internal fun JadbDevice.run(command: String, su: Boolean = true): Int {
     if (su) {
         return this.buildCommand(command).start().waitFor()
     }
-    
-    return this.CheckSU(command)!!.waitFor()
+
+    return this.checkSU(command)!!.waitFor()
 }
 
-private fun JadbDevice.CheckSU(command: String): ShellProcess? {
-    val byteArray = ByteArray(8)
+private fun JadbDevice.checkSU(command: String): ShellProcess? {
+    val suType = ByteArray(8)
     val adbCommand = this.buildCommand(command, false).start()
 
     // fix: deadlock with SuperSU
     val adbInputStream = adbCommand.inputStream
-    adbInputStream.read(byteArray)
+    adbInputStream.read(suType)
 
-    val SuperUserType = String(byteArray).filter { !it.isWhitespace() }
-    if (SuperUserType == "SuperSU") {
+    val superUserType = String(suType).filter { !it.isWhitespace() }
+    if (superUserType == "SuperSU") {
         Constants.IS_SUPERSU = true
     }
 
