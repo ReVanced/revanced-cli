@@ -7,15 +7,14 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.util.zip.ZipEntry
 
-internal class ZipFileSystemUtils(input: File?, output: File) : Closeable {
-    private val inFileSystem = if (input != null) {
-        FileSystems.newFileSystem(input.toPath())
-    } else null
-    private val outFileSystem = FileSystems.newFileSystem(output.toPath(), mapOf("noCompression" to true))
+internal class ZipFileSystemUtils(
+    file: File
+) : Closeable {
+    private var zipFileSystem = FileSystems.newFileSystem(file.toPath(), mapOf("noCompression" to true))
 
     private fun Path.deleteRecursively() {
         if (!Files.exists(this)) {
-            throw IllegalStateException("File exists in input but not in output, cannot delete")
+            throw IllegalStateException("File exists in real folder but not in zip file system")
         }
 
         if (Files.isDirectory(this)) {
@@ -27,25 +26,21 @@ internal class ZipFileSystemUtils(input: File?, output: File) : Closeable {
         Files.delete(this)
     }
 
-    internal fun writeInput() {
-        if (inFileSystem == null) {
-            throw IllegalArgumentException("Input file not set")
-        }
-        val root = inFileSystem.getPath(inFileSystem.separator)
+    internal fun getFile(path: String) = zipFileSystem.getPath(path)
 
-        Files.list(root).close()
-
-        Files.list(root).also { fileStream ->
+    internal fun writePathRecursively(path: Path) {
+        Files.list(path).use { fileStream ->
             fileStream.forEach { filePath ->
-                val fileSystemPath = filePath.getRelativePath(root)
+                val fileSystemPath = filePath.getRelativePath(path)
                 fileSystemPath.deleteRecursively()
             }
-        }.close()
+        }
 
-        Files.walk(root).also { fileStream ->
-            // don't include build directory by skipping the root node.
+        Files.walk(path).use { fileStream ->
+            // don't include build directory
+            // by skipping the root node.
             fileStream.skip(1).forEach { filePath ->
-                val relativePath = filePath.getRelativePath(root)
+                val relativePath = filePath.getRelativePath(path)
 
                 if (Files.isDirectory(filePath)) {
                     Files.createDirectory(relativePath)
@@ -54,18 +49,16 @@ internal class ZipFileSystemUtils(input: File?, output: File) : Closeable {
 
                 Files.copy(filePath, relativePath)
             }
-        }.close()
+        }
     }
 
-    internal fun write(path: String, content: ByteArray) = Files.write(outFileSystem.getPath(path), content)
+    internal fun write(path: String, content: ByteArray) = Files.write(zipFileSystem.getPath(path), content)
 
-    private fun Path.getRelativePath(path: Path): Path = outFileSystem.getPath(path.relativize(this).toString())
+    private fun Path.getRelativePath(path: Path): Path = zipFileSystem.getPath(path.relativize(this).toString())
 
+    // TODO: figure out why the file system is uncompressed by default and how to fix it
     internal fun uncompress(vararg paths: String) =
-        paths.forEach { Files.setAttribute(outFileSystem.getPath(it), "zip:method", ZipEntry.STORED) }
+        paths.forEach { Files.setAttribute(zipFileSystem.getPath(it), "zip:method", ZipEntry.STORED) }
 
-    override fun close() {
-        inFileSystem?.close()
-        outFileSystem.close()
-    }
+    override fun close() = zipFileSystem.close()
 }

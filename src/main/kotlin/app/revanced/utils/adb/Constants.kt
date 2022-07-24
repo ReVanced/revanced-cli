@@ -27,7 +27,7 @@ internal object Constants {
     // revanced apk path
     internal const val PATH_REVANCED_APP = "$PATH_REVANCED$PLACEHOLDER.apk"
 
-    // (un)mount script paths
+    // mount script paths
     internal val PATH_MOUNT: String
         get() = if (IS_SUPERSU) "/su/su.d/$NAME_MOUNT_SCRIPT" else "/data/adb/service.d/$NAME_MOUNT_SCRIPT"
 

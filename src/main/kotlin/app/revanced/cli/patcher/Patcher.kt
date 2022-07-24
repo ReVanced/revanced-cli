@@ -11,37 +11,38 @@ import java.nio.file.Files
 
 internal object Patcher {
     internal fun start(patcher: app.revanced.patcher.Patcher, output: File) {
-        val args = args.pArgs!!
+        val inputFile = args.inputFile
+        val args = args.patchArgs?.patchingArgs!!
 
         // merge files like necessary integrations
         patcher.mergeFiles()
         // add patches, but filter incompatible or excluded patches
-        patcher.addPatchesFiltered(excludePatches = args.excludedPatches.isNotEmpty())
+        patcher.addPatchesFiltered()
         // apply patches
         patcher.applyPatchesVerbose()
 
         // write output file
         if (output.exists()) Files.delete(output.toPath())
-        args.inputFile.copyTo(output)
+        inputFile.copyTo(output)
 
         val result = patcher.save()
-        val inputFile = if (!args.disableResourcePatching && result.resourceFile != null) {
-            result.resourceFile
-        } else null
-        ZipFileSystemUtils(inputFile, output).use { fileSystem ->
+        ZipFileSystemUtils(output).use { outputFileSystem ->
             // replace all dex files
             result.dexFiles.forEach {
                 logger.info("Writing dex file ${it.name}")
-                fileSystem.write(it.name, it.dexFileInputStream.readAllBytes())
+                outputFileSystem.write(it.name, it.dexFileInputStream.readAllBytes())
             }
 
-            // inputFile being null implies resource patching being disabled
-            if (inputFile != null) {
-                // write resources
-                logger.info("Writing resources")
-                fileSystem.writeInput()
-                fileSystem.uncompress(*result.doNotCompress!!.toTypedArray())
+            if (!args.disableResourcePatching) {
+                logger.info("Writing resources...")
+
+                ZipFileSystemUtils(result.resourceFile!!).use { resourceFileSystem ->
+                    val resourceFiles = resourceFileSystem.getFile(File.separator)
+                    outputFileSystem.writePathRecursively(resourceFiles)
+                }
             }
+
+            result.doNotCompress?.let { outputFileSystem.uncompress(*it.toTypedArray()) }
         }
     }
 }

@@ -4,20 +4,18 @@ import app.revanced.cli.command.MainCommand
 import app.revanced.cli.command.MainCommand.args
 import app.revanced.cli.command.MainCommand.logger
 import app.revanced.patcher.Patcher
-import app.revanced.patcher.data.base.Data
+import app.revanced.patcher.data.Data
 import app.revanced.patcher.extensions.PatchExtensions.compatiblePackages
 import app.revanced.patcher.extensions.PatchExtensions.include
 import app.revanced.patcher.extensions.PatchExtensions.patchName
-import app.revanced.patcher.patch.base.Patch
+import app.revanced.patcher.patch.Patch
 import app.revanced.patcher.util.patch.implementation.JarPatchBundle
 
-fun Patcher.addPatchesFiltered(
-    excludePatches: Boolean = false
-) {
+fun Patcher.addPatchesFiltered() {
     val packageName = this.data.packageMetadata.packageName
     val packageVersion = this.data.packageMetadata.packageVersion
 
-    args.patchBundles.forEach { bundle ->
+    args.patchArgs?.patchBundles!!.forEach { bundle ->
         val includedPatches = mutableListOf<Class<out Patch<Data>>>()
         JarPatchBundle(bundle).loadPatches().forEach patch@{ patch ->
             val compatiblePackages = patch.compatiblePackages
@@ -25,13 +23,13 @@ fun Patcher.addPatchesFiltered(
 
             val prefix = "Skipping $patchName"
 
-            val args = MainCommand.args.pArgs!!
+            val args = MainCommand.args.patchArgs?.patchingArgs!!
 
-            if (excludePatches && args.excludedPatches.contains(patchName)) {
+            if (args.excludedPatches.contains(patchName)) {
                 logger.info("$prefix: Explicitly excluded")
                 return@patch
-            } else if (!patch.include) {
-                logger.info("$prefix: Explicitly excluded")
+            } else if ((!patch.include || args.defaultExclude) && !args.includedPatches.contains(patchName)) {
+                logger.info("$prefix: Not explicitly included")
                 return@patch
             }
 
@@ -74,7 +72,7 @@ fun Patcher.applyPatchesVerbose() {
 }
 
 fun Patcher.mergeFiles() {
-    this.addFiles(args.pArgs!!.mergeFiles) { file ->
+    this.addFiles(args.patchArgs?.patchingArgs!!.mergeFiles) { file ->
         logger.info("Merging $file")
     }
 }

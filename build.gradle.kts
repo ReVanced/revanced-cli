@@ -10,13 +10,7 @@ val githubPassword: String = project.findProperty("gpr.key") as? String ?: Syste
 
 repositories {
     mavenCentral()
-    maven {
-        url = uri("https://maven.pkg.github.com/revanced/multidexlib2")
-        credentials {
-            username = githubUsername
-            password = githubPassword
-        }
-    }
+    mavenLocal()
     maven {
         url = uri("https://maven.pkg.github.com/revanced/revanced-patcher")
         credentials {
@@ -32,7 +26,7 @@ dependencies {
     implementation(kotlin("stdlib"))
     implementation(kotlin("reflect"))
 
-    implementation("app.revanced:revanced-patcher:1.11.0")
+    implementation("app.revanced:revanced-patcher:2.4.0")
     implementation("info.picocli:picocli:4.6.3")
     implementation("com.android.tools.build:apksig:7.2.1")
     implementation("com.github.revanced:jadb:master-SNAPSHOT") // updated fork

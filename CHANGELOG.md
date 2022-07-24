@@ -1,3 +1,136 @@
+## [2.7.1](https://github.com/revanced/revanced-cli/compare/v2.7.0...v2.7.1) (2022-07-21)
+
+
+### Bug Fixes
+
+* align every file ([96ec6a0](https://github.com/revanced/revanced-cli/commit/96ec6a0384e4c710c36b99ccf88bb14c5addc7af))
+
+# [2.7.0](https://github.com/revanced/revanced-cli/compare/v2.6.0...v2.7.0) (2022-07-21)
+
+
+### Features
+
+* `--custom-aapt2-binary` option ([#104](https://github.com/revanced/revanced-cli/issues/104)) ([d8dbffd](https://github.com/revanced/revanced-cli/commit/d8dbffd7a7ebc583476d368d2ae78853cbb40382))
+
+# [2.6.0](https://github.com/revanced/revanced-cli/compare/v2.5.3...v2.6.0) (2022-07-18)
+
+
+### Features
+
+* more efficient zipalign ([a942a57](https://github.com/revanced/revanced-cli/commit/a942a57364777d6ab6fcb11e6171cc4b496c8540))
+
+## [2.5.3](https://github.com/revanced/revanced-cli/compare/v2.5.2...v2.5.3) (2022-07-11)
+
+
+### Bug Fixes
+
+* Log not showing in CLI  ([#80](https://github.com/revanced/revanced-cli/issues/80)) ([d9c5a17](https://github.com/revanced/revanced-cli/commit/d9c5a179c529c386f66df4fa63cd321d396836b5)), closes [#79](https://github.com/revanced/revanced-cli/issues/79)
+
+## [2.5.2](https://github.com/revanced/revanced-cli/compare/v2.5.1...v2.5.2) (2022-07-10)
+
+
+### Bug Fixes
+
+* `defaultExclude` unused ([2015c2a](https://github.com/revanced/revanced-cli/commit/2015c2a1dcc0290af237e2eb1ab4aaf5fc84d382))
+
+## [2.5.1](https://github.com/revanced/revanced-cli/compare/v2.5.0...v2.5.1) (2022-07-10)
+
+
+### Bug Fixes
+
+* Make clear what the --exclusive command actually does ([a26b0ea](https://github.com/revanced/revanced-cli/commit/a26b0ea64dcd0757b5b49c09137959751874d955))
+
+# [2.5.0](https://github.com/revanced/revanced-cli/compare/v2.4.0...v2.5.0) (2022-07-10)
+
+
+### Bug Fixes
+
+* null exception when resource patching is disabled ([#85](https://github.com/revanced/revanced-cli/issues/85)) ([125fa06](https://github.com/revanced/revanced-cli/commit/125fa06ca6bac66f790e4aba66887464189b3a63))
+* remove `excludePatches` check ([eb83cab](https://github.com/revanced/revanced-cli/commit/eb83cabfff6fbc28dd892f15b8e28278e284caa9))
+
+
+### Features
+
+* `--exclusive` switch ([#78](https://github.com/revanced/revanced-cli/issues/78)) ([8e91c12](https://github.com/revanced/revanced-cli/commit/8e91c12c5e3864c369005ef9fe7d9db668e86701))
+* `--uninstall` switch ([#84](https://github.com/revanced/revanced-cli/issues/84)) ([131100e](https://github.com/revanced/revanced-cli/commit/131100ef0043924a9c11eb9886b4f6b0373690d9))
+
+# [2.4.0](https://github.com/revanced/revanced-cli/compare/v2.3.3...v2.4.0) (2022-07-10)
+
+
+### Bug Fixes
+
+* wrong label in additional items [skip ci] ([cd3ded1](https://github.com/revanced/revanced-cli/commit/cd3ded1fbdb0c8eb7485912d5cbd6a2dd7455658))
+
+
+### Features
+
+* better output for excluded patches ([#77](https://github.com/revanced/revanced-cli/issues/77)) ([ac7c7a9](https://github.com/revanced/revanced-cli/commit/ac7c7a9a1a5c08322e3b206780d4f31104d8b570))
+* issue templates [skip ci] ([bac8c67](https://github.com/revanced/revanced-cli/commit/bac8c67d6f7bc10a38bb98a2f6e3f5cf6fa2e3e1))
+
+## [2.3.3](https://github.com/revanced/revanced-cli/compare/v2.3.2...v2.3.3) (2022-07-09)
+
+## [2.3.2](https://github.com/revanced/revanced-cli/compare/v2.3.1...v2.3.2) (2022-07-05)
+
+
+### Bug Fixes
+
+* fix noSuchMethodError ([00fec25](https://github.com/revanced/revanced-cli/commit/00fec2508a3421b7b5a246254e0cb08850eab6ea))
+
+## [2.3.1](https://github.com/revanced/revanced-cli/compare/v2.3.0...v2.3.1) (2022-07-04)
+
+# [2.3.0](https://github.com/revanced/revanced-cli/compare/v2.2.0...v2.3.0) (2022-07-03)
+
+
+### Features
+
+* separate logger to stdout & stderr ([#63](https://github.com/revanced/revanced-cli/issues/63)) ([0ddc2b5](https://github.com/revanced/revanced-cli/commit/0ddc2b54b739dae3e8ccc983bab73fc84e72be0a))
+
+# [2.2.0](https://github.com/revanced/revanced-cli/compare/v2.1.0...v2.2.0) (2022-07-03)
+
+
+### Features
+
+* separate options for `--list` ([#60](https://github.com/revanced/revanced-cli/issues/60)) ([52b3161](https://github.com/revanced/revanced-cli/commit/52b316150de397ebdee979caf51d4cb20961cf70))
+
+# [2.1.0](https://github.com/revanced/revanced-cli/compare/v2.0.5...v2.1.0) (2022-07-03)
+
+
+### Features
+
+* `--include` option ([#76](https://github.com/revanced/revanced-cli/issues/76)) ([57a1e7c](https://github.com/revanced/revanced-cli/commit/57a1e7c27fb0c4292e08332b88ccd57d69fa02c6))
+
+## [2.0.5](https://github.com/revanced/revanced-cli/compare/v2.0.4...v2.0.5) (2022-06-29)
+
+## [2.0.4](https://github.com/revanced/revanced-cli/compare/v2.0.3...v2.0.4) (2022-06-28)
+
+## [2.0.3](https://github.com/revanced/revanced-cli/compare/v2.0.2...v2.0.3) (2022-06-27)
+
+
+### Bug Fixes
+
+* wrong keystore output path ([20fa179](https://github.com/revanced/revanced-cli/commit/20fa17957e3e454b9755bc7b9b473b6c578cc593))
+
+## [2.0.2](https://github.com/revanced/revanced-cli/compare/v2.0.1...v2.0.2) (2022-06-27)
+
+
+### Bug Fixes
+
+* wrong separator when using `ZipFileSystemUtils` ([20e15de](https://github.com/revanced/revanced-cli/commit/20e15defc2b90aa5e79bad41c097bd0db8d5e12a))
+
+## [2.0.1](https://github.com/revanced/revanced-cli/compare/v2.0.0...v2.0.1) (2022-06-26)
+
+# [2.0.0](https://github.com/revanced/revanced-cli/compare/v1.11.1...v2.0.0) (2022-06-26)
+
+
+### Code Refactoring
+
+* migrate from `Signature` to `Fingerprint` ([88852a4](https://github.com/revanced/revanced-cli/commit/88852a45ac90ad9419c18f0cb3395745e62eadbf))
+
+
+### BREAKING CHANGES
+
+* Not backwards compatible, since a lot of classes where renamed.
+
 ## [1.11.1](https://github.com/revanced/revanced-cli/compare/v1.11.0...v1.11.1) (2022-06-25)
 
 
