@@ -1,6 +1,5 @@
 package app.revanced.cli.command
 
-import app.revanced.cli.aligning.Aligning
 import app.revanced.cli.logging.impl.DefaultCliLogger
 import app.revanced.cli.patcher.Patcher
 import app.revanced.cli.patcher.logging.impl.PatcherLogger
@@ -160,15 +159,11 @@ internal object MainCommand : Runnable {
 
         val cacheDirectory = File(pArgs.cacheDirectory)
 
-        // align the file
-        val alignedFile = cacheDirectory.resolve("${outputFile.nameWithoutExtension}_aligned.apk")
-        Aligning.align(patchedFile, alignedFile)
-
         // sign the file
         val finalFile = if (!pArgs.mount) {
             val signedOutput = cacheDirectory.resolve("${outputFile.nameWithoutExtension}_signed.apk")
             Signing.sign(
-                alignedFile,
+                patchedFile,
                 signedOutput,
                 SigningOptions(
                     pArgs.cn,
@@ -181,7 +176,7 @@ internal object MainCommand : Runnable {
 
             signedOutput
         } else
-            alignedFile
+            patchedFile
 
         // finally copy to the specified output file
         logger.info("Copying ${finalFile.name} to ${outputFile.name}")
