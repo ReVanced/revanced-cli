@@ -2,12 +2,12 @@ package app.revanced.cli.patcher
 
 import app.revanced.cli.command.MainCommand.args
 import app.revanced.cli.command.MainCommand.logger
-import app.revanced.utils.signing.align.ZipAligner
-import app.revanced.utils.signing.align.zip.ZipFile
-import app.revanced.utils.signing.align.zip.structures.ZipEntry
 import app.revanced.utils.patcher.addPatchesFiltered
 import app.revanced.utils.patcher.applyPatchesVerbose
 import app.revanced.utils.patcher.mergeFiles
+import app.revanced.utils.signing.align.ZipAligner
+import app.revanced.utils.signing.align.zip.ZipFile
+import app.revanced.utils.signing.align.zip.structures.ZipEntry
 import java.io.File
 import java.nio.file.Files
 
@@ -36,15 +36,11 @@ internal object Patcher {
 
             if (!args.disableResourcePatching) {
                 logger.info("Writing resources...")
-                ZipFile(result.resourceFile!!).use {
-                    outputFile.copyEntriesFromFileAligned(
-                        it,
-                        ZipAligner::getEntryAlignment
-                    )
-                }
+
+                outputFile.copyEntriesFromFileAligned(ZipFile(result.resourceFile!!), ZipAligner::getEntryAlignment)
             }
 
-            ZipFile(inputFile).use { outputFile.copyEntriesFromFileAligned(it, ZipAligner::getEntryAlignment) }
+            outputFile.copyEntriesFromFileAligned(ZipFile(inputFile), ZipAligner::getEntryAlignment)
         }
     }
 }
