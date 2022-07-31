@@ -1,3 +1,10 @@
+# [2.8.0](https://github.com/revanced/revanced-cli/compare/v2.7.1...v2.8.0) (2022-07-31)
+
+
+### Features
+
+* `frameworkFolderLocation` patcher option ([bc17298](https://github.com/revanced/revanced-cli/commit/bc17298a807ce035b8baa1f7c30e1392ca4ee43b))
+
 ## [2.7.1](https://github.com/revanced/revanced-cli/compare/v2.7.0...v2.7.1) (2022-07-21)
 
 
