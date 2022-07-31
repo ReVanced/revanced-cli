@@ -144,7 +144,8 @@ internal object MainCommand : Runnable {
                 pArgs.cacheDirectory,
                 !pArgs.disableResourcePatching,
                 pArgs.aaptPath,
-                logger = PatcherLogger
+                pArgs.cacheDirectory,
+                PatcherLogger
             )
         )
 
