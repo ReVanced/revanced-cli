@@ -1,3 +1,10 @@
+## [2.8.1](https://github.com/revanced/revanced-cli/compare/v2.8.0...v2.8.1) (2022-08-02)
+
+
+### Bug Fixes
+
+* remove requirement for solution [skip ci] ([#108](https://github.com/revanced/revanced-cli/issues/108)) ([0ce680a](https://github.com/revanced/revanced-cli/commit/0ce680a6f1de139434edd80876a168ff695c2d79))
+
 # [2.8.0](https://github.com/revanced/revanced-cli/compare/v2.7.1...v2.8.0) (2022-07-31)
 
 
