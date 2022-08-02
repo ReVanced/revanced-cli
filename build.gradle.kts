@@ -26,7 +26,7 @@ dependencies {
     implementation(kotlin("stdlib"))
     implementation(kotlin("reflect"))
 
-    implementation("app.revanced:revanced-patcher:2.4.0")
+    implementation("app.revanced:revanced-patcher:2.9.0")
     implementation("info.picocli:picocli:4.6.3")
     implementation("com.android.tools.build:apksig:7.2.1")
     implementation("com.github.revanced:jadb:master-SNAPSHOT") // updated fork
