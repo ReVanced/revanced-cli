@@ -1,3 +1,10 @@
+# [2.9.0](https://github.com/revanced/revanced-cli/compare/v2.8.3...v2.9.0) (2022-08-03)
+
+
+### Features
+
+* remove extra zipalign step ([#106](https://github.com/revanced/revanced-cli/issues/106)) ([c8e793e](https://github.com/revanced/revanced-cli/commit/c8e793efab8eed39b2cb564bee80ef6e0b2a7d03))
+
 ## [2.8.3](https://github.com/revanced/revanced-cli/compare/v2.8.2...v2.8.3) (2022-08-03)
 
 ## [2.8.2](https://github.com/revanced/revanced-cli/compare/v2.8.1...v2.8.2) (2022-08-02)
