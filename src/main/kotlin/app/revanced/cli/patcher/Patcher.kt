@@ -2,10 +2,12 @@ package app.revanced.cli.patcher
 
 import app.revanced.cli.command.MainCommand.args
 import app.revanced.cli.command.MainCommand.logger
-import app.revanced.utils.filesystem.ZipFileSystemUtils
 import app.revanced.utils.patcher.addPatchesFiltered
 import app.revanced.utils.patcher.applyPatchesVerbose
 import app.revanced.utils.patcher.mergeFiles
+import app.revanced.utils.signing.align.ZipAligner
+import app.revanced.utils.signing.align.zip.ZipFile
+import app.revanced.utils.signing.align.zip.structures.ZipEntry
 import java.io.File
 import java.nio.file.Files
 
@@ -23,26 +25,22 @@ internal object Patcher {
 
         // write output file
         if (output.exists()) Files.delete(output.toPath())
-        inputFile.copyTo(output)
 
         val result = patcher.save()
-        ZipFileSystemUtils(output).use { outputFileSystem ->
+        ZipFile(output).use { outputFile ->
             // replace all dex files
             result.dexFiles.forEach {
                 logger.info("Writing dex file ${it.name}")
-                outputFileSystem.write(it.name, it.dexFileInputStream.readAllBytes())
+                outputFile.addEntryCompressData(ZipEntry.createWithName(it.name), it.dexFileInputStream.readAllBytes())
             }
 
             if (!args.disableResourcePatching) {
                 logger.info("Writing resources...")
 
-                ZipFileSystemUtils(result.resourceFile!!).use { resourceFileSystem ->
-                    val resourceFiles = resourceFileSystem.getFile(File.separator)
-                    outputFileSystem.writePathRecursively(resourceFiles)
-                }
+                outputFile.copyEntriesFromFileAligned(ZipFile(result.resourceFile!!), ZipAligner::getEntryAlignment)
             }
 
-            result.doNotCompress?.let { outputFileSystem.uncompress(*it.toTypedArray()) }
+            outputFile.copyEntriesFromFileAligned(ZipFile(inputFile), ZipAligner::getEntryAlignment)
         }
     }
 }
