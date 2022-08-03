@@ -61,7 +61,7 @@ internal class Adb(
             // relaunch app
             device.run(Constants.COMMAND_RESTART.replacePlaceholder())
 
-            logger.info("Started logging app")
+            logger.info("Logging")
 
             // log the app
             log()
