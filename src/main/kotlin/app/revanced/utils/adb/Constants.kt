@@ -43,8 +43,7 @@ internal object Constants {
         "stock_path=${'$'}( pm path $PLACEHOLDER | grep base | sed 's/package://g' ) && umount -l ${'$'}stock_path"
 
     // install mount script & set permissions
-    internal val COMMAND_INSTALL_MOUNT : String
-        get() = "mv $PATH_INIT_PUSH $PATH_MOUNT && $COMMAND_CHMOD $PATH_MOUNT"
+    internal val COMMAND_INSTALL_MOUNT = "mv $PATH_INIT_PUSH $PATH_MOUNT && $COMMAND_CHMOD $PATH_MOUNT"
 
     // mount script
     internal val CONTENT_MOUNT_SCRIPT =
