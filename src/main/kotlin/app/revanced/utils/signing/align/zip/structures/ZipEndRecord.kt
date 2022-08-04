@@ -58,8 +58,7 @@ data class ZipEndRecord(
     fun toECD(): ByteBuffer {
         val commentBytes = fileComment.toByteArray(Charsets.UTF_8)
 
-        val buffer = ByteBuffer.allocate(ECD_HEADER_SIZE + commentBytes.size)
-            .also { it.order(ByteOrder.LITTLE_ENDIAN) }
+        val buffer = ByteBuffer.allocate(ECD_HEADER_SIZE + commentBytes.size).also { it.order(ByteOrder.LITTLE_ENDIAN) }
 
         buffer.putUInt(ECD_SIGNATURE)
         buffer.putUShort(diskNumber)
