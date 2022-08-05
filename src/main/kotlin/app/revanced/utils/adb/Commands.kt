@@ -22,10 +22,10 @@ internal fun JadbDevice.run(command: String, su: Boolean = true): Int {
         return this.buildCommand(command).start().waitFor()
     }
 
-    return this.checkSU(command)!!.waitFor()
+    return this.checkSU(command).waitFor()
 }
 
-private fun JadbDevice.checkSU(command: String): ShellProcess? {
+private fun JadbDevice.checkSU(command: String): ShellProcess {
     val suType = ByteArray(8)
     val adbCommand = this.buildCommand(command, false).start()
 
@@ -34,7 +34,7 @@ private fun JadbDevice.checkSU(command: String): ShellProcess? {
 
     val superUserType = String(suType).filter { !it.isWhitespace() }
     if (superUserType == "SuperSU") {
-        Adb.SuperSU = true
+        Adb.usingSuperSU = true
     }
 
     adbInputStream.close()
