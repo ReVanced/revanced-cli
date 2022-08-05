@@ -2,7 +2,6 @@ package app.revanced.utils.adb
 
 import se.vidstige.jadb.JadbDevice
 import se.vidstige.jadb.RemoteFile
-import se.vidstige.jadb.ShellProcess
 import se.vidstige.jadb.ShellProcessBuilder
 import java.io.File
 
@@ -18,18 +17,15 @@ internal fun JadbDevice.buildCommand(command: String, su: Boolean = true): Shell
 }
 
 internal fun JadbDevice.run(command: String, su: Boolean = true): Int {
-    if (su) {
-        return this.buildCommand(command).start().waitFor()
-    }
-
-    return this.checkSU(command).waitFor()
+    return this.buildCommand(command, su).start().waitFor()
 }
 
-private fun JadbDevice.checkSU(command: String): ShellProcess {
+internal fun JadbDevice.isRooted(): Boolean {
+    val adbCommand = this.buildCommand("su -h", false).start()
+
     // Size of the buffer to read the output from the shell process
     val suTypeArray = ByteArray(8)
-    
-    val adbCommand = this.buildCommand(command, false).start()
+
     val adbInputStream = adbCommand.inputStream
     adbInputStream.read(suTypeArray)
 
@@ -37,7 +33,7 @@ private fun JadbDevice.checkSU(command: String): ShellProcess {
     Adb.rootType = RootType.values().find { it.name == suType } ?: RootType.NONE_OR_UNSUPPORTED
 
     adbInputStream.close()
-    return adbCommand
+    return adbCommand.waitFor() == 0
 }
 
 internal fun JadbDevice.copy(targetPath: String, file: File) {
