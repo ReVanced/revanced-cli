@@ -32,7 +32,7 @@ internal object Constants {
 
     // move to revanced apk path & set permissions
     internal const val COMMAND_PREPARE_MOUNT_APK =
-        "base_path=\"$PATH_REVANCED_APP\" && mv $PATH_INIT_PUSH ${'$'}base_path && chmod 644 ${'$'}base_path && chown system:system ${'$'}base_path && chcon u:object_r:apk_data_file:s0  ${'$'}base_path"
+        "base_path=\"$PATH_REVANCED_APP\" && mv $PATH_INIT_PUSH ${'$'}base_path && chmod 644 ${'$'}base_path && chown system:system ${'$'}base_path && chcon u:object_r:apk_data_file:s0 ${'$'}base_path"
 
     // unmount command
     internal const val COMMAND_UMOUNT =
