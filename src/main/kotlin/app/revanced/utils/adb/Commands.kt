@@ -26,7 +26,6 @@ internal fun JadbDevice.run(command: String, su: Boolean = true): Int {
 }
 
 private fun JadbDevice.checkSU(command: String): ShellProcess {
-
     // Size of the buffer to read the output from the shell process
     val suTypeArray = ByteArray(8)
     
@@ -35,7 +34,7 @@ private fun JadbDevice.checkSU(command: String): ShellProcess {
     adbInputStream.read(suTypeArray)
 
     val suType = String(suTypeArray).split(" ")[0].uppercase()
-    Adb.rootType = ROOT.values().find { it.name == suType } ?: ROOT.NONE_OR_UNSUPPORTED
+    Adb.rootType = RootType.values().find { it.name == suType } ?: RootType.NONE_OR_UNSUPPORTED
 
     adbInputStream.close()
     return adbCommand

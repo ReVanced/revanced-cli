@@ -16,7 +16,7 @@ internal class Adb(
 ) {
     private val device: JadbDevice
     companion object {
-        internal lateinit var rootType: ROOT
+        internal lateinit var rootType: RootType
     }
 
     init {
