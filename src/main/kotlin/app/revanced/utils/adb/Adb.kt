@@ -19,7 +19,6 @@ internal class Adb(
         var SuperSU: Boolean = true
     }
 
-
     init {
         device = JadbConnection().devices.find { it.serial == deviceName }
             ?: throw IllegalArgumentException("No such device with name $deviceName")
