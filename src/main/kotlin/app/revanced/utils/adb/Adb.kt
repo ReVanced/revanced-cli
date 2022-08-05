@@ -15,6 +15,10 @@ internal class Adb(
     private val logging: Boolean = true
 ) {
     private val device: JadbDevice
+    companion object {
+        var SuperSU: Boolean = true
+    }
+
 
     init {
         device = JadbConnection().devices.find { it.serial == deviceName }
@@ -34,7 +38,7 @@ internal class Adb(
 
             PackageManager(device).install(file)
         } else {
-            logger.info("Installing by mounting (rooted with ${if (Constants.IS_SUPERSU) "SuperSU" else "Magisk"})")
+            logger.info("Installing by mounting (rooted with ${if (SuperSU) "SuperSU" else "Magisk"})")
 
             // push patched file
             device.copy(Constants.PATH_INIT_PUSH, file)

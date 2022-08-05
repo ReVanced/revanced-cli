@@ -29,13 +29,12 @@ private fun JadbDevice.checkSU(command: String): ShellProcess? {
     val suType = ByteArray(8)
     val adbCommand = this.buildCommand(command, false).start()
 
-    // fix: deadlock with SuperSU
     val adbInputStream = adbCommand.inputStream
     adbInputStream.read(suType)
 
     val superUserType = String(suType).filter { !it.isWhitespace() }
     if (superUserType == "SuperSU") {
-        Constants.IS_SUPERSU = true
+        Adb.SuperSU = true
     }
 
     adbInputStream.close()
