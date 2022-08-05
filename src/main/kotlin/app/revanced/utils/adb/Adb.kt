@@ -71,7 +71,7 @@ internal class Adb(
     }
 
     internal fun uninstall() {
-        logger.info("Uninstalling by unmounting")
+        logger.info("Uninstalling by unmounting (rooted with ${rootType.alias})")
 
         // unmount the apk
         device.run(Constants.COMMAND_UMOUNT.replacePlaceholder())
