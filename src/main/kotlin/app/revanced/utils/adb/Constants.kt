@@ -5,7 +5,7 @@ internal object Constants {
     internal const val PLACEHOLDER = "TEMPLATE_PACKAGE_NAME"
 
     // utility commands
-    private val COMMAND_CHMOD = if (Adb.usingSuperSU) "chmod 700" else "chmod +x"
+    private val COMMAND_CHMOD = if (Adb.rootType == ROOT.SUPERSU) "chmod 700" else "chmod +x"
     internal const val COMMAND_PID_OF = "pidof -s"
     internal const val COMMAND_CREATE_DIR = "mkdir -p"
     internal const val COMMAND_LOGCAT = "logcat -c && logcat | grep AndroidRuntime"
@@ -24,7 +24,8 @@ internal object Constants {
     internal const val PATH_REVANCED_APP = "$PATH_REVANCED$PLACEHOLDER.apk"
 
     // mount script paths
-    internal val PATH_MOUNT = if (Adb.usingSuperSU) "/su/su.d/$NAME_MOUNT_SCRIPT" else "/data/adb/service.d/$NAME_MOUNT_SCRIPT"
+    internal val PATH_MOUNT =
+        if (Adb.rootType == ROOT.SUPERSU) "/su/su.d/$NAME_MOUNT_SCRIPT" else "/data/adb/service.d/$NAME_MOUNT_SCRIPT"
 
     // delete command
     internal const val COMMAND_DELETE = "rm -rf $PLACEHOLDER"

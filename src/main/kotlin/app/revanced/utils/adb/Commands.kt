@@ -26,16 +26,16 @@ internal fun JadbDevice.run(command: String, su: Boolean = true): Int {
 }
 
 private fun JadbDevice.checkSU(command: String): ShellProcess {
-    val suType = ByteArray(8)
+
+    // Size of the buffer to read the output from the shell process
+    val suTypeArray = ByteArray(8)
+    
     val adbCommand = this.buildCommand(command, false).start()
-
     val adbInputStream = adbCommand.inputStream
-    adbInputStream.read(suType)
+    adbInputStream.read(suTypeArray)
 
-    val superUserType = String(suType).filter { !it.isWhitespace() }
-    if (superUserType == "SuperSU") {
-        Adb.usingSuperSU = true
-    }
+    val suType = String(suTypeArray).split(" ")[0].uppercase()
+    Adb.rootType = ROOT.values().find { it.name == suType } ?: ROOT.NONE_OR_UNSUPPORTED
 
     adbInputStream.close()
     return adbCommand

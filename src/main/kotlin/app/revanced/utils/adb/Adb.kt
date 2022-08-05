@@ -16,15 +16,16 @@ internal class Adb(
 ) {
     private val device: JadbDevice
     companion object {
-        var usingSuperSU: Boolean = true
+        internal lateinit var rootType: ROOT
     }
 
     init {
         device = JadbConnection().devices.find { it.serial == deviceName }
             ?: throw IllegalArgumentException("No such device with name $deviceName")
 
-        if (!modeInstall && device.run("su -h", false) != 0)
+        if (!modeInstall && device.run("su -h", false) != 0){
             throw IllegalArgumentException("Root required on $deviceName. Task failed")
+        }
     }
 
     private fun String.replacePlaceholder(with: String? = null): String {
@@ -37,7 +38,7 @@ internal class Adb(
 
             PackageManager(device).install(file)
         } else {
-            logger.info("Installing by mounting (rooted with ${if (usingSuperSU) "SuperSU" else "Magisk"})")
+            logger.info("Installing by mounting (rooted with ${rootType.value})")
 
             // push patched file
             device.copy(Constants.PATH_INIT_PUSH, file)
