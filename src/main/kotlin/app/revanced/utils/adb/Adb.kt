@@ -23,9 +23,8 @@ internal class Adb(
         device = JadbConnection().devices.find { it.serial == deviceName }
             ?: throw IllegalArgumentException("No such device with name $deviceName")
 
-        if (!modeInstall && device.run("su -h", false) != 0){
+        if (!modeInstall && device.run("su -h", false) != 0)
             throw IllegalArgumentException("Root required on $deviceName. Task failed")
-        }
     }
 
     private fun String.replacePlaceholder(with: String? = null): String {
