@@ -23,9 +23,6 @@ internal object Constants {
     // revanced apk path
     internal const val PATH_REVANCED_APP = "$PATH_REVANCED$PLACEHOLDER.apk"
 
-    // delete command
-    internal const val COMMAND_DELETE = "rm -rf $PLACEHOLDER"
-
     // mount script path
     internal const val PATH_MOUNT = "/data/adb/service.d/$NAME_MOUNT_SCRIPT"
 

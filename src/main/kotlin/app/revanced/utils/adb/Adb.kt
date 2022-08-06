@@ -18,7 +18,7 @@ internal class Adb(
         null,
         Constants.PLACEHOLDER,
         deviceName,
-        false
+        true
     )
 
     private val device: JadbDevice
@@ -74,8 +74,23 @@ internal class Adb(
     }
 
     internal fun uninstall() {
-        logger.info("Uninstalling by unmounting")
+        val adbLookupFiles = device.buildCommand("ls ${Constants.PATH_REVANCED}").start()
+        val inputStreamReader = adbLookupFiles.inputReader()
 
+        val fileList = inputStreamReader.readLines()
+        if (fileList.isEmpty()) {
+            logger.error("No mounted apps found")
+            return
+        }
+        fileList.forEachIndexed { index, file ->
+            println("$index: $file")
+        }
+
+        println("Which app do you want to uninstall?")
+        val fileToUninstall = readLine()!!.toInt()
+        packageName = File(fileList[fileToUninstall]).nameWithoutExtension
+
+        logger.info("Uninstalling $packageName by unmounting")
         // unmount the apk
         device.run(Constants.COMMAND_UMOUNT.replacePlaceholder())
 
