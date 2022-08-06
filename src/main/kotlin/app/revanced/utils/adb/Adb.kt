@@ -8,12 +8,19 @@ import java.io.File
 import java.util.concurrent.Executors
 
 internal class Adb(
-    private val file: File,
+    private val file: File? = null,
     private val packageName: String,
     deviceName: String,
     private val modeInstall: Boolean = false,
     private val logging: Boolean = true
 ) {
+    constructor(deviceName: String, packageName: String): this(
+        null,
+        packageName,
+        deviceName,
+        false
+    )
+
     private val device: JadbDevice
 
     init {
@@ -37,7 +44,7 @@ internal class Adb(
             logger.info("Installing by mounting")
 
             // push patched file
-            device.copy(Constants.PATH_INIT_PUSH, file)
+            device.copy(Constants.PATH_INIT_PUSH, file!!)
 
             // create revanced folder path
             device.run("${Constants.COMMAND_CREATE_DIR} ${Constants.PATH_REVANCED}")

@@ -34,9 +34,6 @@ internal object MainCommand : Runnable {
     lateinit var args: Args
 
     class Args {
-        @Option(names = ["-a", "--apk"], description = ["Input file to be patched"], required = true)
-        lateinit var inputFile: File
-
         @Option(names = ["--uninstall"], description = ["Uninstall the mount variant"])
         var uninstall: Boolean = false
 
@@ -44,18 +41,18 @@ internal object MainCommand : Runnable {
         var deploy: String? = null
 
         @ArgGroup(exclusive = false)
-        var patchArgs: PatchArgs? = null
+        var lArgsParent: ListingArgsParent? = null
+
+        @ArgGroup(exclusive = false)
+        var pArgs: PatchingArgs? = null
     }
 
-    class PatchArgs {
+    class ListingArgsParent {
         @Option(names = ["-b", "--bundles"], description = ["One or more bundles of patches"], required = true)
         var patchBundles = arrayOf<String>()
 
         @ArgGroup(exclusive = false)
-        var listingArgs: ListingArgs? = null
-
-        @ArgGroup(exclusive = false)
-        var patchingArgs: PatchingArgs? = null
+        var lArgs: ListingArgs? = null
     }
 
     class ListingArgs {
@@ -73,6 +70,9 @@ internal object MainCommand : Runnable {
     }
 
     class PatchingArgs {
+        @Option(names = ["-a", "--apk"], description = ["Input file to be patched"], required = true)
+        lateinit var inputFile: File
+
         @Option(names = ["-o", "--out"], description = ["Output file path"], required = true)
         lateinit var outputPath: String
 
@@ -123,7 +123,7 @@ internal object MainCommand : Runnable {
     }
 
     override fun run() {
-        if (args.patchArgs?.listingArgs?.listOnly == true) {
+        if (args.lArgsParent?.lArgs?.listOnly == true) {
             printListOfPatches()
             return
         }
@@ -133,14 +133,14 @@ internal object MainCommand : Runnable {
             return
         }
 
-        val pArgs = this.args.patchArgs?.patchingArgs ?: return
+        val pArgs = this.args.pArgs ?: return
 
         // the file to write to
         val outputFile = File(pArgs.outputPath)
 
         val patcher = app.revanced.patcher.Patcher(
             PatcherOptions(
-                args.inputFile,
+                pArgs.inputFile,
                 pArgs.cacheDirectory,
                 !pArgs.disableResourcePatching,
                 pArgs.aaptPath,
@@ -209,48 +209,41 @@ internal object MainCommand : Runnable {
     }
 
     private fun uninstall() {
-        // temporarily get package name using Patcher method
-        // fix: abstract options in patcher
-        val patcher = app.revanced.patcher.Patcher(
-            PatcherOptions(
-                args.inputFile,
-                "uninstaller-cache",
-                false
-            )
-        )
-        File("uninstaller-cache").deleteRecursively()
-
         val adb: Adb? = args.deploy?.let {
-            Adb(File("placeholder_file"), patcher.data.packageMetadata.packageName, args.deploy!!, false)
+            Adb("sss", "sss")
         }
         adb?.uninstall()
     }
 
     private fun printListOfPatches() {
-        for (patchBundlePath in args.patchArgs?.patchBundles!!) for (patch in JarPatchBundle(patchBundlePath).loadPatches()) {
+        for (patchBundlePath in args.lArgsParent?.patchBundles!!) for (patch in JarPatchBundle(patchBundlePath).loadPatches()) {
             for (compatiblePackage in patch.compatiblePackages!!) {
                 val packageEntryStr = buildString {
+                    val lArgs = args.lArgsParent?.lArgs ?: return
+
                     // Add package if flag is set
-                    if (args.patchArgs?.listingArgs?.withPackages == true) {
+                    if (lArgs.withPackages) {
                         val packageName = compatiblePackage.name.substringAfterLast(".").padStart(10)
                         append(packageName)
                         append("\t")
                     }
+
                     // Add patch name
                     val patchName = patch.patchName.padStart(25)
                     append(patchName)
+
                     // Add description if flag is set.
-                    if (args.patchArgs?.listingArgs?.withDescriptions == true) {
+                    if (lArgs.withDescriptions) {
                         append("\t")
                         append(patch.description)
                     }
+
                     // Add compatible versions, if flag is set
-                    if (args.patchArgs?.listingArgs?.withVersions == true) {
+                    if (lArgs.withVersions) {
                         val compatibleVersions = compatiblePackage.versions.joinToString(separator = ", ")
                         append("\t")
                         append(compatibleVersions)
                     }
-
                 }
                 logger.info(packageEntryStr)
             }
