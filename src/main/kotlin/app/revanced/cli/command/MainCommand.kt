@@ -109,12 +109,12 @@ internal object MainCommand : Runnable {
         @Option(names = ["-p", "--password"], description = ["Overwrite the default password for the signed file"])
         var password = "ReVanced"
 
-        @Option(names = ["-t", "--temp-dir"], description = ["Temporal resource cache directory"])
+        @Option(names = ["-t", "--temp-dir"], description = ["Temporary resource cache directory"])
         var cacheDirectory = "revanced-cache"
 
         @Option(
             names = ["-c", "--clean"],
-            description = ["Clean the temporal resource cache directory. This will be done anyways when running the patcher"]
+            description = ["Clean the temporary resource cache directory. This will be done anyways when running the patcher"]
         )
         var clean: Boolean = false
 
