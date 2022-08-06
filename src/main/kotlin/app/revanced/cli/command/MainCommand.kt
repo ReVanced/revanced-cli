@@ -34,25 +34,30 @@ internal object MainCommand : Runnable {
     lateinit var args: Args
 
     class Args {
-        @Option(names = ["--uninstall"], description = ["Uninstall the mount variant"])
-        var uninstall: Boolean = false
-
-        @Option(names = ["-d", "--deploy-on"], description = ["If specified, deploy to adb device with given name"])
-        var deploy: String? = null
+        @ArgGroup(exclusive = false)
+        var uArgs: UninstallerArgs? = null
 
         @ArgGroup(exclusive = false)
-        var lArgsParent: ListingArgsParent? = null
-
-        @ArgGroup(exclusive = false)
-        var pArgs: PatchingArgs? = null
+        var cArgs: CLIArgs? = null
     }
 
-    class ListingArgsParent {
+    class UninstallerArgs {
+        @Option(names = ["-d", "--deploy-on"], description = ["If specified, deploy to adb device with given name"], required = true)
+        var deploy: String? = null
+
+        @Option(names = ["--uninstall"], description = ["Uninstall the mount variant"])
+        var uninstall: Boolean = false
+    }
+
+    class CLIArgs {
         @Option(names = ["-b", "--bundles"], description = ["One or more bundles of patches"], required = true)
         var patchBundles = arrayOf<String>()
 
         @ArgGroup(exclusive = false)
         var lArgs: ListingArgs? = null
+
+        @ArgGroup(exclusive = false)
+        var pArgs: PatchingArgs? = null
     }
 
     class ListingArgs {
@@ -123,17 +128,16 @@ internal object MainCommand : Runnable {
     }
 
     override fun run() {
-        if (args.lArgsParent?.lArgs?.listOnly == true) {
+        if (args.cArgs?.lArgs?.listOnly == true) {
             printListOfPatches()
             return
         }
-
-        if (args.uninstall) {
+        if (args.uArgs?.uninstall == true) {
             uninstall()
             return
         }
 
-        val pArgs = this.args.pArgs ?: return
+        val pArgs = this.args.cArgs?.pArgs ?: return
 
         // the file to write to
         val outputFile = File(pArgs.outputPath)
@@ -150,8 +154,8 @@ internal object MainCommand : Runnable {
         )
 
         // prepare adb
-        val adb: Adb? = args.deploy?.let {
-            Adb(outputFile, patcher.data.packageMetadata.packageName, args.deploy!!, !pArgs.mount)
+        val adb: Adb? = args.uArgs?.deploy?.let {
+            Adb(outputFile, patcher.data.packageMetadata.packageName, args.uArgs?.deploy!!, !pArgs.mount)
         }
 
         val patchedFile = File(pArgs.cacheDirectory).resolve("${outputFile.nameWithoutExtension}_raw.apk")
@@ -195,7 +199,7 @@ internal object MainCommand : Runnable {
         // deploy if specified
         adb?.deploy()
 
-        if (pArgs.clean && args.deploy != null) Files.delete(outputFile.toPath())
+        if (pArgs.clean && args.uArgs?.deploy != null) Files.delete(outputFile.toPath())
 
         logger.info("Finished")
     }
@@ -209,17 +213,14 @@ internal object MainCommand : Runnable {
     }
 
     private fun uninstall() {
-        val adb: Adb? = args.deploy?.let {
-            Adb("sss", "sss")
-        }
-        adb?.uninstall()
+        Adb(args.uArgs?.deploy!!).uninstall()
     }
 
     private fun printListOfPatches() {
-        for (patchBundlePath in args.lArgsParent?.patchBundles!!) for (patch in JarPatchBundle(patchBundlePath).loadPatches()) {
+        for (patchBundlePath in args.cArgs?.patchBundles!!) for (patch in JarPatchBundle(patchBundlePath).loadPatches()) {
             for (compatiblePackage in patch.compatiblePackages!!) {
                 val packageEntryStr = buildString {
-                    val lArgs = args.lArgsParent?.lArgs ?: return
+                    val lArgs = args.cArgs?.lArgs ?: return
 
                     // Add package if flag is set
                     if (lArgs.withPackages) {

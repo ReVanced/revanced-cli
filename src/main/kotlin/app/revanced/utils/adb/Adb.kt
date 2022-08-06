@@ -9,14 +9,14 @@ import java.util.concurrent.Executors
 
 internal class Adb(
     private val file: File? = null,
-    private val packageName: String,
+    private var packageName: String,
     deviceName: String,
     private val modeInstall: Boolean = false,
     private val logging: Boolean = true
 ) {
-    constructor(deviceName: String, packageName: String): this(
+    constructor(deviceName: String): this(
         null,
-        packageName,
+        Constants.PLACEHOLDER,
         deviceName,
         false
     )
