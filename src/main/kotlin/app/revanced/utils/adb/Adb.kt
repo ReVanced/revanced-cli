@@ -18,7 +18,7 @@ internal class Adb(
         null,
         Constants.PLACEHOLDER,
         deviceName,
-        true
+        false
     )
 
     private val device: JadbDevice
