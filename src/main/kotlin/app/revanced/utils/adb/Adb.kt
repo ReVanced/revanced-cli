@@ -80,10 +80,10 @@ internal class Adb(
         device.run(Constants.COMMAND_UMOUNT.replacePlaceholder())
 
         // delete revanced app
-        device.run(Constants.COMMAND_DELETE.replacePlaceholder(Constants.PATH_REVANCED_APP).replacePlaceholder())
+        device.delete(Constants.PATH_REVANCED_APP.replacePlaceholder())
 
         // delete mount script
-        device.run(Constants.COMMAND_DELETE.replacePlaceholder(Constants.PATH_MOUNT).replacePlaceholder())
+        device.delete(Constants.PATH_MOUNT.replacePlaceholder())
 
         logger.info("Finished uninstalling")
     }

@@ -27,3 +27,7 @@ internal fun JadbDevice.copy(targetPath: String, file: File) {
 internal fun JadbDevice.createFile(targetFile: String, content: String) {
     push(content.byteInputStream(), System.currentTimeMillis(), 644, RemoteFile(targetFile))
 }
+
+internal fun JadbDevice.delete(targetPath: String) {
+    this.buildCommand("rm -rf $targetPath").start().waitFor()
+}

@@ -132,8 +132,9 @@ internal object MainCommand : Runnable {
             printListOfPatches()
             return
         }
+
         if (args.uArgs?.uninstall == true) {
-            uninstall()
+            Adb(args.uArgs?.deploy!!).uninstall()
             return
         }
 
@@ -210,10 +211,6 @@ internal object MainCommand : Runnable {
         else
             "Failed to clean up cache directory"
         logger.info(result)
-    }
-
-    private fun uninstall() {
-        Adb(args.uArgs?.deploy!!).uninstall()
     }
 
     private fun printListOfPatches() {
