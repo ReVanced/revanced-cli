@@ -87,7 +87,7 @@ internal class Adb(
         }
 
         println("Which app do you want to uninstall?")
-        val fileToUninstall = readLine()!!.toInt()
+        val fileToUninstall = readln().toInt()
         packageName = File(fileList[fileToUninstall]).nameWithoutExtension
 
         logger.info("Uninstalling $packageName by unmounting")
