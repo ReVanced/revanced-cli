@@ -9,7 +9,7 @@ import app.revanced.patcher.extensions.PatchExtensions.compatiblePackages
 import app.revanced.patcher.extensions.PatchExtensions.include
 import app.revanced.patcher.extensions.PatchExtensions.patchName
 import app.revanced.patcher.patch.Patch
-import app.revanced.patcher.util.patch.implementation.JarPatchBundle
+import app.revanced.patcher.util.patch.impl.JarPatchBundle
 
 fun Patcher.addPatchesFiltered() {
     val packageName = this.data.packageMetadata.packageName

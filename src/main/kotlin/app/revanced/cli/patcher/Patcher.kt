@@ -30,7 +30,7 @@ internal object Patcher {
             // replace all dex files
             result.dexFiles.forEach {
                 logger.info("Writing dex file ${it.name}")
-                outputFileSystem.write(it.name, it.dexFileInputStream.readAllBytes())
+                outputFileSystem.write(it.name, it.stream.readAllBytes())
             }
 
             if (!args.disableResourcePatching) {
