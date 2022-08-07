@@ -15,12 +15,15 @@ internal class Adb(
     private val logging: Boolean = true
 ) {
     private val device: JadbDevice
+    companion object {
+        internal lateinit var rootType: RootType
+    }
 
     init {
         device = JadbConnection().devices.find { it.serial == deviceName }
             ?: throw IllegalArgumentException("No such device with name $deviceName")
 
-        if (!modeInstall && device.run("su -h", false) != 0)
+        if (!modeInstall && !device.isRooted())
             throw IllegalArgumentException("Root required on $deviceName. Task failed")
     }
 
@@ -34,7 +37,7 @@ internal class Adb(
 
             PackageManager(device).install(file)
         } else {
-            logger.info("Installing by mounting")
+            logger.info("Installing by mounting (rooted with ${rootType.alias})")
 
             // push patched file
             device.copy(Constants.PATH_INIT_PUSH, file)
@@ -67,7 +70,7 @@ internal class Adb(
     }
 
     internal fun uninstall() {
-        logger.info("Uninstalling by unmounting")
+        logger.info("Uninstalling by unmounting (rooted with ${rootType.alias})")
 
         // unmount the apk
         device.run(Constants.COMMAND_UMOUNT.replacePlaceholder())
