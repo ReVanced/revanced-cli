@@ -8,12 +8,19 @@ import java.io.File
 import java.util.concurrent.Executors
 
 internal class Adb(
-    private val file: File,
-    private val packageName: String,
+    private val file: File? = null,
+    private var packageName: String,
     deviceName: String,
     private val modeInstall: Boolean = false,
     private val logging: Boolean = true
 ) {
+    constructor(deviceName: String): this(
+        null,
+        Constants.PLACEHOLDER,
+        deviceName,
+        false
+    )
+
     private val device: JadbDevice
 
     init {
@@ -37,7 +44,7 @@ internal class Adb(
             logger.info("Installing by mounting")
 
             // push patched file
-            device.copy(Constants.PATH_INIT_PUSH, file)
+            device.copy(Constants.PATH_INIT_PUSH, file!!)
 
             // create revanced folder path
             device.run("${Constants.COMMAND_CREATE_DIR} ${Constants.PATH_REVANCED}")
@@ -67,16 +74,31 @@ internal class Adb(
     }
 
     internal fun uninstall() {
-        logger.info("Uninstalling by unmounting")
+        val adbLookupFiles = device.buildCommand("ls ${Constants.PATH_REVANCED}").start()
+        val inputStreamReader = adbLookupFiles.inputReader()
 
+        val fileList = inputStreamReader.readLines()
+        if (fileList.isEmpty()) {
+            logger.error("No mounted apps found")
+            return
+        }
+        fileList.forEachIndexed { index, file ->
+            println("$index: $file")
+        }
+
+        println("Which app do you want to uninstall?")
+        val fileToUninstall = readln().toInt()
+        packageName = File(fileList[fileToUninstall]).nameWithoutExtension
+
+        logger.info("Uninstalling $packageName by unmounting")
         // unmount the apk
         device.run(Constants.COMMAND_UMOUNT.replacePlaceholder())
 
         // delete revanced app
-        device.run(Constants.COMMAND_DELETE.replacePlaceholder(Constants.PATH_REVANCED_APP).replacePlaceholder())
+        device.delete(Constants.PATH_REVANCED_APP.replacePlaceholder())
 
         // delete mount script
-        device.run(Constants.COMMAND_DELETE.replacePlaceholder(Constants.PATH_MOUNT).replacePlaceholder())
+        device.delete(Constants.PATH_MOUNT.replacePlaceholder())
 
         logger.info("Finished uninstalling")
     }
