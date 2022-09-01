@@ -44,12 +44,14 @@ internal object Constants {
     internal val CONTENT_MOUNT_SCRIPT =
         """
             #!/system/bin/sh
+            MAGISKTMP="${'$'}(magisk --path)" || MAGISKTMP=/sbin
+            MIRROR="${'$'}MAGISKTMP/.magisk/mirror"
             while [ "${'$'}(getprop sys.boot_completed | tr -d '\r')" != "1" ]; do sleep 1; done
             
             base_path="$PATH_REVANCED_APP"
             stock_path=${'$'}( pm path $PLACEHOLDER | grep base | sed 's/package://g' )
 
             chcon u:object_r:apk_data_file:s0  ${'$'}base_path
-            mount -o bind ${'$'}base_path ${'$'}stock_path
+            mount -o bind ${'$'}MIRROR${'$'}base_path ${'$'}stock_path
         """.trimIndent()
 }
