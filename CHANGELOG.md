@@ -1,3 +1,10 @@
+## [2.9.5](https://github.com/revanced/revanced-cli/compare/v2.9.4...v2.9.5) (2022-09-01)
+
+
+### Bug Fixes
+
+* mount bind revanced.apk from magisk's mirror ([372470c](https://github.com/revanced/revanced-cli/commit/372470c77b82e8601ca523e87a2cfd44f79d0e31))
+
 ## [2.9.4](https://github.com/revanced/revanced-cli/compare/v2.9.3...v2.9.4) (2022-08-31)
 
 ## [2.9.3](https://github.com/revanced/revanced-cli/compare/v2.9.2...v2.9.3) (2022-08-14)
