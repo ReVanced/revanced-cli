@@ -1,3 +1,10 @@
+## [2.9.8](https://github.com/revanced/revanced-cli/compare/v2.9.7...v2.9.8) (2022-09-08)
+
+
+### Bug Fixes
+
+* broken deprecation message ([e3e74ac](https://github.com/revanced/revanced-cli/commit/e3e74ac0e9a844f9d717a499bca09e575dd90435))
+
 ## [2.9.7](https://github.com/revanced/revanced-cli/compare/v2.9.6...v2.9.7) (2022-09-08)
 
 ## [2.9.6](https://github.com/revanced/revanced-cli/compare/v2.9.5...v2.9.6) (2022-09-07)
