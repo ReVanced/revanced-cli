@@ -35,7 +35,8 @@ fun Patcher.addPatchesFiltered() {
             }
 
             patch.deprecated?.let { (reason, replacement) ->
-                logger.warn("$prefix: deprecated: '$reason'" + if (replacement != null) ". Use '$replacement' instead." else "")
+                logger.warn("$prefix: deprecated: $reason")
+                if (replacement != null) logger.warn("Either use ${replacement.java.patchName} instead or include it manually")
                 return@patch
             }
 
