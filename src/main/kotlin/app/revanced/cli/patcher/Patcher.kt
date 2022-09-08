@@ -2,6 +2,8 @@ package app.revanced.cli.patcher
 
 import app.revanced.cli.command.MainCommand.args
 import app.revanced.cli.command.MainCommand.logger
+import app.revanced.patcher.data.Data
+import app.revanced.patcher.patch.Patch
 import app.revanced.utils.filesystem.ZipFileSystemUtils
 import app.revanced.utils.patcher.addPatchesFiltered
 import app.revanced.utils.patcher.applyPatchesVerbose
@@ -10,14 +12,14 @@ import java.io.File
 import java.nio.file.Files
 
 internal object Patcher {
-    internal fun start(patcher: app.revanced.patcher.Patcher, output: File) {
+    internal fun start(patcher: app.revanced.patcher.Patcher, output: File, allPatches: List<Class<out Patch<Data>>>) {
         val inputFile = args.inputFile
         val args = args.patchArgs?.patchingArgs!!
 
         // merge files like necessary integrations
         patcher.mergeFiles()
         // add patches, but filter incompatible or excluded patches
-        patcher.addPatchesFiltered()
+        patcher.addPatchesFiltered(allPatches)
         // apply patches
         patcher.applyPatchesVerbose()
 
