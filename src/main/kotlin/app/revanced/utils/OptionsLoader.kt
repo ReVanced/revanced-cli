@@ -37,7 +37,6 @@ object OptionsLoader {
             val patchOptions = patch.options ?: continue
             for ((key, value) in options) {
                 try {
-                    logger.info("Setting option '${key}' to value: '${value}'")
                     patchOptions[key] = value.let {
                         if (it == NULL) null else it
                     }
