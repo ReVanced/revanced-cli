@@ -227,7 +227,9 @@ internal object MainCommand : Runnable {
     }
 
     private fun printListOfPatches() {
+        val logged = mutableListOf<String>()
         for (patchBundlePath in args.patchArgs?.patchBundles!!) for (patch in JarPatchBundle(patchBundlePath).loadPatches()) {
+            if (patch.patchName in logged) continue
             for (compatiblePackage in patch.compatiblePackages!!) {
                 val packageEntryStr = buildString {
                     // Add package if flag is set
@@ -250,8 +252,9 @@ internal object MainCommand : Runnable {
                         append("\t")
                         append(compatibleVersions)
                     }
-
                 }
+
+                logged.add(patch.patchName)
                 logger.info(packageEntryStr)
             }
         }
