@@ -23,7 +23,6 @@ repositories {
 }
 
 dependencies {
-    implementation(kotlin("stdlib"))
     implementation(kotlin("reflect"))
 
     implementation("app.revanced:revanced-patcher:4.1.4")
