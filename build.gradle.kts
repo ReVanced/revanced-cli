@@ -25,11 +25,12 @@ repositories {
 dependencies {
     implementation(kotlin("reflect"))
 
-    implementation("app.revanced:revanced-patcher:4.2.2")
+    implementation("app.revanced:revanced-patcher:4.2.3")
     implementation("info.picocli:picocli:4.6.3")
     implementation("com.android.tools.build:apksig:7.2.1")
     implementation("com.github.revanced:jadb:master-SNAPSHOT") // updated fork
     implementation("org.bouncycastle:bcpkix-jdk15on:1.70")
+    implementation("cc.ekblad:4koma:1.1.0")
 }
 
 tasks {

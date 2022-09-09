@@ -11,6 +11,7 @@ import app.revanced.patcher.extensions.PatchExtensions.compatiblePackages
 import app.revanced.patcher.extensions.PatchExtensions.description
 import app.revanced.patcher.extensions.PatchExtensions.patchName
 import app.revanced.patcher.util.patch.impl.JarPatchBundle
+import app.revanced.utils.OptionsLoader
 import app.revanced.utils.adb.Adb
 import picocli.CommandLine.*
 import java.io.File
@@ -50,6 +51,9 @@ internal object MainCommand : Runnable {
     class PatchArgs {
         @Option(names = ["-b", "--bundles"], description = ["One or more bundles of patches"], required = true)
         var patchBundles = arrayOf<String>()
+
+        @Option(names = ["--options"], description = ["Configuration file for all patch options"])
+        var options: File = File("options.toml")
 
         @ArgGroup(exclusive = false)
         var listingArgs: ListingArgs? = null
@@ -123,20 +127,17 @@ internal object MainCommand : Runnable {
     }
 
     override fun run() {
-        if (args.patchArgs?.listingArgs?.listOnly == true) {
-            printListOfPatches()
-            return
-        }
-
-        if (args.uninstall) {
-            uninstall()
-            return
-        }
+        if (args.patchArgs?.listingArgs?.listOnly == true) return printListOfPatches()
+        if (args.uninstall) return uninstall()
 
         val pArgs = this.args.patchArgs?.patchingArgs ?: return
+        val outputFile = File(pArgs.outputPath) // the file to write to
 
-        // the file to write to
-        val outputFile = File(pArgs.outputPath)
+        val allPatches = args.patchArgs!!.patchBundles.flatMap { bundle ->
+            JarPatchBundle(bundle).loadPatches()
+        }
+
+        OptionsLoader.init(args.patchArgs!!.options, allPatches)
 
         val patcher = app.revanced.patcher.Patcher(
             PatcherOptions(
@@ -157,7 +158,7 @@ internal object MainCommand : Runnable {
         val patchedFile = File(pArgs.cacheDirectory).resolve("${outputFile.nameWithoutExtension}_raw.apk")
 
         // start the patcher
-        Patcher.start(patcher, patchedFile)
+        Patcher.start(patcher, patchedFile, allPatches)
 
         val cacheDirectory = File(pArgs.cacheDirectory)
 
@@ -227,7 +228,9 @@ internal object MainCommand : Runnable {
     }
 
     private fun printListOfPatches() {
+        val logged = mutableListOf<String>()
         for (patchBundlePath in args.patchArgs?.patchBundles!!) for (patch in JarPatchBundle(patchBundlePath).loadPatches()) {
+            if (patch.patchName in logged) continue
             for (compatiblePackage in patch.compatiblePackages!!) {
                 val packageEntryStr = buildString {
                     // Add package if flag is set
@@ -250,8 +253,9 @@ internal object MainCommand : Runnable {
                         append("\t")
                         append(compatibleVersions)
                     }
-
                 }
+
+                logged.add(patch.patchName)
                 logger.info(packageEntryStr)
             }
         }

@@ -1,3 +1,17 @@
+# [2.10.0](https://github.com/revanced/revanced-cli/compare/v2.9.10...v2.10.0) (2022-09-08)
+
+
+### Features
+
+* Patch Options CLI implementation ([#132](https://github.com/revanced/revanced-cli/issues/132)) ([3f5345a](https://github.com/revanced/revanced-cli/commit/3f5345af6e45bfb6c91d52fc089ab18d81fdc998))
+
+## [2.9.10](https://github.com/revanced/revanced-cli/compare/v2.9.9...v2.9.10) (2022-09-08)
+
+
+### Bug Fixes
+
+* don't print same patch multiple times ([f4b0469](https://github.com/revanced/revanced-cli/commit/f4b04698d8c1717824e86f91da5e01c5021612da))
+
 ## [2.9.9](https://github.com/revanced/revanced-cli/compare/v2.9.8...v2.9.9) (2022-09-08)
 
 ## [2.9.8](https://github.com/revanced/revanced-cli/compare/v2.9.7...v2.9.8) (2022-09-08)
