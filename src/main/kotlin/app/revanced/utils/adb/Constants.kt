@@ -35,7 +35,7 @@ internal object Constants {
 
     // unmount command
     internal const val COMMAND_UMOUNT =
-        "mount | grep $PLACEHOLDER | while read -r line; do echo ${'$'}line | cut -d " " -f 3 | xargs -r umount -l; done"
+        "grep $PLACEHOLDER /proc/mounts | while read -r line; do echo ${'$'}line | cut -d " " -f 3 | xargs -r umount -l; done"
 
     // install mount script & set permissions
     internal const val COMMAND_INSTALL_MOUNT = "mv $PATH_INIT_PUSH $PATH_MOUNT && $COMMAND_CHMOD_MOUNT $PATH_MOUNT"
