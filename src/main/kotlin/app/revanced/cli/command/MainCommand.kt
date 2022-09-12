@@ -9,6 +9,7 @@ import app.revanced.cli.signing.SigningOptions
 import app.revanced.patcher.PatcherOptions
 import app.revanced.patcher.extensions.PatchExtensions.compatiblePackages
 import app.revanced.patcher.extensions.PatchExtensions.description
+import app.revanced.patcher.extensions.PatchExtensions.options
 import app.revanced.patcher.extensions.PatchExtensions.patchName
 import app.revanced.patcher.util.patch.impl.JarPatchBundle
 import app.revanced.utils.OptionsLoader
@@ -74,6 +75,9 @@ internal object MainCommand : Runnable {
 
         @Option(names = ["--with-descriptions"], description = ["List patches with their descriptions"])
         var withDescriptions: Boolean = true
+
+        @Option(names = ["--with-options"], description = ["List patches with their options"])
+        var withOptions: Boolean = true
     }
 
     class PatchingArgs {
@@ -229,34 +233,55 @@ internal object MainCommand : Runnable {
 
     private fun printListOfPatches() {
         val logged = mutableListOf<String>()
-        for (patchBundlePath in args.patchArgs?.patchBundles!!) for (patch in JarPatchBundle(patchBundlePath).loadPatches()) {
-            if (patch.patchName in logged) continue
-            for (compatiblePackage in patch.compatiblePackages!!) {
-                val packageEntryStr = buildString {
-                    // Add package if flag is set
-                    if (args.patchArgs?.listingArgs?.withPackages == true) {
-                        val packageName = compatiblePackage.name.substringAfterLast(".").padStart(10)
-                        append(packageName)
-                        append("\t")
+        for (patchBundlePath in args.patchArgs?.patchBundles!!) {
+            val patches = JarPatchBundle(patchBundlePath).loadPatches()
+            val longestName = patches.maxOfOrNull { it.patchName.length } ?: 25
+            for (patch in patches.sortedBy { it.patchName.length }) {
+                if (patch.patchName in logged) continue
+                for (compatiblePackage in patch.compatiblePackages!!) {
+                    val packageEntryStr = buildString {
+                        // Add package if flag is set
+                        if (args.patchArgs?.listingArgs?.withPackages == true) {
+                            val packageName = compatiblePackage.name.substringAfterLast(".").padStart(10)
+                            append(packageName)
+                            append("\t")
+                        }
+                        // Add patch name
+                        val patchName = patch.patchName.padEnd(longestName)
+                        append(patchName)
+                        // Add description if flag is set.
+                        if (args.patchArgs?.listingArgs?.withDescriptions == true) {
+                            append("\t")
+                            append(patch.description)
+                        }
+                        // Add compatible versions, if flag is set
+                        if (args.patchArgs?.listingArgs?.withVersions == true) {
+                            val compatibleVersions = compatiblePackage.versions.joinToString(separator = ", ")
+                            append("\t")
+                            append(compatibleVersions)
+                        }
                     }
-                    // Add patch name
-                    val patchName = patch.patchName.padStart(25)
-                    append(patchName)
-                    // Add description if flag is set.
-                    if (args.patchArgs?.listingArgs?.withDescriptions == true) {
-                        append("\t")
-                        append(patch.description)
-                    }
-                    // Add compatible versions, if flag is set
-                    if (args.patchArgs?.listingArgs?.withVersions == true) {
-                        val compatibleVersions = compatiblePackage.versions.joinToString(separator = ", ")
-                        append("\t")
-                        append(compatibleVersions)
+
+                    logged.add(patch.patchName)
+                    logger.info(packageEntryStr)
+
+                    if (args.patchArgs?.listingArgs?.withOptions == true) {
+                        val options = patch.options
+                        // make sure options is not null and has at least 1 option
+                        if (options == null || !options.iterator().hasNext()) continue
+
+                        logger.info("\t options:")
+                        for (option in options) {
+                            logger.info("\t\t ${option.title} - ${option.description}")
+                            logger.info("\t\t\t usage: ${option.key} = \"${option.value ?: "<value>"}\"")
+                            if (option.value != null) {
+                                logger.info("\t\t\t default: ${option.value}")
+                            } else {
+                                logger.info("\t\t\t this option has no default value")
+                            }
+                        }
                     }
                 }
-
-                logged.add(patch.patchName)
-                logger.info(packageEntryStr)
             }
         }
     }
