@@ -1,3 +1,10 @@
+# [2.11.0](https://github.com/revanced/revanced-cli/compare/v2.10.2...v2.11.0) (2022-09-20)
+
+
+### Features
+
+* section `acknowledgements` for issue templates ([0e3ecc3](https://github.com/revanced/revanced-cli/commit/0e3ecc3a51540b71072ae0be0eb94d115a5b1f92))
+
 ## [2.10.2](https://github.com/revanced/revanced-cli/compare/v2.10.1...v2.10.2) (2022-09-18)
 
 ## [2.10.1](https://github.com/revanced/revanced-cli/compare/v2.10.0...v2.10.1) (2022-09-09)
