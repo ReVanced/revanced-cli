@@ -1,3 +1,10 @@
+# [2.12.0](https://github.com/revanced/revanced-cli/compare/v2.11.2...v2.12.0) (2022-09-26)
+
+
+### Features
+
+* remove unused option `-r` ([467d838](https://github.com/revanced/revanced-cli/commit/467d8387e646c88d24a30406a5b2e84065ef4d54))
+
 ## [2.11.2](https://github.com/revanced/revanced-cli/compare/v2.11.1...v2.11.2) (2022-09-23)
 
 ## [2.11.1](https://github.com/revanced/revanced-cli/compare/v2.11.0...v2.11.1) (2022-09-21)
