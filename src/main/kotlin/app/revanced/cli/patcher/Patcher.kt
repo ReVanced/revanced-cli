@@ -35,10 +35,10 @@ internal object Patcher {
                 outputFileSystem.write(it.name, it.stream.readAllBytes())
             }
 
-            if (!args.disableResourcePatching) {
+            result.resourceFile?.let {
                 logger.info("Writing resources...")
 
-                ZipFileSystemUtils(result.resourceFile!!).use { resourceFileSystem ->
+                ZipFileSystemUtils(it).use { resourceFileSystem ->
                     val resourceFiles = resourceFileSystem.getFile(File.separator)
                     outputFileSystem.writePathRecursively(resourceFiles)
                 }

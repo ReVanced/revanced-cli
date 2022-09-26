@@ -92,9 +92,6 @@ internal object MainCommand : Runnable {
         @Option(names = ["-i", "--include"], description = ["Include patches"])
         var includedPatches = arrayOf<String>()
 
-        @Option(names = ["-r", "--resource-patcher"], description = ["Disable patching resources"])
-        var disableResourcePatching: Boolean = false
-
         @Option(names = ["--experimental"], description = ["Disable patch version compatibility patch"])
         var experimental: Boolean = false
 
@@ -143,7 +140,6 @@ internal object MainCommand : Runnable {
             PatcherOptions(
                 args.inputFile,
                 pArgs.cacheDirectory,
-                !pArgs.disableResourcePatching,
                 pArgs.aaptPath,
                 pArgs.cacheDirectory,
                 PatcherLogger
@@ -210,19 +206,13 @@ internal object MainCommand : Runnable {
     }
 
     private fun uninstall() {
-        // temporarily get package name using Patcher method
-        // fix: abstract options in patcher
-        val patcher = app.revanced.patcher.Patcher(
-            PatcherOptions(
-                args.inputFile,
-                "uninstaller-cache",
+        val adb: Adb? = args.deploy?.let {
+            Adb(
+                File("placeholder_file"),
+                app.revanced.patcher.Patcher(PatcherOptions(args.inputFile, "")).data.packageMetadata.packageName,
+                args.deploy!!,
                 false
             )
-        )
-        File("uninstaller-cache").deleteRecursively()
-
-        val adb: Adb? = args.deploy?.let {
-            Adb(File("placeholder_file"), patcher.data.packageMetadata.packageName, args.deploy!!, false)
         }
         adb?.uninstall()
     }
