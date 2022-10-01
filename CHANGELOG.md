@@ -1,3 +1,10 @@
+# [2.13.0](https://github.com/revanced/revanced-cli/compare/v2.12.0...v2.13.0) (2022-10-01)
+
+
+### Features
+
+* check, if input file exists ([b6dff6d](https://github.com/revanced/revanced-cli/commit/b6dff6d832de4a513a6d86b0a59b2458eddd23c2))
+
 # [2.12.0](https://github.com/revanced/revanced-cli/compare/v2.11.2...v2.12.0) (2022-09-26)
 
 
