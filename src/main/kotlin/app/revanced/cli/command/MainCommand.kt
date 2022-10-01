@@ -138,7 +138,7 @@ internal object MainCommand : Runnable {
 
         val patcher = app.revanced.patcher.Patcher(
             PatcherOptions(
-                args.inputFile,
+                args.inputFile.also { if (!it.exists()) return logger.error("Input file ${args.inputFile} does not exist.") },
                 pArgs.cacheDirectory,
                 pArgs.aaptPath,
                 pArgs.cacheDirectory,
