@@ -4,18 +4,18 @@ import app.revanced.cli.command.MainCommand
 import app.revanced.cli.command.MainCommand.args
 import app.revanced.cli.command.MainCommand.logger
 import app.revanced.patcher.Patcher
-import app.revanced.patcher.data.Data
+import app.revanced.patcher.data.Context
 import app.revanced.patcher.extensions.PatchExtensions.compatiblePackages
 import app.revanced.patcher.extensions.PatchExtensions.deprecated
 import app.revanced.patcher.extensions.PatchExtensions.include
 import app.revanced.patcher.extensions.PatchExtensions.patchName
 import app.revanced.patcher.patch.Patch
 
-fun Patcher.addPatchesFiltered(allPatches: List<Class<out Patch<Data>>>) {
-    val packageName = this.data.packageMetadata.packageName
-    val packageVersion = this.data.packageMetadata.packageVersion
+fun Patcher.addPatchesFiltered(allPatches: List<Class<out Patch<Context>>>) {
+    val packageName = this.context.packageMetadata.packageName
+    val packageVersion = this.context.packageMetadata.packageVersion
 
-    val includedPatches = mutableListOf<Class<out Patch<Data>>>()
+    val includedPatches = mutableListOf<Class<out Patch<Context>>>()
     allPatches.forEach patchLoop@{ patch ->
         val compatiblePackages = patch.compatiblePackages
         val patchName = patch.patchName
@@ -66,7 +66,7 @@ fun Patcher.addPatchesFiltered(allPatches: List<Class<out Patch<Data>>>) {
 }
 
 fun Patcher.applyPatchesVerbose() {
-    this.applyPatches().forEach { (patch, result) ->
+    this.executePatches().forEach { (patch, result) ->
         if (result.isSuccess) {
             logger.info("$patch succeeded")
             return@forEach

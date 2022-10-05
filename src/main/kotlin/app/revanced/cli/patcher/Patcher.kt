@@ -2,7 +2,7 @@ package app.revanced.cli.patcher
 
 import app.revanced.cli.command.MainCommand.args
 import app.revanced.cli.command.MainCommand.logger
-import app.revanced.patcher.data.Data
+import app.revanced.patcher.data.Context
 import app.revanced.patcher.patch.Patch
 import app.revanced.utils.filesystem.ZipFileSystemUtils
 import app.revanced.utils.patcher.addPatchesFiltered
@@ -12,7 +12,11 @@ import java.io.File
 import java.nio.file.Files
 
 internal object Patcher {
-    internal fun start(patcher: app.revanced.patcher.Patcher, output: File, allPatches: List<Class<out Patch<Data>>>) {
+    internal fun start(
+        patcher: app.revanced.patcher.Patcher,
+        output: File,
+        allPatches: List<Class<out Patch<Context>>>
+    ) {
         val inputFile = args.inputFile
 
         // merge files like necessary integrations
