@@ -2,7 +2,7 @@ package app.revanced.utils
 
 import app.revanced.cli.command.MainCommand.logger
 import app.revanced.patcher.Patcher
-import app.revanced.patcher.data.Data
+import app.revanced.patcher.data.Context
 import app.revanced.patcher.extensions.PatchExtensions.options
 import app.revanced.patcher.extensions.PatchExtensions.patchName
 import app.revanced.patcher.patch.Patch
@@ -12,7 +12,7 @@ import cc.ekblad.toml.serialization.from
 import cc.ekblad.toml.tomlMapper
 import java.io.File
 
-private typealias PatchList = List<Class<out Patch<Data>>>
+private typealias PatchList = List<Class<out Patch<Context>>>
 private typealias OptionsMap = MutableMap<String, MutableMap<String, Any>>
 
 object OptionsLoader {

@@ -10,7 +10,7 @@ import app.revanced.patcher.PatcherOptions
 import app.revanced.patcher.extensions.PatchExtensions.compatiblePackages
 import app.revanced.patcher.extensions.PatchExtensions.description
 import app.revanced.patcher.extensions.PatchExtensions.patchName
-import app.revanced.patcher.util.patch.impl.JarPatchBundle
+import app.revanced.patcher.util.patch.PatchBundle
 import app.revanced.utils.OptionsLoader
 import app.revanced.utils.adb.Adb
 import picocli.CommandLine.*
@@ -92,9 +92,6 @@ internal object MainCommand : Runnable {
         @Option(names = ["-i", "--include"], description = ["Include patches"])
         var includedPatches = arrayOf<String>()
 
-        @Option(names = ["-r", "--resource-patcher"], description = ["Disable patching resources"])
-        var disableResourcePatching: Boolean = false
-
         @Option(names = ["--experimental"], description = ["Disable patch version compatibility patch"])
         var experimental: Boolean = false
 
@@ -134,16 +131,15 @@ internal object MainCommand : Runnable {
         val outputFile = File(pArgs.outputPath) // the file to write to
 
         val allPatches = args.patchArgs!!.patchBundles.flatMap { bundle ->
-            JarPatchBundle(bundle).loadPatches()
+            PatchBundle.Jar(bundle).loadPatches()
         }
 
         OptionsLoader.init(args.patchArgs!!.options, allPatches)
 
         val patcher = app.revanced.patcher.Patcher(
             PatcherOptions(
-                args.inputFile,
+                args.inputFile.also { if (!it.exists()) return logger.error("Input file ${args.inputFile} does not exist.") },
                 pArgs.cacheDirectory,
-                !pArgs.disableResourcePatching,
                 pArgs.aaptPath,
                 pArgs.cacheDirectory,
                 PatcherLogger
@@ -152,7 +148,7 @@ internal object MainCommand : Runnable {
 
         // prepare adb
         val adb: Adb? = args.deploy?.let {
-            Adb(outputFile, patcher.data.packageMetadata.packageName, args.deploy!!, !pArgs.mount)
+            Adb(outputFile, patcher.context.packageMetadata.packageName, args.deploy!!, !pArgs.mount)
         }
 
         val patchedFile = File(pArgs.cacheDirectory).resolve("${outputFile.nameWithoutExtension}_raw.apk")
@@ -210,26 +206,21 @@ internal object MainCommand : Runnable {
     }
 
     private fun uninstall() {
-        // temporarily get package name using Patcher method
-        // fix: abstract options in patcher
-        val patcher = app.revanced.patcher.Patcher(
-            PatcherOptions(
-                args.inputFile,
-                "uninstaller-cache",
+        val adb: Adb? = args.deploy?.let {
+            Adb(
+                File("placeholder_file"),
+                app.revanced.patcher.Patcher(PatcherOptions(args.inputFile, "")).context.packageMetadata.packageName,
+                args.deploy!!,
                 false
             )
-        )
-        File("uninstaller-cache").deleteRecursively()
-
-        val adb: Adb? = args.deploy?.let {
-            Adb(File("placeholder_file"), patcher.data.packageMetadata.packageName, args.deploy!!, false)
         }
         adb?.uninstall()
     }
 
     private fun printListOfPatches() {
         val logged = mutableListOf<String>()
-        for (patchBundlePath in args.patchArgs?.patchBundles!!) for (patch in JarPatchBundle(patchBundlePath).loadPatches()) {
+        for (patchBundlePath in args.patchArgs?.patchBundles!!) for (patch in PatchBundle.Jar(patchBundlePath)
+            .loadPatches()) {
             if (patch.patchName in logged) continue
             for (compatiblePackage in patch.compatiblePackages!!) {
                 val packageEntryStr = buildString {

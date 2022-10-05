@@ -1,3 +1,30 @@
+# [2.13.0](https://github.com/revanced/revanced-cli/compare/v2.12.0...v2.13.0) (2022-10-01)
+
+
+### Features
+
+* check, if input file exists ([b6dff6d](https://github.com/revanced/revanced-cli/commit/b6dff6d832de4a513a6d86b0a59b2458eddd23c2))
+
+# [2.12.0](https://github.com/revanced/revanced-cli/compare/v2.11.2...v2.12.0) (2022-09-26)
+
+
+### Features
+
+* remove unused option `-r` ([467d838](https://github.com/revanced/revanced-cli/commit/467d8387e646c88d24a30406a5b2e84065ef4d54))
+
+## [2.11.2](https://github.com/revanced/revanced-cli/compare/v2.11.1...v2.11.2) (2022-09-23)
+
+## [2.11.1](https://github.com/revanced/revanced-cli/compare/v2.11.0...v2.11.1) (2022-09-21)
+
+# [2.11.0](https://github.com/revanced/revanced-cli/compare/v2.10.2...v2.11.0) (2022-09-20)
+
+
+### Features
+
+* section `acknowledgements` for issue templates ([0e3ecc3](https://github.com/revanced/revanced-cli/commit/0e3ecc3a51540b71072ae0be0eb94d115a5b1f92))
+
+## [2.10.2](https://github.com/revanced/revanced-cli/compare/v2.10.1...v2.10.2) (2022-09-18)
+
 ## [2.10.1](https://github.com/revanced/revanced-cli/compare/v2.10.0...v2.10.1) (2022-09-09)
 
 # [2.10.0](https://github.com/revanced/revanced-cli/compare/v2.9.10...v2.10.0) (2022-09-08)
