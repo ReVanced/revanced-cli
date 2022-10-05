@@ -1,3 +1,16 @@
+# [2.14.0](https://github.com/revanced/revanced-cli/compare/v2.13.0...v2.14.0) (2022-10-05)
+
+
+### Bug Fixes
+
+* escape quotation mark in string ([6e21d81](https://github.com/revanced/revanced-cli/commit/6e21d81964e8160e06ffda7051dd484e4aaaa432))
+
+
+### Features
+
+* handle unmounting deleted files ([#148](https://github.com/revanced/revanced-cli/issues/148)) ([3a733e5](https://github.com/revanced/revanced-cli/commit/3a733e513717799ca0e32327e5b8be043680c556))
+* unmount all occurrences in `/proc/mounts` ([#131](https://github.com/revanced/revanced-cli/issues/131)) ([4f4e1f9](https://github.com/revanced/revanced-cli/commit/4f4e1f9834bf28d9be2efd4fd7bae19951b85258))
+
 # [2.13.0](https://github.com/revanced/revanced-cli/compare/v2.12.0...v2.13.0) (2022-10-01)
 
 
