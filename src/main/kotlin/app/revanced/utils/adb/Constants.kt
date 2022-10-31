@@ -9,7 +9,7 @@ internal object Constants {
     internal const val COMMAND_PID_OF = "pidof -s"
     internal const val COMMAND_CREATE_DIR = "mkdir -p"
     internal const val COMMAND_LOGCAT = "logcat -c && logcat | grep AndroidRuntime"
-    internal const val COMMAND_RESTART = "monkey -p $PLACEHOLDER 1 && kill ${'$'}($COMMAND_PID_OF $PLACEHOLDER)"
+    internal const val COMMAND_RESTART = "pm resolve-activity --brief $PLACEHOLDER | tail -n 1 | xargs am start -n && kill ${'$'}($COMMAND_PID_OF $PLACEHOLDER)"
 
     // default mount file name
     private const val NAME_MOUNT_SCRIPT = "mount_revanced_$PLACEHOLDER.sh"
