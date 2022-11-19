@@ -41,7 +41,7 @@ fun Patcher.addPatchesFiltered(allPatches: List<Class<out Patch<Context>>>) {
         if (compatiblePackages == null) logger.warn("$prefix: Missing compatibility annotation. Continuing.")
         else {
             if (!compatiblePackages.any { it.name == packageName }) {
-                logger.warn("$prefix: incompatible with $packageName. This patch is only compatible with ${
+                logger.trace("$prefix: Incompatible with $packageName. This patch is only compatible with ${
                     compatiblePackages.joinToString(
                         ", "
                     ) { it.name }
@@ -53,7 +53,7 @@ fun Patcher.addPatchesFiltered(allPatches: List<Class<out Patch<Context>>>) {
                 val compatibleWith = compatiblePackages.joinToString(";") { _package ->
                     "${_package.name}: ${_package.versions.joinToString(", ")}"
                 }
-                logger.warn("$prefix: incompatible with version $packageVersion. This patch is only compatible with version $compatibleWith")
+                logger.warn("$prefix: Incompatible with version $packageVersion. This patch is only compatible with version $compatibleWith")
                 return@patchLoop
             }
         }
