@@ -1,3 +1,10 @@
+# [2.16.0](https://github.com/revanced/revanced-cli/compare/v2.15.1...v2.16.0) (2022-11-20)
+
+
+### Features
+
+* do not warn on incompatible packages ([39e377b](https://github.com/revanced/revanced-cli/commit/39e377bc485e2892422e9712d30e6ff665856ac1))
+
 ## [2.15.1](https://github.com/revanced/revanced-cli/compare/v2.15.0...v2.15.1) (2022-11-18)
 
 # [2.15.0](https://github.com/revanced/revanced-cli/compare/v2.14.0...v2.15.0) (2022-10-31)
