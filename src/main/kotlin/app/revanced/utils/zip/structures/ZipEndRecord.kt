@@ -1,9 +1,9 @@
-package app.revanced.utils.signing.align.zip.structures
+package app.revanced.utils.zip.structures
 
-import app.revanced.utils.signing.align.zip.putUInt
-import app.revanced.utils.signing.align.zip.putUShort
-import app.revanced.utils.signing.align.zip.readUIntLE
-import app.revanced.utils.signing.align.zip.readUShortLE
+import app.revanced.utils.zip.putUInt
+import app.revanced.utils.zip.putUShort
+import app.revanced.utils.zip.readUIntLE
+import app.revanced.utils.zip.readUShortLE
 import java.io.DataInput
 import java.nio.ByteBuffer
 import java.nio.ByteOrder

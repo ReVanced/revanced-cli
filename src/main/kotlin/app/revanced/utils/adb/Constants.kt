@@ -1,6 +1,9 @@
 package app.revanced.utils.adb
 
 internal object Constants {
+    fun String.replacePlaceholder(with: String): String {
+        return this.replace(PLACEHOLDER, with)
+    }
     // template placeholder to replace a string in commands
     internal const val PLACEHOLDER = "TEMPLATE_PACKAGE_NAME"
 

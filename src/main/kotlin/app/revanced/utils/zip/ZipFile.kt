@@ -1,7 +1,7 @@
-package app.revanced.utils.signing.align.zip
+package app.revanced.utils.zip
 
-import app.revanced.utils.signing.align.zip.structures.ZipEndRecord
-import app.revanced.utils.signing.align.zip.structures.ZipEntry
+import app.revanced.utils.zip.structures.ZipEndRecord
+import app.revanced.utils.zip.structures.ZipEntry
 import java.io.Closeable
 import java.io.File
 import java.io.RandomAccessFile
@@ -11,9 +11,9 @@ import java.util.zip.CRC32
 import java.util.zip.Deflater
 
 class ZipFile(file: File) : Closeable {
-    var entries: MutableList<ZipEntry> = mutableListOf()
+    var entries = mutableListOf<ZipEntry>()
 
-    private val filePointer: RandomAccessFile = RandomAccessFile(file, "rw")
+    private val filePointer = RandomAccessFile(file, "rw")
     private var CDNeedsRewrite = false
 
     private val compressionLevel = 5
@@ -134,7 +134,15 @@ class ZipFile(file: File) : Closeable {
         addEntry(entry, compressedBuffer)
     }
 
-    private fun addEntryCopyData(entry: ZipEntry, data: ByteBuffer, alignment: Int? = null) {
+    fun addFileCompressedAligned(file: File, name: String, entryAlignment: (entry: ZipEntry) -> Int?) {
+        val entry = ZipEntry.createWithName(name).also { align(it, entryAlignment(it)) }
+
+        val data = file.readBytes()
+
+        addEntryCompressData(entry, data)
+    }
+
+    private fun align(entry: ZipEntry, alignment: Int? = null) {
         alignment?.let {
             //calculate where data would end up
             val dataOffset = filePointer.filePointer + entry.LFHSize
@@ -148,7 +156,10 @@ class ZipFile(file: File) : Closeable {
                     entry.localExtraField.copyOf((entry.localExtraField.size + (alignment - mod)).toInt())
             }
         }
+    }
 
+    private fun addEntryCopyData(entry: ZipEntry, data: ByteBuffer, alignment: Int? = null) {
+        align(entry, alignment)
         addEntry(entry, data)
     }
 

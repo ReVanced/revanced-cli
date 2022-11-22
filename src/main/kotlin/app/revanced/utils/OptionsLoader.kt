@@ -2,7 +2,7 @@ package app.revanced.utils
 
 import app.revanced.cli.command.MainCommand.logger
 import app.revanced.patcher.Patcher
-import app.revanced.patcher.data.Context
+import app.revanced.patcher.Context
 import app.revanced.patcher.extensions.PatchExtensions.options
 import app.revanced.patcher.extensions.PatchExtensions.patchName
 import app.revanced.patcher.patch.Patch

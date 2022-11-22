@@ -23,17 +23,24 @@ repositories {
 }
 
 dependencies {
-    implementation(kotlin("reflect"))
-
-    implementation("app.revanced:revanced-patcher:6.3.1")
+    implementation("app.revanced:revanced-patcher:6.4.0-dev.1")
     implementation("info.picocli:picocli:4.7.0")
     implementation("com.android.tools.build:apksig:7.2.1")
     implementation("com.github.revanced:jadb:master-SNAPSHOT") // updated fork
     implementation("org.bouncycastle:bcpkix-jdk15on:1.70")
     implementation("cc.ekblad:4koma:1.1.0")
+
+    implementation(kotlin("reflect"))
+    testImplementation(kotlin("test"))
 }
 
 tasks {
+    test {
+        useJUnitPlatform()
+        testLogging {
+            events("PASSED", "SKIPPED", "FAILED")
+        }
+    }
     build {
         dependsOn(shadowJar)
     }

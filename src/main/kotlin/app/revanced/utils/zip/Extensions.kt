@@ -1,4 +1,4 @@
-package app.revanced.utils.signing.align.zip
+package app.revanced.utils.zip
 
 import java.io.DataInput
 import java.io.DataOutput
@@ -14,8 +14,8 @@ fun UInt.toBigEndian() = (((this.toInt() and 0xff) shl 24) or ((this.toInt() and
 
 fun UShort.toBigEndian() = (this.toUInt() shl 16).toBigEndian().toUShort()
 
-fun ByteBuffer.getUShort() = this.getShort().toUShort()
-fun ByteBuffer.getUInt() = this.getInt().toUInt()
+fun ByteBuffer.getUShort() = this.short.toUShort()
+fun ByteBuffer.getUInt() = this.int.toUInt()
 
 fun ByteBuffer.putUShort(ushort: UShort) = this.putShort(ushort.toShort())
 fun ByteBuffer.putUInt(uint: UInt) = this.putInt(uint.toInt())

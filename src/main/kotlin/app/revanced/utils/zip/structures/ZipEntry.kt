@@ -1,6 +1,6 @@
-package app.revanced.utils.signing.align.zip.structures
+package app.revanced.utils.zip.structures
 
-import app.revanced.utils.signing.align.zip.*
+import app.revanced.utils.zip.*
 import java.io.DataInput
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
