@@ -6,7 +6,6 @@ import app.revanced.cli.command.MainCommand.logger
 import app.revanced.patcher.Patcher
 import app.revanced.patcher.data.Context
 import app.revanced.patcher.extensions.PatchExtensions.compatiblePackages
-import app.revanced.patcher.extensions.PatchExtensions.deprecated
 import app.revanced.patcher.extensions.PatchExtensions.include
 import app.revanced.patcher.extensions.PatchExtensions.patchName
 import app.revanced.patcher.patch.Patch
@@ -29,12 +28,6 @@ fun Patcher.addPatchesFiltered(allPatches: List<Class<out Patch<Context>>>) {
             return@patchLoop
         } else if ((!patch.include || args.defaultExclude) && !args.includedPatches.contains(patchName)) {
             logger.info("$prefix: excluded by default")
-            return@patchLoop
-        }
-
-        patch.deprecated?.let { (reason, replacement) ->
-            logger.warn("$prefix: deprecated: $reason")
-            if (replacement != null) logger.warn("Either use ${replacement.java.patchName} instead or include it manually")
             return@patchLoop
         }
 
