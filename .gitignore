@@ -113,6 +113,9 @@ gradle-app.setting
 # # Work around https://youtrack.jetbrains.com/issue/IDEA-116898
 # gradle/wrapper/gradle-wrapper.properties
 
+# Dependency directories
+node_modules/
+
+# ReVanced CLI
 revanced-cache/
 options.toml
-.idea/vcs.xml
