@@ -31,7 +31,8 @@
           {
             "path": "build/libs/*all.jar"
           }
-        ]
+        ],
+        successComment: false
       }
     ],
     [
