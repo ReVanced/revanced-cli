@@ -43,6 +43,7 @@ tasks {
             attributes("Implementation-Title" to project.name)
             attributes("Implementation-Version" to project.version)
         }
+        minimize()
     }
     // Dummy task to fix the Gradle semantic-release plugin.
     // Remove this if you forked it to support building only.
