@@ -1,3 +1,10 @@
+# [2.17.0-dev.2](https://github.com/revanced/revanced-cli/compare/v2.17.0-dev.1...v2.17.0-dev.2) (2022-12-14)
+
+
+### Bug Fixes
+
+* invalid header when writing a `ZipFile` ([#169](https://github.com/revanced/revanced-cli/issues/169)) ([6e703eb](https://github.com/revanced/revanced-cli/commit/6e703eb8e8d7da0e52266c4965f37bc8aafb409c))
+
 # [2.17.0-dev.1](https://github.com/revanced/revanced-cli/compare/v2.16.1...v2.17.0-dev.1) (2022-12-11)
 
 
