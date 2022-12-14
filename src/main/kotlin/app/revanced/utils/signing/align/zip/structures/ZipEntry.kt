@@ -9,12 +9,12 @@ data class ZipEntry(
     val version: UShort,
     val versionNeeded: UShort,
     val flags: UShort,
-    val compression: UShort,
+    var compression: UShort,
     val modificationTime: UShort,
     val modificationDate: UShort,
-    val crc32: UInt,
-    val compressedSize: UInt,
-    val uncompressedSize: UInt,
+    var crc32: UInt,
+    var compressedSize: UInt,
+    var uncompressedSize: UInt,
     val diskNumber: UShort,
     val internalAttributes: UShort,
     val externalAttributes: UInt,
@@ -22,7 +22,7 @@ data class ZipEntry(
     val fileName: String,
     val extraField: ByteArray,
     val fileComment: String,
-    var localExtraField: ByteArray = ByteArray(0), //seperate for alignment
+    var localExtraField: ByteArray = ByteArray(0), //separate for alignment
 ) {
     val LFHSize: Int
         get() = LFH_HEADER_SIZE + fileName.toByteArray(Charsets.UTF_8).size + localExtraField.size
@@ -36,6 +36,27 @@ data class ZipEntry(
 
         const val LFH_HEADER_SIZE = 30
         const val LFH_SIGNATURE = 0x04034b50u
+
+        fun createWithName(fileName: String): ZipEntry {
+            return ZipEntry(
+                0x1403u, //made by unix, version 20
+                0u,
+                0u,
+                0u,
+                0x0821u, //seems to be static time google uses, no idea
+                0x0221u, //same as above
+                0u,
+                0u,
+                0u,
+                0u,
+                0u,
+                0u,
+                0u,
+                fileName,
+                ByteArray(0),
+                ""
+            )
+        }
 
         fun fromCDE(input: DataInput): ZipEntry {
             val signature = input.readUIntLE()
@@ -55,7 +76,7 @@ data class ZipEntry(
             val fileNameLength = input.readUShortLE()
             var fileName = ""
             val extraFieldLength = input.readUShortLE()
-            var extraField = ByteArray(extraFieldLength.toInt())
+            val extraField = ByteArray(extraFieldLength.toInt())
             val fileCommentLength = input.readUShortLE()
             var fileComment = ""
             val diskNumber = input.readUShortLE()
@@ -63,7 +84,8 @@ data class ZipEntry(
             val externalAttributes = input.readUIntLE()
             val localHeaderOffset = input.readUIntLE()
 
-            val variableFieldsLength = fileNameLength.toInt() + extraFieldLength.toInt() + fileCommentLength.toInt()
+            val variableFieldsLength =
+                fileNameLength.toInt() + extraFieldLength.toInt() + fileCommentLength.toInt()
 
             if (variableFieldsLength > 0) {
                 val fileNameBytes = ByteArray(fileNameLength.toInt())
@@ -77,7 +99,8 @@ data class ZipEntry(
                 fileComment = fileCommentBytes.toString(Charsets.UTF_8)
             }
 
-            flags = (flags and 0b1000u.inv().toUShort()) //disable data descriptor flag as they are not used
+            flags = (flags and 0b1000u.inv()
+                .toUShort()) //disable data descriptor flag as they are not used
 
             return ZipEntry(
                 version,
@@ -134,8 +157,9 @@ data class ZipEntry(
         val nameBytes = fileName.toByteArray(Charsets.UTF_8)
         val commentBytes = fileComment.toByteArray(Charsets.UTF_8)
 
-        val buffer = ByteBuffer.allocate(CDE_HEADER_SIZE + nameBytes.size + extraField.size + commentBytes.size)
-            .also { it.order(ByteOrder.LITTLE_ENDIAN) }
+        val buffer =
+            ByteBuffer.allocate(CDE_HEADER_SIZE + nameBytes.size + extraField.size + commentBytes.size)
+                .also { it.order(ByteOrder.LITTLE_ENDIAN) }
 
         buffer.putUInt(CDE_SIGNATURE)
         buffer.putUShort(version)
@@ -163,4 +187,3 @@ data class ZipEntry(
         return buffer
     }
 }
-
