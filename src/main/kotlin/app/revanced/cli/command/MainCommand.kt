@@ -151,16 +151,14 @@ internal object MainCommand : Runnable {
             Adb(outputFile, patcher.context.packageMetadata.packageName, args.deploy!!, !pArgs.mount)
         }
 
-        val patchedFile = File(pArgs.cacheDirectory).resolve("${outputFile.nameWithoutExtension}_raw.apk")
-
         // start the patcher
-        Patcher.start(patcher, patchedFile, allPatches)
+        val result = Patcher.start(patcher, allPatches)
 
         val cacheDirectory = File(pArgs.cacheDirectory)
 
         // align the file
         val alignedFile = cacheDirectory.resolve("${outputFile.nameWithoutExtension}_aligned.apk")
-        Aligning.align(patchedFile, alignedFile)
+        Aligning.align(result, args.inputFile, alignedFile)
 
         // sign the file
         val finalFile = if (!pArgs.mount) {
