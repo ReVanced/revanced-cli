@@ -1,3 +1,10 @@
+# [2.17.0-dev.3](https://github.com/revanced/revanced-cli/compare/v2.17.0-dev.2...v2.17.0-dev.3) (2022-12-14)
+
+
+### Features
+
+* improve missing compatibility annotation tracing log ([e473a88](https://github.com/revanced/revanced-cli/commit/e473a889c0e78910480fd8572c41099f9542429f))
+
 # [2.17.0](https://github.com/revanced/revanced-cli/compare/v2.16.1...v2.17.0) (2022-12-14)
 
 
