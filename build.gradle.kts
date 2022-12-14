@@ -40,8 +40,6 @@ tasks {
     shadowJar {
         manifest {
             attributes("Main-Class" to "app.revanced.cli.main.MainKt")
-            attributes("Implementation-Title" to project.name)
-            attributes("Implementation-Version" to project.version)
         }
         minimize()
     }
