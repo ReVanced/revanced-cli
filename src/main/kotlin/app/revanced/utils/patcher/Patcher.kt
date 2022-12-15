@@ -19,7 +19,7 @@ fun Patcher.addPatchesFiltered(allPatches: List<Class<out Patch<Context>>>) {
         val compatiblePackages = patch.compatiblePackages
         val patchName = patch.patchName
 
-        val prefix = "Skipping $patchName, reason"
+        val prefix = "Skipping $patchName"
 
         val args = MainCommand.args.patchArgs?.patchingArgs!!
 
