@@ -87,7 +87,7 @@ internal object MainCommand : Runnable {
             names = ["--exclusive"],
             description = ["Only installs the patches you include, not including any patch by default"]
         )
-        var defaultExclude = false
+        var exclusive = false
 
         @Option(names = ["-i", "--include"], description = ["Include patches"])
         var includedPatches = arrayOf<String>()

@@ -43,6 +43,7 @@ tasks {
         }
         minimize {
             exclude(dependency("org.jetbrains.kotlin:.*"))
+            exclude(dependency("org.bouncycastle:.*"))
         }
     }
     // Dummy task to fix the Gradle semantic-release plugin.
