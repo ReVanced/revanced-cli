@@ -31,7 +31,7 @@ fun Patcher.addPatchesFiltered(allPatches: List<Class<out Patch<Context>>>) {
             return@patchLoop
         }
 
-        if (compatiblePackages == null) logger.trace("$prefix: No constraint on packages. Continuing.")
+        if (compatiblePackages == null) logger.trace("$patchName: No constraint on packages.")
         else {
             if (!compatiblePackages.any { it.name == packageName }) {
                 logger.trace("$prefix: Incompatible with $packageName. This patch is only compatible with ${
