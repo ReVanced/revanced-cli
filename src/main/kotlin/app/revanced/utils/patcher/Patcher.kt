@@ -19,19 +19,19 @@ fun Patcher.addPatchesFiltered(allPatches: List<Class<out Patch<Context>>>) {
         val compatiblePackages = patch.compatiblePackages
         val patchName = patch.patchName
 
-        val prefix = "Skipping $patchName, reason"
+        val prefix = "Skipping $patchName"
 
         val args = MainCommand.args.patchArgs?.patchingArgs!!
 
         if (args.excludedPatches.contains(patchName)) {
-            logger.info("$prefix: manually excluded")
+            logger.info("$prefix: Manually excluded")
             return@patchLoop
         } else if ((!patch.include || args.defaultExclude) && !args.includedPatches.contains(patchName)) {
-            logger.info("$prefix: excluded by default")
+            logger.info("$prefix: Excluded by default")
             return@patchLoop
         }
 
-        if (compatiblePackages == null) logger.trace("$prefix: No constraint on packages. Continuing.")
+        if (compatiblePackages == null) logger.trace("$patchName: No constraint on packages.")
         else {
             if (!compatiblePackages.any { it.name == packageName }) {
                 logger.trace("$prefix: Incompatible with $packageName. This patch is only compatible with ${
