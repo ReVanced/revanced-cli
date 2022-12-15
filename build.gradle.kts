@@ -41,7 +41,9 @@ tasks {
         manifest {
             attributes("Main-Class" to "app.revanced.cli.main.MainKt")
         }
-        minimize()
+        minimize {
+            exclude(dependency("org.jetbrains.kotlin:.*"))
+        }
     }
     // Dummy task to fix the Gradle semantic-release plugin.
     // Remove this if you forked it to support building only.
