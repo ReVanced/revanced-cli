@@ -1,3 +1,10 @@
+## [2.18.1-dev.1](https://github.com/revanced/revanced-cli/compare/v2.18.0...v2.18.1-dev.1) (2022-12-15)
+
+
+### Bug Fixes
+
+* don't log when package is incompatible and `exclusive` option is used ([ad81a1b](https://github.com/revanced/revanced-cli/commit/ad81a1b656586226f8b7b8d1123c52b0f3f2e6f7))
+
 # [2.18.0](https://github.com/revanced/revanced-cli/compare/v2.17.0...v2.18.0) (2022-12-15)
 
 
