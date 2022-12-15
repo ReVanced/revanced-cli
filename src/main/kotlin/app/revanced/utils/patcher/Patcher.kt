@@ -24,10 +24,10 @@ fun Patcher.addPatchesFiltered(allPatches: List<Class<out Patch<Context>>>) {
         val args = MainCommand.args.patchArgs?.patchingArgs!!
 
         if (args.excludedPatches.contains(patchName)) {
-            logger.info("$prefix: manually excluded")
+            logger.info("$prefix: Manually excluded")
             return@patchLoop
         } else if ((!patch.include || args.defaultExclude) && !args.includedPatches.contains(patchName)) {
-            logger.info("$prefix: excluded by default")
+            logger.info("$prefix: Excluded by default")
             return@patchLoop
         }
 
