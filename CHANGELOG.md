@@ -11,6 +11,19 @@
 
 * simplify log message ([74d73ca](https://github.com/revanced/revanced-cli/commit/74d73ca3a7ba2f5da872fe9a241629e1c143cd4e))
 
+# [2.18.0](https://github.com/revanced/revanced-cli/compare/v2.17.0...v2.18.0) (2022-12-15)
+
+
+### Bug Fixes
+
+* start with uppercase in log message ([ae91b0d](https://github.com/revanced/revanced-cli/commit/ae91b0d597b107a152e1b630b8c16a795a7ca3b3))
+* use correct prefix in log message ([1a67cd8](https://github.com/revanced/revanced-cli/commit/1a67cd81da5ed7f259b6dbaeb66a7eef4a113034))
+
+
+### Features
+
+* simplify log message ([74d73ca](https://github.com/revanced/revanced-cli/commit/74d73ca3a7ba2f5da872fe9a241629e1c143cd4e))
+
 # [2.18.0-dev.1](https://github.com/revanced/revanced-cli/compare/v2.17.1-dev.2...v2.18.0-dev.1) (2022-12-15)
 
 
