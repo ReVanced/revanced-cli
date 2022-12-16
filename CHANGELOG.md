@@ -1,3 +1,10 @@
+## [2.18.2-dev.1](https://github.com/revanced/revanced-cli/compare/v2.18.1...v2.18.2-dev.1) (2022-12-16)
+
+
+### Bug Fixes
+
+* exclude patcher dependency from minimizing ([d5794b9](https://github.com/revanced/revanced-cli/commit/d5794b94ca19c9287190a3b863c97a089893cc07))
+
 ## [2.18.1](https://github.com/revanced/revanced-cli/compare/v2.18.0...v2.18.1) (2022-12-15)
 
 
