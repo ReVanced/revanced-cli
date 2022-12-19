@@ -1,5 +1,6 @@
 package app.revanced.cli.patcher
 
+import app.revanced.cli.command.MainCommand.args
 import app.revanced.patcher.PatcherResult
 import app.revanced.patcher.data.Context
 import app.revanced.patcher.patch.Patch
@@ -18,6 +19,16 @@ internal object Patcher {
         patcher.addPatchesFiltered(allPatches)
         // apply patches
         patcher.applyPatchesVerbose()
+		
+        args.patchArgs?.patchingArgs?.let { args ->
+            args.ripLibs.forEach {
+                logger.info("Ripping $it libs")
+                try {
+                    outputFileSystem.deleteRecursively("lib/$it")
+                } catch (_e: Exception) {
+                }
+            }
+        }
 
         return patcher.save()
     }

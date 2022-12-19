@@ -121,6 +121,12 @@ internal object MainCommand : Runnable {
 
         @Option(names = ["--custom-aapt2-binary"], description = ["Path to custom aapt2 binary"])
         var aaptPath: String = ""
+		
+		@Option(names = ["--rip-lib"], description = ["Rips the lib (arm64-v8a etc.) from the APK"])
+        var ripLibs = arrayOf<String>()
+
+		@Option(names = ["--unsigned"], description = ["Disable signing of the final apk"])
+        var unsigned: Boolean = false
     }
 
     override fun run() {
@@ -161,7 +167,7 @@ internal object MainCommand : Runnable {
         Aligning.align(result, args.inputFile, alignedFile)
 
         // sign the file
-        val finalFile = if (!pArgs.mount) {
+        val finalFile = if (!pArgs.mount && !pArgs.unsigned) {
             val signedOutput = cacheDirectory.resolve("${outputFile.nameWithoutExtension}_signed.apk")
             Signing.sign(
                 alignedFile,
