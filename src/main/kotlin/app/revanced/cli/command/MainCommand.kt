@@ -49,7 +49,7 @@ internal object MainCommand : Runnable {
     }
 
     class PatchArgs {
-        @Option(names = ["-b", "--bundles"], description = ["One or more bundles of patches"], required = true)
+        @Option(names = ["-b", "--bundle"], description = ["One or more bundles of patches"], required = true)
         var patchBundles = arrayOf<String>()
 
         @Option(names = ["--options"], description = ["Configuration file for all patch options"])
@@ -63,7 +63,7 @@ internal object MainCommand : Runnable {
     }
 
     class ListingArgs {
-        @Option(names = ["-l", "--list"], description = ["List patches only"], required = true)
+        @Option(names = ["-l", "--list"], description = ["List patches"], required = true)
         var listOnly: Boolean = false
 
         @Option(names = ["--with-versions"], description = ["List patches with compatible versions"])
