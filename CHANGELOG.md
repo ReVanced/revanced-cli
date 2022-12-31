@@ -1,3 +1,10 @@
+# [2.19.0-dev.1](https://github.com/revanced/revanced-cli/compare/v2.18.2...v2.19.0-dev.1) (2022-12-31)
+
+
+### Features
+
+* improve description of options ([#185](https://github.com/revanced/revanced-cli/issues/185)) ([b69e784](https://github.com/revanced/revanced-cli/commit/b69e784785f7f262f83b35c4f241c90036169fc7))
+
 ## [2.18.2](https://github.com/revanced/revanced-cli/compare/v2.18.1...v2.18.2) (2022-12-16)
 
 
