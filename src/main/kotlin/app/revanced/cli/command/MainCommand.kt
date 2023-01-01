@@ -71,9 +71,6 @@ internal object MainCommand : Runnable {
 
         @Option(names = ["--with-packages"], description = ["List patches with compatible packages"])
         var withPackages: Boolean = false
-
-        @Option(names = ["--with-descriptions"], description = ["List patches with their descriptions"])
-        var withDescriptions: Boolean = true
     }
 
     class PatchingArgs {
@@ -228,14 +225,15 @@ internal object MainCommand : Runnable {
                         append(packageName)
                         append("\t")
                     }
+
                     // Add patch name
                     val patchName = patch.patchName.padStart(25)
                     append(patchName)
+
                     // Add description if flag is set.
-                    if (args.patchArgs?.listingArgs?.withDescriptions == true) {
-                        append("\t")
-                        append(patch.description)
-                    }
+                    append("\t")
+                    append(patch.description)
+
                     // Add compatible versions, if flag is set
                     if (args.patchArgs?.listingArgs?.withVersions == true) {
                         val compatibleVersions = compatiblePackage.versions.joinToString(separator = ", ")
