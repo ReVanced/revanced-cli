@@ -220,7 +220,7 @@ internal object MainCommand : Runnable {
         for (patchBundlePath in args.patchArgs?.patchBundles!!) for (patch in PatchBundle.Jar(patchBundlePath)
             .loadPatches()) {
             if (patch.patchName in logged) continue
-            for (compatiblePackage in patch.compatiblePackages!!) {
+            for (compatiblePackage in patch.compatiblePackages ?: continue) {
                 val packageEntryStr = buildString {
                     // Add package if flag is set
                     if (args.patchArgs?.listingArgs?.withPackages == true) {
