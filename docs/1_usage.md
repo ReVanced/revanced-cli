@@ -2,7 +2,7 @@
 
 Lean how to use the ReVanced CLI.
 
-## ⚡ Setup
+## ⚡ Setup (optional)
 
 1. Make sure your device is connected
 
@@ -30,7 +30,7 @@ Lean how to use the ReVanced CLI.
   java -jar revanced-cli.jar -h
   ```
 
-- ### List all available patches inside supplied bundles
+- ### List all available patches from supplied patch bundles
 
   ```bash
   java -jar revanced-cli.jar \
@@ -64,11 +64,11 @@ Lean how to use the ReVanced CLI.
 > **Note**:
 >
 > - If you want to exclude patches, you can use the option `-e`. In the case of YouTube, you have to exclude
-    the `microg-support` patch from the [ReVanced Patches](https://github.com/revanced/revanced-patches) with the
+    the `microg-support` patch from  [ReVanced Patches](https://github.com/revanced/revanced-patches) with the
     option `-e microg-support`.
 >
-> - Some patches from the [ReVanced Patches](https://github.com/revanced/revanced-patches) also might require
-    the [ReVanced Integrations](https://github.com/revanced/revanced-integrations). Supply them with the option `-m`.
+> - Some patches from [ReVanced Patches](https://github.com/revanced/revanced-patches) also might require
+    [ReVanced Integrations](https://github.com/revanced/revanced-integrations). Supply them with the option `-m`.
 >
 > - If you supplied a device with the option `-d`, the patched application will be automatically installed on the
     device.
