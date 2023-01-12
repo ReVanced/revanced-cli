@@ -51,6 +51,7 @@ Lean how to use the ReVanced CLI.
 - ### Mount the patched application with root permissions over the installed application
 
   ```bash
+  adb install input.apk # make sure the same version is installed
   java -jar revanced-cli.jar \
       -a input.apk \
       -c \
