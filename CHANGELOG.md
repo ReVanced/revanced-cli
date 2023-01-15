@@ -1,3 +1,10 @@
+# [2.20.0-dev.2](https://github.com/revanced/revanced-cli/compare/v2.20.0-dev.1...v2.20.0-dev.2) (2023-01-15)
+
+
+### Features
+
+* connect to first device if given device was not found ([6485e47](https://github.com/revanced/revanced-cli/commit/6485e477a10bb89dfb2e40f3596d72b20bf23cc8))
+
 # [2.20.0](https://github.com/revanced/revanced-cli/compare/v2.19.0...v2.20.0) (2023-01-02)
 
 
