@@ -1,3 +1,10 @@
+# [2.20.0-dev.3](https://github.com/revanced/revanced-cli/compare/v2.20.0-dev.2...v2.20.0-dev.3) (2023-01-15)
+
+
+### Bug Fixes
+
+* bump patcher dependency version ([51c04b7](https://github.com/revanced/revanced-cli/commit/51c04b7b162ad2876bbeb248b7ccddd105b5076d))
+
 # [2.20.0-dev.2](https://github.com/revanced/revanced-cli/compare/v2.20.0-dev.1...v2.20.0-dev.2) (2023-01-15)
 
 
