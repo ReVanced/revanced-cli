@@ -17,7 +17,7 @@ internal class Adb(
     private val device: JadbDevice
 
     init {
-        device = JadbConnection().devices.find { it.serial == deviceName }
+        device = JadbConnection().devices.let { device -> device.find { it.serial == deviceName } ?: device.first() }
             ?: throw IllegalArgumentException("No such device with name $deviceName")
 
         if (!modeInstall && device.run("su -h", false) != 0)
