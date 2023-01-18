@@ -1,3 +1,17 @@
+# [2.20.0](https://github.com/revanced/revanced-cli/compare/v2.19.0...v2.20.0) (2023-01-18)
+
+
+### Bug Fixes
+
+* bump patcher dependency version ([51c04b7](https://github.com/revanced/revanced-cli/commit/51c04b7b162ad2876bbeb248b7ccddd105b5076d))
+* do not list compatible packages if patches do not define them ([31e4a41](https://github.com/revanced/revanced-cli/commit/31e4a41dd20f5fa62f840cd8e3b92fe0814eda87))
+
+
+### Features
+
+* connect to first device if given device was not found ([6485e47](https://github.com/revanced/revanced-cli/commit/6485e477a10bb89dfb2e40f3596d72b20bf23cc8))
+* remove option `--with-descriptions` ([07a423b](https://github.com/revanced/revanced-cli/commit/07a423b19ec72e9f020aeb0222f4ced571036dbe))
+
 # [2.20.0](https://github.com/revanced/revanced-cli/compare/v2.19.0...v2.20.0) (2023-01-17)
 
 
