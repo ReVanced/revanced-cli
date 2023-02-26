@@ -69,7 +69,7 @@ fun Patcher.applyPatchesVerbose() {
 }
 
 fun Patcher.mergeFiles() {
-    this.addFiles(args.patchArgs?.patchingArgs!!.mergeFiles) { file ->
+    this.addIntegrations(args.patchArgs?.patchingArgs!!.mergeFiles) { file ->
         logger.info("Merging $file")
     }
 }
