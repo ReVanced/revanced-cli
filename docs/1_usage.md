@@ -70,6 +70,7 @@ Lean how to use the ReVanced CLI.
 >
 > - Some patches from [ReVanced Patches](https://github.com/revanced/revanced-patches) also might require
     [ReVanced Integrations](https://github.com/revanced/revanced-integrations). Supply them with the option `-m`.
+    > The integrations will be merged, if necessary automatically, if supplied.
 >
 > - If you supplied a device with the option `-d`, the patched application will be automatically installed on the
     device.
