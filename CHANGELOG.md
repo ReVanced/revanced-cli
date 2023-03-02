@@ -1,3 +1,11 @@
+## [2.20.1-dev.1](https://github.com/revanced/revanced-cli/compare/v2.20.0...v2.20.1-dev.1) (2023-03-02)
+
+
+### Bug Fixes
+
+* change permission of gradlew ([6787267](https://github.com/revanced/revanced-cli/commit/6787267c67c8829bd18acc530474d29a88f84f9b))
+* correctly word option descriptions ([6050d12](https://github.com/revanced/revanced-cli/commit/6050d122e65abd5bb27efdca77d0187b50e3df83))
+
 # [2.20.0](https://github.com/revanced/revanced-cli/compare/v2.19.0...v2.20.0) (2023-01-18)
 
 
