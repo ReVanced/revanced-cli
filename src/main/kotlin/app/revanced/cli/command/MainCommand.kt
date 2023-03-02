@@ -35,13 +35,16 @@ internal object MainCommand : Runnable {
     lateinit var args: Args
 
     class Args {
-        @Option(names = ["-a", "--apk"], description = ["Input file to be patched"], required = true)
+        @Option(names = ["-a", "--apk"], description = ["Input APK file to be patched"], required = true)
         lateinit var inputFile: File
 
         @Option(names = ["--uninstall"], description = ["Uninstall the mount variant"])
         var uninstall: Boolean = false
 
-        @Option(names = ["-d", "--deploy-on"], description = ["If specified, deploy to adb device with given name"])
+        @Option(
+            names = ["-d", "--deploy-on"],
+            description = ["If specified, deploy to device over ADB with given name"]
+        )
         var deploy: String? = null
 
         @ArgGroup(exclusive = false)
