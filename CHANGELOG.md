@@ -1,3 +1,10 @@
+## [2.20.1-dev.1](https://github.com/revanced/revanced-cli/compare/v2.20.0...v2.20.1-dev.1) (2023-03-03)
+
+
+### Bug Fixes
+
+* correctly word option descriptions ([ac3a8f6](https://github.com/revanced/revanced-cli/commit/ac3a8f66f77a7218974465eebbfc78a536b76d51))
+
 ## [2.20.1-dev.1](https://github.com/revanced/revanced-cli/compare/v2.20.0...v2.20.1-dev.1) (2023-03-02)
 
 
