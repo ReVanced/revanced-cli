@@ -44,7 +44,7 @@ Lean how to use the ReVanced CLI.
   java -jar revanced-cli.jar \
    -a input.apk \
    -c \
-   -o unpatched-output.apk \
+   -o patched-output.apk \
    -b revanced-patches.jar
   ```
 
