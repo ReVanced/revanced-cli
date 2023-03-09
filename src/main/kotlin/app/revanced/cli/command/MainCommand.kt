@@ -212,10 +212,11 @@ internal object MainCommand : Runnable {
             OptionsLoader.init(patchingArgs.options, it)
         }
 
+        val bundle = ApkBundle(baseApk, splitApk)
         // prepare the patcher
         val patcher = Patcher( // constructor decodes base
             PatcherOptions(
-                ApkBundle(baseApk, splitApk),
+                bundle,
                 workDirectory.path,
                 patchingArgs.aaptPath,
                 workDirectory.path,
@@ -237,82 +238,24 @@ internal object MainCommand : Runnable {
             val signedDirectory = resolve("signed").also(File::mkdirs)
 
             /**
-             * Align an [Apk] file.
+             * Align an [ApkBundle].
              *
              * @param apk The apk file to write.
-             * @return The written [Apk] file.
+             * @return The written [ApkBundle].
              */
-            fun writeApk(apk: Apk): File {
-                logger.info("Writing $apk apk")
-
-                with(apk) {
-                    return alignedDirectory.resolve(file.name).also { alignedApk ->
-                        if (alignedApk.exists()) alignedApk.delete()
-
-                        ZipFile(alignedApk).use { zipFile ->
-                            if (this is Apk.Base) {
-                                logger.info("Writing dex files")
-                                dexFiles.forEach {
-                                    zipFile.addEntryCompressData(
-                                        ZipEntry.createWithName(
-                                            it.name
-                                        ),
-                                        it.stream.readBytes()
-                                    )
-                                }
-                                /**
-                                 * Copy a file to [ZipFile].
-                                 * If it is a directory, the contents including the directory will be copied as well.
-                                 *
-                                 * @param file The file to copy to the [ZipFile].
-                                 */
-                                fun ZipFile.deepCopy(file: File) {
-                                    val base = file.parentFile
-
-                                    fun File.recursivelyCopy() {
-                                        if (isDirectory) listFiles()?.forEach(File::recursivelyCopy)
-                                        else addFileCompressedAligned(
-                                            this,
-                                            this.relativeTo(base).path,
-                                            Alignment::getEntryAlignment
-                                        )
-                                    }
-
-                                    file.recursivelyCopy()
-                                }
-                                mergedResources?.forEach {
-                                    zipFile.deepCopy(it)
-                                }
-                            }
-
-
-                            resources?.let {
-                                logger.info("Writing resources")
-
-                                zipFile.copyEntriesFromFileAligned(
-                                    ZipFile(it),
-                                    Alignment::getEntryAlignment
-                                )
-                            }
-
-                            logger.info("Writing remaining files")
-
-                            zipFile.copyEntriesFromFileAligned(
-                                ZipFile(this.file),
-                                Alignment::getEntryAlignment
-                            )
-                        }
-                    }
-                }
+            fun writeApk(apkBundle: ApkBundle, out: File): File {
+                logger.info("Writing $apkBundle")
+                apkBundle.save(out)
+                return out
             }
 
             /**
-             * Sign a list of [Apk] files.
+             * Sign an Apk file
              *
-             * @param unsignedApks The list of [Apk] files to sign.
-             * @return The list of signed [Apk] files.
+             * @param unsignedApk [File]
+             * @return
              */
-            fun signApks(unsignedApks: List<File>) = if (!args.mount) {
+            fun signApk(unsignedApk: File) = if (!args.mount) {
                 with(
                     ApkSigner(
                         SigningOptions(
@@ -323,18 +266,17 @@ internal object MainCommand : Runnable {
                         )
                     )
                 ) {
-                    unsignedApks.map { unsignedApk -> // sign the unsigned apk
-                        logger.info("Signing ${unsignedApk.name}")
-                        signedDirectory.resolve(unsignedApk.name)
+                        // sign the unsigned apk
+                        logger.info("Signing ${unsignedApk}")
+                        signedDirectory.resolve(unsignedApk)
                             .also { signedApk ->
                                 signApk(
                                     unsignedApk, signedApk
                                 )
                             }
                     }
-                }
-            } else {
-                unsignedApks
+                } else {
+                unsignedApk
             }
 
             /**
@@ -356,6 +298,8 @@ internal object MainCommand : Runnable {
              * @param apkFiles The [Apk] files to install.
              * @return The input [Apk] file.
              */
+            // TODO: reimplement this lol
+            /*
             fun install(apkFiles: List<Pair<File, Apk>> /* pair of the apk file and the apk */) =
                 apkFiles.also {
                     adb?.apply {
@@ -367,21 +311,21 @@ internal object MainCommand : Runnable {
                         install(base, splits)
                     }
                 }.map { (outputApk, _) -> outputApk }
-
+            */
             /**
              * Clean up the work directory and output files.
              *
-             * @param outputApks The list of output [Apk] files.
+             * @param outputApk The list of output [Apk] files.
              */
-            fun cleanUp(outputApks: List<File>) {
+            fun cleanUp(outputApk: File) {
                 // clean up the work directory if needed
                 if (patchingArgs.clean) {
                     patchingArgs.workDirectory.let {
                         if (!it.deleteRecursively())
                             return logger.error("Failed to delete directory $it")
                     }
-                    if (args.deploy?.let { outputApks.any { !it.delete() } } == true)
-                        logger.error("Failed to delete some output files")
+                    //if (args.deploy?.let { outputApk.any { !it.delete() } } == true)
+                    //    logger.error("Failed to delete some output files")
                 }
             }
 
@@ -471,16 +415,14 @@ internal object MainCommand : Runnable {
                     if (result is PatchResult.Error) logger.error("Executing $patch failed:\n${result.stackTraceToString()}")
                     else logger.info("Executing $patch succeeded")
                 }
-            }.save().apkFiles.map { it.apk }
-
-            with(patcher.run()) {
-                also { patchingArgs.outputPath.also(File::mkdirs) }
-                    .map(::writeApk)
-                    .let(::signApks)
-                    .map(::moveToOutput).zip(this)
-                    .let(::install)
-                    .let(::cleanUp)
-            }
+            }.save()
+            patcher.run()
+            bundle.also { patchingArgs.outputPath.also(File::mkdirs) }
+            writeApk(bundle, args.patchArgs!!.patchingArgs?.outputPath!!.resolve("result.apk"))
+                .let(::signApk)
+                .let(::moveToOutput)
+                // .let(::install)
+                .let(::cleanUp)
 
             logger.info("Finished")
         }

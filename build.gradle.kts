@@ -20,6 +20,9 @@ repositories {
     }
     maven { url = uri("https://jitpack.io") }
     google()
+    flatDir {
+        dirs("libs")
+    }
 }
 
 dependencies {
