@@ -182,6 +182,7 @@ internal object MainCommand : Runnable {
         // TODO: convert this code to picocli subcommands
         if (args.patchArgs?.listingArgs?.listOnly == true) return printListOfPatches()
         if (args.uninstall != null) return uninstall()
+
         val patcherLogger = PatcherLogger
 
         // patching commands require these arguments
@@ -213,15 +214,14 @@ internal object MainCommand : Runnable {
             OptionsLoader.init(patchingArgs.options, it)
         }
 
-        val bundle = ApkBundle(baseApk, splitApk, patcherLogger)
         // prepare the patcher
         val patcher = Patcher( // constructor decodes base
             PatcherOptions(
-                bundle,
+                ApkBundle(baseApk, splitApk, patcherLogger),
                 workDirectory.path,
                 patchingArgs.aaptPath,
                 workDirectory.path,
-                patcherLogger
+                PatcherLogger
             )
         )
 
@@ -239,26 +239,29 @@ internal object MainCommand : Runnable {
             val signedDirectory = resolve("signed").also(File::mkdirs)
 
             /**
-             * Align an [ApkBundle].
+             * Align an [Apk] file.
              *
              * @param apk The apk file to write.
-             * @return The written [ApkBundle].
+             * @return The written [Apk] file.
              */
-            fun writeApk(apkBundle: ApkBundle): File {
-                logger.info("Writing bundle...")
-                return alignedDirectory.resolve("out.apk").also {
-                    if (it.exists()) it.delete()
-                    apkBundle.save(it)
+            fun writeApk(apk: Apk): File {
+                logger.info("Writing $apk apk")
+
+                with(apk) {
+                    return alignedDirectory.resolve(file.name).also { alignedApk ->
+                        if (alignedApk.exists()) alignedApk.delete()
+                        apk.save(alignedApk)
+                    }
                 }
             }
 
             /**
-             * Sign an Apk file
+             * Sign a list of [Apk] files.
              *
-             * @param unsignedApk [File]
-             * @return
+             * @param unsignedApks The list of [Apk] files to sign.
+             * @return The list of signed [Apk] files.
              */
-            fun signApk(unsignedApk: File) = if (!args.mount) {
+            fun signApks(unsignedApks: List<File>) = if (!args.mount) {
                 with(
                     ApkSigner(
                         SigningOptions(
@@ -269,8 +272,8 @@ internal object MainCommand : Runnable {
                         )
                     )
                 ) {
-                        // sign the unsigned apk
-                        logger.info("Signing ${unsignedApk}")
+                    unsignedApks.map { unsignedApk -> // sign the unsigned apk
+                        logger.info("Signing ${unsignedApk.name}")
                         signedDirectory.resolve(unsignedApk.name)
                             .also { signedApk ->
                                 signApk(
@@ -278,8 +281,9 @@ internal object MainCommand : Runnable {
                                 )
                             }
                     }
-                } else {
-                unsignedApk
+                }
+            } else {
+                unsignedApks
             }
 
             /**
@@ -301,8 +305,6 @@ internal object MainCommand : Runnable {
              * @param apkFiles The [Apk] files to install.
              * @return The input [Apk] file.
              */
-            // TODO: reimplement this lol
-            /*
             fun install(apkFiles: List<Pair<File, Apk>> /* pair of the apk file and the apk */) =
                 apkFiles.also {
                     adb?.apply {
@@ -314,21 +316,21 @@ internal object MainCommand : Runnable {
                         install(base, splits)
                     }
                 }.map { (outputApk, _) -> outputApk }
-            */
+
             /**
              * Clean up the work directory and output files.
              *
-             * @param outputApk The list of output [Apk] files.
+             * @param outputApks The list of output [Apk] files.
              */
-            fun cleanUp(outputApk: File) {
+            fun cleanUp(outputApks: List<File>) {
                 // clean up the work directory if needed
                 if (patchingArgs.clean) {
                     patchingArgs.workDirectory.let {
                         if (!it.deleteRecursively())
                             return logger.error("Failed to delete directory $it")
                     }
-                    //if (args.deploy?.let { outputApk.any { !it.delete() } } == true)
-                    //    logger.error("Failed to delete some output files")
+                    if (args.deploy?.let { outputApks.any { !it.delete() } } == true)
+                        logger.error("Failed to delete some output files")
                 }
             }
 
@@ -418,14 +420,16 @@ internal object MainCommand : Runnable {
                     if (result is PatchResult.Error) logger.error("Executing $patch failed:\n${result.stackTraceToString()}")
                     else logger.info("Executing $patch succeeded")
                 }
-            }.save()
-            patcher.run()
-            bundle.also { patchingArgs.outputPath.also(File::mkdirs) }
-            writeApk(bundle)
-                .let(::signApk)
-                .let(::moveToOutput)
-                // .let(::install)
-                .let(::cleanUp)
+            }.save().apkFiles.map { it.apk }
+
+            with(patcher.run()) {
+                also { patchingArgs.outputPath.also(File::mkdirs) }
+                    .map(::writeApk)
+                    .let(::signApks)
+                    .map(::moveToOutput).zip(this)
+                    .let(::install)
+                    .let(::cleanUp)
+            }
 
             logger.info("Finished")
         }
