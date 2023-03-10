@@ -182,6 +182,7 @@ internal object MainCommand : Runnable {
         // TODO: convert this code to picocli subcommands
         if (args.patchArgs?.listingArgs?.listOnly == true) return printListOfPatches()
         if (args.uninstall != null) return uninstall()
+        val patcherLogger = PatcherLogger
 
         // patching commands require these arguments
         val patchArgs = this.args.patchArgs ?: return
@@ -196,13 +197,13 @@ internal object MainCommand : Runnable {
         // prepare apks
         val apkArgs = patchingArgs.apkArgs!!
 
-        val baseApk = Apk.Base(apkArgs.baseApk)
+        val baseApk = Apk.Base(apkArgs.baseApk, patcherLogger)
         val splitApk = apkArgs.splitsArgs?.let { args ->
             with(args) {
                 ApkBundle.Split(
-                    Apk.Split.Library(libraryApk),
-                    Apk.Split.Asset(assetApk),
-                    Apk.Split.Language(languageApk)
+                    Apk.Split.Library(libraryApk, patcherLogger),
+                    Apk.Split.Asset(assetApk, patcherLogger),
+                    Apk.Split.Language(languageApk, patcherLogger)
                 )
             }
         }
@@ -212,7 +213,7 @@ internal object MainCommand : Runnable {
             OptionsLoader.init(patchingArgs.options, it)
         }
 
-        val bundle = ApkBundle(baseApk, splitApk)
+        val bundle = ApkBundle(baseApk, splitApk, patcherLogger)
         // prepare the patcher
         val patcher = Patcher( // constructor decodes base
             PatcherOptions(
@@ -220,7 +221,7 @@ internal object MainCommand : Runnable {
                 workDirectory.path,
                 patchingArgs.aaptPath,
                 workDirectory.path,
-                PatcherLogger
+                patcherLogger
             )
         )
 
@@ -243,10 +244,12 @@ internal object MainCommand : Runnable {
              * @param apk The apk file to write.
              * @return The written [ApkBundle].
              */
-            fun writeApk(apkBundle: ApkBundle, out: File): File {
-                logger.info("Writing $apkBundle")
-                apkBundle.save(out)
-                return out
+            fun writeApk(apkBundle: ApkBundle): File {
+                logger.info("Writing bundle...")
+                return alignedDirectory.resolve("out.apk").also {
+                    if (it.exists()) it.delete()
+                    apkBundle.save(it)
+                }
             }
 
             /**
@@ -268,7 +271,7 @@ internal object MainCommand : Runnable {
                 ) {
                         // sign the unsigned apk
                         logger.info("Signing ${unsignedApk}")
-                        signedDirectory.resolve(unsignedApk)
+                        signedDirectory.resolve(unsignedApk.name)
                             .also { signedApk ->
                                 signApk(
                                     unsignedApk, signedApk
@@ -418,7 +421,7 @@ internal object MainCommand : Runnable {
             }.save()
             patcher.run()
             bundle.also { patchingArgs.outputPath.also(File::mkdirs) }
-            writeApk(bundle, args.patchArgs!!.patchingArgs?.outputPath!!.resolve("result.apk"))
+            writeApk(bundle)
                 .let(::signApk)
                 .let(::moveToOutput)
                 // .let(::install)
