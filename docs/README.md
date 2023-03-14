@@ -1,6 +1,6 @@
 # 💻 Documentation and guides of ReVanced CLI
 
-This documentation explain, how to use the [ReVanced CLI](https://github.com/revanced/revanced-cli).
+This documentation explains how to use the [ReVanced CLI](https://github.com/revanced/revanced-cli).
 
 ## 📖 Table of contents
 
