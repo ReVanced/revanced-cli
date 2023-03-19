@@ -22,6 +22,7 @@ import app.revanced.utils.zip.structures.ZipEntry
 import picocli.CommandLine.*
 import java.io.File
 import java.nio.file.Files
+import java.nio.file.Path
 import java.nio.file.StandardCopyOption
 
 private class CLIVersionProvider : IVersionProvider {
@@ -245,10 +246,10 @@ internal object MainCommand : Runnable {
              * @return The written [Apk] file.
              */
             fun writeApk(apk: Apk): File {
-                logger.info("Writing $apk apk")
+                logger.info("Writing $apk.apk")
 
                 with(apk) {
-                    return alignedDirectory.resolve(file.name).also { alignedApk ->
+                    return alignedDirectory.resolve(apk.path).also { alignedApk ->
                         if (alignedApk.exists()) alignedApk.delete()
                         apk.save(alignedApk)
                     }
@@ -268,7 +269,7 @@ internal object MainCommand : Runnable {
                             patchingArgs.cn,
                             patchingArgs.password,
                             patchingArgs.keystorePath
-                                ?: patchingArgs.outputPath.absoluteFile.resolve("${baseApk.file.nameWithoutExtension}.keystore").canonicalPath
+                                ?: patchingArgs.outputPath.absoluteFile.resolve("${File(baseApk.path).nameWithoutExtension}.keystore").canonicalPath
                         )
                     )
                 ) {
