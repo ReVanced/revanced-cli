@@ -43,7 +43,6 @@ Lean how to use the ReVanced CLI.
   ```bash
   java -jar revanced-cli.jar \
    -a input.apk \
-   -c \
    -o patched-output.apk \
    -b revanced-patches.jar
   ```
@@ -54,7 +53,6 @@ Lean how to use the ReVanced CLI.
   adb install input.apk # make sure the same version is installed
   java -jar revanced-cli.jar \
       -a input.apk \
-      -c \
       -d device-name \
       -o patched-output.apk \
       -b revanced-patches.jar \
