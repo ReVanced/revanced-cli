@@ -135,7 +135,7 @@ internal object MainCommand : Runnable {
                         description = ["The base apk file that is to be patched"],
                         required = true
                     )
-                    lateinit var baseApk: String
+                    lateinit var baseApk: File
 
                     @ArgGroup(exclusive = false)
                     val splitsArgs: SplitsArgs? = null
@@ -145,19 +145,19 @@ internal object MainCommand : Runnable {
                             names = ["--language-apk"],
                             description = ["Additional split apk file which contains language files"], required = true
                         )
-                        lateinit var languageApk: String
+                        lateinit var languageApk: File
 
                         @Option(
                             names = ["--library-apk"],
                             description = ["Additional split apk file which contains libraries"], required = true
                         )
-                        lateinit var libraryApk: String
+                        lateinit var libraryApk: File
 
                         @Option(
                             names = ["--asset-apk"],
                             description = ["Additional split apk file which contains assets"], required = true
                         )
-                        lateinit var assetApk: String
+                        lateinit var assetApk: File
                     }
                 }
             }
@@ -184,8 +184,6 @@ internal object MainCommand : Runnable {
         if (args.patchArgs?.listingArgs?.listOnly == true) return printListOfPatches()
         if (args.uninstall != null) return uninstall()
 
-        val patcherLogger = PatcherLogger
-
         // patching commands require these arguments
         val patchArgs = this.args.patchArgs ?: return
         val patchingArgs = patchArgs.patchingArgs ?: return
@@ -199,13 +197,13 @@ internal object MainCommand : Runnable {
         // prepare apks
         val apkArgs = patchingArgs.apkArgs!!
 
-        val baseApk = Apk.Base(apkArgs.baseApk, patcherLogger)
+        val baseApk = Apk.Base(apkArgs.baseApk)
         val splitApk = apkArgs.splitsArgs?.let { args ->
             with(args) {
                 ApkBundle.Split(
-                    Apk.Split.Library(libraryApk, patcherLogger),
-                    Apk.Split.Asset(assetApk, patcherLogger),
-                    Apk.Split.Language(languageApk, patcherLogger)
+                    Apk.Split.Library(libraryApk),
+                    Apk.Split.Asset(assetApk),
+                    Apk.Split.Language(languageApk)
                 )
             }
         }
@@ -218,7 +216,7 @@ internal object MainCommand : Runnable {
         // prepare the patcher
         val patcher = Patcher( // constructor decodes base
             PatcherOptions(
-                ApkBundle(baseApk, splitApk, patcherLogger),
+                ApkBundle(baseApk, splitApk),
                 workDirectory.path,
                 patchingArgs.aaptPath,
                 workDirectory.path,
@@ -249,9 +247,9 @@ internal object MainCommand : Runnable {
                 logger.info("Writing $apk.apk")
 
                 with(apk) {
-                    return alignedDirectory.resolve(apk.path).also { alignedApk ->
+                    return alignedDirectory.resolve(path).also { alignedApk ->
                         if (alignedApk.exists()) alignedApk.delete()
-                        apk.save(alignedApk)
+                        save(alignedApk)
                     }
                 }
             }
@@ -269,7 +267,7 @@ internal object MainCommand : Runnable {
                             patchingArgs.cn,
                             patchingArgs.password,
                             patchingArgs.keystorePath
-                                ?: patchingArgs.outputPath.absoluteFile.resolve("${File(baseApk.path).nameWithoutExtension}.keystore").canonicalPath
+                                ?: patchingArgs.outputPath.absoluteFile.resolve("${baseApk.path.nameWithoutExtension}.keystore").canonicalPath
                         )
                     )
                 ) {
