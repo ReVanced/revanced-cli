@@ -8,7 +8,6 @@ import app.revanced.patcher.PatcherOptions
 import app.revanced.patcher.apk.Apk
 import app.revanced.patcher.apk.ApkBundle
 import app.revanced.patcher.extensions.PatchExtensions.compatiblePackages
-import app.revanced.patcher.extensions.PatchExtensions.description
 import app.revanced.patcher.extensions.PatchExtensions.include
 import app.revanced.patcher.extensions.PatchExtensions.patchName
 import app.revanced.patcher.patch.PatchResult
@@ -16,13 +15,9 @@ import app.revanced.patcher.util.patch.PatchBundle
 import app.revanced.utils.OptionsLoader
 import app.revanced.utils.adb.Adb
 import app.revanced.utils.apk.ApkSigner
-import app.revanced.utils.zip.Alignment
-import app.revanced.utils.zip.ZipFile
-import app.revanced.utils.zip.structures.ZipEntry
 import picocli.CommandLine.*
 import java.io.File
 import java.nio.file.Files
-import java.nio.file.Path
 import java.nio.file.StandardCopyOption
 
 private class CLIVersionProvider : IVersionProvider {
@@ -123,9 +118,6 @@ internal object MainCommand : Runnable {
                 )
                 var clean: Boolean = false
 
-                @Option(names = ["--custom-aapt2-binary"], description = ["Path to custom aapt2 binary"])
-                var aaptPath: String = ""
-
                 /**
                  * Arguments for [Apk] files.
                  */
@@ -217,9 +209,6 @@ internal object MainCommand : Runnable {
         val patcher = Patcher( // constructor decodes base
             PatcherOptions(
                 ApkBundle(baseApk, splitApk),
-                workDirectory.path,
-                patchingArgs.aaptPath,
-                workDirectory.path,
                 PatcherLogger
             )
         )
@@ -234,11 +223,11 @@ internal object MainCommand : Runnable {
         }
 
         with(workDirectory.resolve("cli")) {
-            val alignedDirectory = resolve("aligned").also(File::mkdirs)
+            val unsignedDirectory = resolve("unsigned").also(File::mkdirs)
             val signedDirectory = resolve("signed").also(File::mkdirs)
 
             /**
-             * Align an [Apk] file.
+             * Write an [Apk] file.
              *
              * @param apk The apk file to write.
              * @return The written [Apk] file.
@@ -247,9 +236,9 @@ internal object MainCommand : Runnable {
                 logger.info("Writing $apk.apk")
 
                 with(apk) {
-                    return alignedDirectory.resolve(path).also { alignedApk ->
-                        if (alignedApk.exists()) alignedApk.delete()
-                        save(alignedApk)
+                    return unsignedDirectory.resolve(path).also { unsignedApk ->
+                        if (unsignedApk.exists()) unsignedApk.delete()
+                        save(unsignedApk)
                     }
                 }
             }
