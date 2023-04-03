@@ -37,7 +37,7 @@ fun Patcher.addPatchesFiltered(allPatches: List<Class<out Patch<Context>>>) {
                 val compatibleWith = compatiblePackages.joinToString(";") { _package ->
                     "${_package.name}: ${_package.versions.joinToString(", ")}"
                 }
-                logger.warn("$prefix: Incompatible with version $packageVersion. This patch is only compatible with version $compatibleWith")
+                logger.warn("$prefix: Incompatible with version $packageVersion. This patch is only compatible with $compatibleWith")
                 return@patchLoop
             }
         }
