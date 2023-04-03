@@ -77,7 +77,7 @@ internal object MainCommand : Runnable {
                 var outputPath: File = File("revanced")
 
                 @Option(names = ["--options"], description = ["Configuration file for all patch options"])
-                var options: File = outputPath.resolve("options.toml")
+                var options: File? = null
 
                 @Option(names = ["-e", "--exclude"], description = ["Explicitly exclude patches"])
                 var excludedPatches = arrayOf<String>()
@@ -202,7 +202,7 @@ internal object MainCommand : Runnable {
 
         // prepare the patches
         val allPatches = patchArgs.patchBundles.flatMap { bundle -> PatchBundle.Jar(bundle).loadPatches() }.also {
-            OptionsLoader.init(patchingArgs.options, it)
+            OptionsLoader.init(patchingArgs.options ?: patchingArgs.outputPath.resolve("options.toml"), it)
         }
 
         // prepare the patcher
@@ -411,7 +411,7 @@ internal object MainCommand : Runnable {
             }.save().apkFiles.map { it.apk }
 
             with(patcher.run()) {
-                also { patchingArgs.outputPath.also(File::mkdirs) }
+                also { patchingArgs.outputPath.mkdirs() }
                     .map(::writeApk)
                     .let(::signApks)
                     .map(::moveToOutput).zip(this)
