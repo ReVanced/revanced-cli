@@ -123,34 +123,11 @@ internal object MainCommand : Runnable {
                  */
                 class ApkArgs {
                     @Option(
-                        names = ["-a", "--base-apk"],
+                        names = ["-a", "--apk"],
                         description = ["The base apk file that is to be patched"],
                         required = true
                     )
-                    lateinit var baseApk: File
-
-                    @ArgGroup(exclusive = false)
-                    val splitsArgs: SplitsArgs? = null
-
-                    class SplitsArgs {
-                        @Option(
-                            names = ["--language-apk"],
-                            description = ["Additional split apk file which contains language files"], required = true
-                        )
-                        lateinit var languageApk: File
-
-                        @Option(
-                            names = ["--library-apk"],
-                            description = ["Additional split apk file which contains libraries"], required = true
-                        )
-                        lateinit var libraryApk: File
-
-                        @Option(
-                            names = ["--asset-apk"],
-                            description = ["Additional split apk file which contains assets"], required = true
-                        )
-                        lateinit var assetApk: File
-                    }
+                    var apks = listOf<File>()
                 }
             }
 
@@ -189,16 +166,8 @@ internal object MainCommand : Runnable {
         // prepare apks
         val apkArgs = patchingArgs.apkArgs!!
 
-        val baseApk = Apk.Base(apkArgs.baseApk)
-        val splitApk = apkArgs.splitsArgs?.let { args ->
-            with(args) {
-                ApkBundle.Split(
-                    Apk.Split.Library(libraryApk),
-                    Apk.Split.Asset(assetApk),
-                    Apk.Split.Language(languageApk)
-                )
-            }
-        }
+        val apkBundle = ApkBundle.new(apkArgs.apks)
+        val baseApk = apkBundle.base
 
         // prepare the patches
         val allPatches = patchArgs.patchBundles.flatMap { bundle -> PatchBundle.Jar(bundle).loadPatches() }.also {
@@ -208,7 +177,7 @@ internal object MainCommand : Runnable {
         // prepare the patcher
         val patcher = Patcher( // constructor decodes base
             PatcherOptions(
-                ApkBundle(baseApk, splitApk),
+                apkBundle,
                 PatcherLogger
             )
         )
@@ -233,10 +202,11 @@ internal object MainCommand : Runnable {
              * @return The written [Apk] file.
              */
             fun writeApk(apk: Apk): File {
-                logger.info("Writing $apk.apk")
+                val fileName = apk.path()
+                logger.info("Writing $fileName")
 
                 with(apk) {
-                    return unsignedDirectory.resolve(path).also { unsignedApk ->
+                    return unsignedDirectory.resolve(fileName).also { unsignedApk ->
                         if (unsignedApk.exists()) unsignedApk.delete()
                         save(unsignedApk)
                     }
@@ -256,7 +226,7 @@ internal object MainCommand : Runnable {
                             patchingArgs.cn,
                             patchingArgs.password,
                             patchingArgs.keystorePath
-                                ?: patchingArgs.outputPath.absoluteFile.resolve("${baseApk.path.nameWithoutExtension}.keystore").canonicalPath
+                                ?: patchingArgs.outputPath.absoluteFile.resolve("base.keystore").canonicalPath
                         )
                     )
                 ) {
