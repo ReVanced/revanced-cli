@@ -1,6 +1,6 @@
 # 🛠️ Using the ReVanced CLI
 
-Lean how to use the ReVanced CLI.
+Learn how to use the ReVanced CLI.
 
 ## ⚡ Setup (optional)
 
