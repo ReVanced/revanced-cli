@@ -70,7 +70,7 @@ internal object MainCommand : Runnable {
              * Arguments for patching.
              */
             class PatchingArgs {
-                @ArgGroup(exclusive = false, multiplicity = "1")
+                @ArgGroup(exclusive = true, multiplicity = "1")
                 val apkArgs: ApkArgs? = null
 
                 @Option(names = ["-o", "--out"], description = ["Output folder path"], required = true)
@@ -124,10 +124,17 @@ internal object MainCommand : Runnable {
                 class ApkArgs {
                     @Option(
                         names = ["-a", "--apk"],
-                        description = ["The base apk file that is to be patched"],
+                        description = ["Load the specified apk file. Can be specified multiple times"],
                         required = true
                     )
                     var apks = listOf<File>()
+
+                    @Option(
+                        names = ["-A", "--apk-dir"],
+                        description = ["Load all files with the .apk file extension in the directory"],
+                        required = true
+                    )
+                    var apkDir: File? = null
                 }
             }
 
@@ -166,7 +173,8 @@ internal object MainCommand : Runnable {
         // prepare apks
         val apkArgs = patchingArgs.apkArgs!!
 
-        val apkBundle = ApkBundle.new(apkArgs.apks)
+        val apkBundle = ApkBundle.new(
+            if (apkArgs.apkDir != null) apkArgs.apkDir!!.listFiles()!!.filter { it.extension == "apk" } else apkArgs.apks)
         val baseApk = apkBundle.base
 
         // prepare the patches
@@ -202,11 +210,11 @@ internal object MainCommand : Runnable {
              * @return The written [Apk] file.
              */
             fun writeApk(apk: Apk): File {
-                val fileName = apk.path()
-                logger.info("Writing $fileName")
+                val path = "$apk"
+                logger.info("Writing $path")
 
                 with(apk) {
-                    return unsignedDirectory.resolve(fileName).also { unsignedApk ->
+                    return unsignedDirectory.resolve(path).also { unsignedApk ->
                         if (unsignedApk.exists()) unsignedApk.delete()
                         save(unsignedApk)
                     }
