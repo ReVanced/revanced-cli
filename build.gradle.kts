@@ -1,5 +1,5 @@
 plugins {
-    kotlin("jvm") version "1.7.0"
+    kotlin("jvm") version "1.8.10"
     id("com.github.johnrengelman.shadow") version "7.1.2"
 }
 
@@ -23,15 +23,14 @@ repositories {
 }
 
 dependencies {
+    implementation("org.jetbrains.kotlin:kotlin-reflect:1.8.10")
+
     implementation("app.revanced:revanced-patcher:7.0.0")
-    implementation("info.picocli:picocli:4.7.0")
+    implementation("info.picocli:picocli:4.7.1")
     implementation("com.github.revanced:jadb:master-SNAPSHOT") // updated fork
     implementation("com.android.tools.build:apksig:7.2.2")
     implementation("org.bouncycastle:bcpkix-jdk15on:1.70")
     implementation("cc.ekblad:4koma:1.1.0")
-
-    implementation(kotlin("reflect"))
-    testImplementation(kotlin("test"))
 }
 
 tasks {
