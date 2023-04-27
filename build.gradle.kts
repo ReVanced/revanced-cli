@@ -24,6 +24,7 @@ repositories {
 
 dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect:1.8.10")
+    testImplementation("org.jetbrains.kotlin:kotlin-test:1.8.10")
 
     implementation("app.revanced:revanced-patcher:7.0.0")
     implementation("info.picocli:picocli:4.7.1")
@@ -31,8 +32,6 @@ dependencies {
     implementation("com.android.tools.build:apksig:7.2.2")
     implementation("org.bouncycastle:bcpkix-jdk15on:1.70")
     implementation("cc.ekblad:4koma:1.1.0")
-
-    testImplementation(kotlin("test"))
 }
 
 kotlin {
