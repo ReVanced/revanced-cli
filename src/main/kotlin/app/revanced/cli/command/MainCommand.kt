@@ -233,7 +233,7 @@ internal object MainCommand : Runnable {
                             patchingArgs.cn,
                             patchingArgs.password,
                             patchingArgs.keystorePath
-                                ?: patchingArgs.outputPath.absoluteFile.resolve("base.keystore").canonicalPath
+                                ?: patchingArgs.outputPath.absoluteFile.resolve("revanced.keystore").canonicalPath
                         )
                     )
                 ) {
