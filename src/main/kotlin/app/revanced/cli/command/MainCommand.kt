@@ -175,7 +175,6 @@ internal object MainCommand : Runnable {
 
         val apkBundle = ApkBundle.new(
             if (apkArgs.apkDir != null) apkArgs.apkDir!!.listFiles()!!.filter { it.extension == "apk" } else apkArgs.apks)
-        val baseApk = apkBundle.base
 
         // prepare the patches
         val allPatches = patchArgs.patchBundles.flatMap { bundle -> PatchBundle.Jar(bundle).loadPatches() }.also {
@@ -308,8 +307,7 @@ internal object MainCommand : Runnable {
             fun Patcher.run() = also {
                 addIntegrations(patchingArgs.mergeFiles)
 
-                val packageName = baseApk.packageMetadata.packageName
-                val packageVersion = baseApk.packageMetadata.packageVersion
+                val (packageName, packageVersion) = it.context.packageMetadata
 
                 sequence {
                     allPatches.forEach patch@{ patch ->
