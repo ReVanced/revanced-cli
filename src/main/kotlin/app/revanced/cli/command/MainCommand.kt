@@ -307,7 +307,7 @@ internal object MainCommand : Runnable {
             fun Patcher.run() = also {
                 addIntegrations(patchingArgs.mergeFiles)
 
-                val (packageName, packageVersion) = it.context.packageMetadata
+                val (packageName, packageVersion) = apkBundle.base.packageMetadata
 
                 sequence {
                     allPatches.forEach patch@{ patch ->
