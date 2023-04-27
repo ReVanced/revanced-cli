@@ -31,6 +31,14 @@ dependencies {
     implementation("com.android.tools.build:apksig:7.2.2")
     implementation("org.bouncycastle:bcpkix-jdk15on:1.70")
     implementation("cc.ekblad:4koma:1.1.0")
+
+    testImplementation(kotlin("test"))
+}
+
+kotlin {
+    jvmToolchain {
+        languageVersion.set(JavaLanguageVersion.of("11"))
+    }
 }
 
 tasks {
