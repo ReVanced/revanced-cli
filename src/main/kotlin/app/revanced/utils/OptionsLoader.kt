@@ -13,7 +13,7 @@ import cc.ekblad.toml.tomlMapper
 import java.io.File
 
 private typealias PatchList = List<Class<out Patch<Context>>>
-private typealias OptionsMap = MutableMap<String, MutableMap<String, Any>>
+private typealias OptionsMap = Map<String, Map<String, Any?>>
 
 object OptionsLoader {
     @JvmStatic
@@ -22,7 +22,7 @@ object OptionsLoader {
     @JvmStatic
     fun init(file: File, patches: PatchList) {
         if (!file.exists()) file.createNewFile()
-        val map = mapper.decodeWithDefaults(generateDefaults(patches), TomlValue.from(file.toPath()))
+        val map = mapper.decodeWithDefaults(generateDefaultOptions(patches), TomlValue.from(file.toPath()))
         readAndSet(map, patches)
         save(map, file)
     }
@@ -32,10 +32,6 @@ object OptionsLoader {
             val patch = patches.find { it.patchName == patchName } ?: continue
             val patchOptions = patch.options ?: continue
             for ((key, value) in options) {
-                if (value == "null") { // backwards compatibility, subject to removal
-                    options.remove(key)
-                    continue
-                }
                 try {
                     patchOptions[key] = value
                 } catch (e: Exception) {
@@ -63,15 +59,7 @@ object OptionsLoader {
         )
     }
 
-    private fun generateDefaults(patches: PatchList) = buildMap {
-        for (patch in patches) {
-            val options = patch.options ?: continue
-            if (!options.iterator().hasNext()) continue
-            put(patch.patchName, buildMap {
-                for (option in options) {
-                    put(option.key, option.value ?: continue)
-                }
-            } as MutableMap)
-        }
-    } as MutableMap
+    private fun generateDefaultOptions(patches: PatchList) = patches
+        .filter { it.options?.any() == true }
+        .associate { patch -> patch.patchName to patch.options!!.associate { it.key to it.value } }
 }
