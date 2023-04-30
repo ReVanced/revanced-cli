@@ -1,3 +1,10 @@
+# [2.21.0-dev.1](https://github.com/revanced/revanced-cli/compare/v2.20.2-dev.1...v2.21.0-dev.1) (2023-04-30)
+
+
+### Features
+
+* add appreciation message for new contributors ([a78d646](https://github.com/revanced/revanced-cli/commit/a78d646afc2cf4e2fa19fbb89416e0a3f6ba559a))
+
 ## [2.20.2-dev.1](https://github.com/revanced/revanced-cli/compare/v2.20.1...v2.20.2-dev.1) (2023-04-03)
 
 
