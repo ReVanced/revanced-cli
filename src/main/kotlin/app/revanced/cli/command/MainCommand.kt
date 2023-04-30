@@ -173,7 +173,7 @@ internal object MainCommand : Runnable {
         // prepare apks
         val apkArgs = patchingArgs.apkArgs!!
 
-        val apkBundle = ApkBundle.new(
+        val apkBundle = ApkBundle(
             if (apkArgs.apkDir != null) apkArgs.apkDir!!.listFiles()!!.filter { it.extension == "apk" } else apkArgs.apks)
 
         // prepare the patches
