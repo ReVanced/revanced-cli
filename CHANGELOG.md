@@ -1,3 +1,10 @@
+## [2.20.2](https://github.com/revanced/revanced-cli/compare/v2.20.1...v2.20.2) (2023-04-30)
+
+
+### Bug Fixes
+
+* correct spelling mistake ([31fb316](https://github.com/revanced/revanced-cli/commit/31fb3166d922ae1f568f52e44cbe726dd1c891a4))
+
 ## [2.20.2-dev.1](https://github.com/revanced/revanced-cli/compare/v2.20.1...v2.20.2-dev.1) (2023-04-03)
 
 
