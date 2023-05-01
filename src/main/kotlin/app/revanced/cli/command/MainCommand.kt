@@ -7,15 +7,23 @@ import app.revanced.cli.patcher.logging.impl.PatcherLogger
 import app.revanced.cli.signing.Signing
 import app.revanced.cli.signing.SigningOptions
 import app.revanced.patcher.PatcherOptions
+import app.revanced.patcher.data.Context
 import app.revanced.patcher.extensions.PatchExtensions.compatiblePackages
 import app.revanced.patcher.extensions.PatchExtensions.description
 import app.revanced.patcher.extensions.PatchExtensions.patchName
+import app.revanced.patcher.patch.Patch
 import app.revanced.patcher.util.patch.PatchBundle
-import app.revanced.utils.OptionsLoader
+import app.revanced.utils.Options
+import app.revanced.utils.Options.setOptions
 import app.revanced.utils.adb.Adb
 import picocli.CommandLine.*
 import java.io.File
 import java.nio.file.Files
+
+/**
+ * Alias for return type of [PatchBundle.loadPatches].
+ */
+internal typealias PatchList = List<Class<out Patch<Context>>>
 
 private class CLIVersionProvider : IVersionProvider {
     override fun getVersion() = arrayOf(
@@ -55,8 +63,8 @@ internal object MainCommand : Runnable {
         @Option(names = ["-b", "--bundle"], description = ["One or more bundles of patches"], required = true)
         var patchBundles = arrayOf<String>()
 
-        @Option(names = ["--options"], description = ["Configuration file for all patch options"])
-        var options: File = File("options.toml")
+        @Option(names = ["--options"], description = ["Path to patch options JSON file"])
+        var optionsFile: File = File("options.json")
 
         @ArgGroup(exclusive = false)
         var listingArgs: ListingArgs? = null
@@ -134,7 +142,10 @@ internal object MainCommand : Runnable {
             PatchBundle.Jar(bundle).loadPatches()
         }
 
-        OptionsLoader.init(args.patchArgs!!.options, allPatches)
+        args.patchArgs!!.optionsFile.let {
+            if (it.exists()) allPatches.setOptions(it, logger)
+            else Options.serialize(allPatches, prettyPrint = true).let(it::writeText)
+        }
 
         val patcher = app.revanced.patcher.Patcher(
             PatcherOptions(

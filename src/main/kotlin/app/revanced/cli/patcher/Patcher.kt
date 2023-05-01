@@ -1,8 +1,7 @@
 package app.revanced.cli.patcher
 
+import app.revanced.cli.command.PatchList
 import app.revanced.patcher.PatcherResult
-import app.revanced.patcher.data.Context
-import app.revanced.patcher.patch.Patch
 import app.revanced.utils.patcher.addPatchesFiltered
 import app.revanced.utils.patcher.applyPatchesVerbose
 import app.revanced.utils.patcher.mergeFiles
@@ -10,7 +9,7 @@ import app.revanced.utils.patcher.mergeFiles
 internal object Patcher {
     internal fun start(
         patcher: app.revanced.patcher.Patcher,
-        allPatches: List<Class<out Patch<Context>>>
+        allPatches: PatchList
     ): PatcherResult {
         // merge files like necessary integrations
         patcher.mergeFiles()
