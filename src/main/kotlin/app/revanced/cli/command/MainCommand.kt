@@ -177,7 +177,7 @@ internal object MainCommand : Runnable {
             if (apkArgs.apkDir != null) apkArgs.apkDir!!.listFiles()!!.filter { it.extension == "apk" } else apkArgs.apks)
 
         // prepare the patches
-        val allPatches = patchArgs.patchBundles.flatMap { bundle -> PatchBundle.Jar(bundle).loadPatches() }.also {
+        val allPatches = patchArgs.patchBundles.flatMap { bundle -> PatchBundle.Jar(bundle).readPatches() }.also {
             OptionsLoader.init(patchingArgs.options ?: patchingArgs.outputPath.resolve("options.toml"), it)
         }
 
@@ -410,7 +410,7 @@ internal object MainCommand : Runnable {
     private fun printListOfPatches() {
         val logged = mutableListOf<String>()
         for (patchBundlePath in args.patchArgs?.patchBundles!!) for (patch in PatchBundle.Jar(patchBundlePath)
-            .loadPatches()) {
+            .readPatches()) {
             if (patch.patchName in logged) continue
             for (compatiblePackage in patch.compatiblePackages ?: continue) {
                 val packageEntryStr = buildString {
