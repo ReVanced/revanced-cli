@@ -10,7 +10,6 @@ import app.revanced.patcher.apk.ApkBundle
 import app.revanced.patcher.extensions.PatchExtensions.compatiblePackages
 import app.revanced.patcher.extensions.PatchExtensions.include
 import app.revanced.patcher.extensions.PatchExtensions.patchName
-import app.revanced.patcher.patch.PatchResult
 import app.revanced.patcher.util.patch.PatchBundle
 import app.revanced.utils.OptionsLoader
 import app.revanced.utils.adb.Adb
@@ -380,8 +379,8 @@ internal object MainCommand : Runnable {
                     }
                 }.asIterable().let(this::addPatches)
 
-                execute().forEach { (patch, result) ->
-                    if (result is PatchResult.Error) logger.error("Executing $patch failed:\n${result.stackTraceToString()}")
+                execute().forEach { (patch, exception) ->
+                    if (exception != null) logger.error("Executing $patch failed:\n${exception.stackTraceToString()}")
                     else logger.info("Executing $patch succeeded")
                 }
             }.save().apkFiles.map { it.apk }
