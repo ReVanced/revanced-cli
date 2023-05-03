@@ -1,3 +1,10 @@
+# [2.21.0-dev.2](https://github.com/revanced/revanced-cli/compare/v2.21.0-dev.1...v2.21.0-dev.2) (2023-05-03)
+
+
+### Bug Fixes
+
+* use working JADB dependency version ([#222](https://github.com/revanced/revanced-cli/issues/222)) ([94a71ef](https://github.com/revanced/revanced-cli/commit/94a71ef2779aacae0458edff96b5fbac0e410dc2))
+
 # [2.21.0-dev.1](https://github.com/revanced/revanced-cli/compare/v2.20.2-dev.1...v2.21.0-dev.1) (2023-04-30)
 
 
