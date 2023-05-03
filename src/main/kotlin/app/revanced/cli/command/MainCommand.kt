@@ -10,14 +10,22 @@ import app.revanced.patcher.apk.ApkBundle
 import app.revanced.patcher.extensions.PatchExtensions.compatiblePackages
 import app.revanced.patcher.extensions.PatchExtensions.include
 import app.revanced.patcher.extensions.PatchExtensions.patchName
+import app.revanced.patcher.patch.Patch
+import app.revanced.patcher.patch.PatchClass
 import app.revanced.patcher.util.patch.PatchBundle
-import app.revanced.utils.OptionsLoader
+import app.revanced.utils.Options
+import app.revanced.utils.Options.setOptions
 import app.revanced.utils.adb.Adb
 import app.revanced.utils.apk.ApkSigner
 import picocli.CommandLine.*
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
+
+/**
+ * Alias for a list of patches.
+ */
+internal typealias PatchList = List<PatchClass>
 
 private class CLIVersionProvider : IVersionProvider {
     override fun getVersion() = arrayOf(
@@ -75,8 +83,8 @@ internal object MainCommand : Runnable {
                 @Option(names = ["-o", "--out"], description = ["Output folder path"], required = true)
                 var outputPath: File = File("revanced")
 
-                @Option(names = ["--options"], description = ["Configuration file for all patch options"])
-                var options: File? = null
+                @Option(names = ["--options"], description = ["Path to patch options JSON file"])
+                var optionsFile: File = File("options.json")
 
                 @Option(names = ["-e", "--exclude"], description = ["Explicitly exclude patches"])
                 var excludedPatches = arrayOf<String>()
@@ -173,11 +181,15 @@ internal object MainCommand : Runnable {
         val apkArgs = patchingArgs.apkArgs!!
 
         val apkBundle = ApkBundle(
-            if (apkArgs.apkDir != null) apkArgs.apkDir!!.listFiles()!!.filter { it.extension == "apk" } else apkArgs.apks)
+            if (apkArgs.apkDir != null) apkArgs.apkDir!!.listFiles()!!
+                .filter { it.extension == "apk" } else apkArgs.apks)
 
         // prepare the patches
-        val allPatches = patchArgs.patchBundles.flatMap { bundle -> PatchBundle.Jar(bundle).readPatches() }.also {
-            OptionsLoader.init(patchingArgs.options ?: patchingArgs.outputPath.resolve("options.toml"), it)
+        val allPatches = patchArgs.patchBundles.flatMap { bundle -> PatchBundle.Jar(bundle).readPatches() }
+
+        patchingArgs.optionsFile.let {
+            if (it.exists()) allPatches.setOptions(it, logger)
+            else Options.serialize(allPatches, prettyPrint = true).let(it::writeText)
         }
 
         // prepare the patcher

@@ -28,10 +28,11 @@ dependencies {
 
     implementation("app.revanced:revanced-patcher:7.1.0-dev.1")
     implementation("info.picocli:picocli:4.7.1")
-    implementation("com.github.revanced:jadb:master-SNAPSHOT") // updated fork
+    implementation("com.github.revanced:jadb:2531a28109") // updated fork
     implementation("com.android.tools.build:apksig:8.1.0-alpha09")
     implementation("org.bouncycastle:bcpkix-jdk15on:1.70")
-    implementation("cc.ekblad:4koma:1.1.0")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.14.+")
+    testImplementation("org.jetbrains.kotlin:kotlin-test:1.8.20-RC")
 }
 
 tasks {
