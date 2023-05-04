@@ -185,7 +185,7 @@ internal object MainCommand : Runnable {
                 .filter { it.extension == "apk" } else apkArgs.apks)
 
         // prepare the patches
-        val allPatches = patchArgs.patchBundles.flatMap { bundle -> PatchBundle.Jar(bundle).readPatches() }
+        val allPatches = patchArgs.patchBundles.flatMap { bundle -> PatchBundle.Jar(bundle).toList() }
 
         patchingArgs.optionsFile.let {
             if (it.exists()) allPatches.setOptions(it, logger)
