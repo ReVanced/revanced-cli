@@ -5,7 +5,10 @@ import app.revanced.patcher.data.Context
 import app.revanced.patcher.patch.*
 import app.revanced.utils.Options
 import app.revanced.utils.Options.setOptions
+import org.junit.jupiter.api.MethodOrderer
+import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestMethodOrder
 
 class PatchOptionsTestPatch : BytecodePatch() {
     override fun execute(context: BytecodeContext): PatchResult {
@@ -27,15 +30,18 @@ class PatchOptionsTestPatch : BytecodePatch() {
     }
 }
 
+@TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 internal object PatchOptionOptionsTest {
     private var patches = listOf(PatchOptionsTestPatch::class.java as Class<out Patch<Context>>)
 
     @Test
+    @Order(1)
     fun serializeTest() {
         assert(SERIALIZED_JSON == Options.serialize(patches))
     }
 
     @Test
+    @Order(2)
     fun loadOptionsTest() {
         patches.setOptions(CHANGED_JSON)
 
@@ -48,5 +54,4 @@ internal object PatchOptionOptionsTest {
 
     private const val CHANGED_JSON =
         "[{\"patchName\":\"PatchOptionsTestPatch\",\"options\":[{\"key\":\"key1\",\"value\":\"test\"},{\"key\":\"key2\",\"value\":false}]}]"
-
 }
