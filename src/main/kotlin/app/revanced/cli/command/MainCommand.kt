@@ -420,8 +420,7 @@ internal object MainCommand : Runnable {
 
     private fun printListOfPatches() {
         val logged = mutableListOf<String>()
-        for (patchBundlePath in args.patchArgs?.patchBundles!!) for (patch in PatchBundle.Jar(patchBundlePath)
-            .readPatches()) {
+        for (patchBundlePath in args.patchArgs?.patchBundles!!) for (patch in PatchBundle.Jar(patchBundlePath)) {
             if (patch.patchName in logged) continue
             for (compatiblePackage in patch.compatiblePackages ?: continue) {
                 val packageEntryStr = buildString {
