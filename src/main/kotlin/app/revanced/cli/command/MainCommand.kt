@@ -223,11 +223,9 @@ internal object MainCommand : Runnable {
                 val path = "$apk"
                 logger.info("Writing $path")
 
-                with(apk) {
-                    return unsignedDirectory.resolve(path).also { unsignedApk ->
-                        if (unsignedApk.exists()) unsignedApk.delete()
-                        save(unsignedApk)
-                    }
+                return unsignedDirectory.resolve(path).also { unsignedApk ->
+                    if (unsignedApk.exists()) unsignedApk.delete()
+                    apk.write(unsignedApk)
                 }
             }
 
