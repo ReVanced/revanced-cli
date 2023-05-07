@@ -34,6 +34,10 @@ dependencies {
     testImplementation("org.jetbrains.kotlin:kotlin-test:1.8.20-RC")
 }
 
+kotlin {
+    jvmToolchain(11)
+}
+
 tasks {
     test {
         useJUnitPlatform()
