@@ -10,6 +10,6 @@ To use ReVanced CLI, you will need to fulfill certain requirements.
 
 ## ⏭️ Whats next
 
-The next section will show, how to use the [ReVanced CLI](https://github.com/revanced/revanced-cli).
+The next section will show, how to use [ReVanced CLI](https://github.com/revanced/revanced-cli).
 
-Continue: [🛠️ Using the ReVanced CLI](1_usage.md)
+Continue: [🛠️ Using ReVanced CLI](1_usage.md)
