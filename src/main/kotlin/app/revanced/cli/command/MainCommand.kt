@@ -5,6 +5,7 @@ import app.revanced.cli.patcher.logging.impl.PatcherLogger
 import app.revanced.cli.signing.SigningOptions
 import app.revanced.patcher.Patcher
 import app.revanced.patcher.PatcherOptions
+import app.revanced.patcher.PatcherResult
 import app.revanced.patcher.apk.Apk
 import app.revanced.patcher.apk.ApkBundle
 import app.revanced.patcher.extensions.PatchExtensions.compatiblePackages
@@ -214,28 +215,12 @@ internal object MainCommand : Runnable {
             val signedDirectory = resolve("signed").also(File::mkdirs)
 
             /**
-             * Write an [Apk] file.
-             *
-             * @param apk The apk file to write.
-             * @return The written [Apk] file.
-             */
-            fun writeApk(apk: Apk): File {
-                val path = "$apk"
-                logger.info("Writing $path")
-
-                return unsignedDirectory.resolve(path).also { unsignedApk ->
-                    if (unsignedApk.exists()) unsignedApk.delete()
-                    apk.write(unsignedApk)
-                }
-            }
-
-            /**
              * Sign a list of [Apk] files.
              *
              * @param unsignedApks The list of [Apk] files to sign.
              * @return The list of signed [Apk] files.
              */
-            fun signApks(unsignedApks: List<File>) = if (!args.mount) {
+            fun signApks(unsignedApks: List<Pair<File, Apk>>) = if (!args.mount) {
                 with(
                     ApkSigner(
                         SigningOptions(
@@ -246,14 +231,14 @@ internal object MainCommand : Runnable {
                         )
                     )
                 ) {
-                    unsignedApks.map { unsignedApk -> // sign the unsigned apk
-                        logger.info("Signing ${unsignedApk.name}")
-                        signedDirectory.resolve(unsignedApk.name)
+                    unsignedApks.map { (unsignedFile, apk) -> // sign the unsigned apk
+                        logger.info("Signing ${unsignedFile.name}")
+                        signedDirectory.resolve(unsignedFile.name)
                             .also { signedApk ->
                                 signApk(
-                                    unsignedApk, signedApk
+                                    unsignedFile, signedApk
                                 )
-                            }
+                            } to apk
                     }
                 }
             } else {
@@ -263,14 +248,16 @@ internal object MainCommand : Runnable {
             /**
              * Move an [Apk] file to the output directory.
              *
-             * @param apk The [Apk] file to copy.
+             * @param pair The [Apk] file to copy.
              * @return The moved [Apk] file.
              */
-            fun moveToOutput(apk: File) = patchingArgs.outputPath.resolve(apk.name).also {
-                logger.info("Moving ${apk.name} to ${it.absolutePath}")
+            fun moveToOutput(pair: Pair<File, Apk>) = pair.first.let { apk ->
+                patchingArgs.outputPath.resolve(apk.name).also {
+                    logger.info("Moving ${apk.name} to ${it.absolutePath}")
 
-                Files.move(apk.toPath(), it.toPath(), StandardCopyOption.REPLACE_EXISTING)
-            }
+                    Files.move(apk.toPath(), it.toPath(), StandardCopyOption.REPLACE_EXISTING)
+                }
+            } to pair.second
 
 
             /**
@@ -393,13 +380,13 @@ internal object MainCommand : Runnable {
                     if (exception != null) logger.error("Executing $patch failed:\n${exception.stackTraceToString()}")
                     else logger.info("Executing $patch succeeded")
                 }
-            }.save().apkFiles.map { it.apk }
+            }.write(unsignedDirectory).apkFiles
 
             with(patcher.run()) {
                 also { patchingArgs.outputPath.mkdirs() }
-                    .map(::writeApk)
+                    .map { it.file to it.apk }
                     .let(::signApks)
-                    .map(::moveToOutput).zip(this)
+                    .map(::moveToOutput)
                     .let(::install)
                     .let(::cleanUp)
             }
