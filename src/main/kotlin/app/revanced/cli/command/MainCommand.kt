@@ -29,11 +29,6 @@ import java.nio.file.StandardCopyOption
  */
 internal typealias PatchList = List<PatchClass>
 
-/**
- * Alias for return type of [PatchBundle.loadPatches].
- */
-internal typealias PatchList = List<Class<out Patch<Context>>>
-
 private class CLIVersionProvider : IVersionProvider {
     override fun getVersion() = arrayOf(
         MainCommand::class.java.`package`.implementationVersion ?: "unknown"
