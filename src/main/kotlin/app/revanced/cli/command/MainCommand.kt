@@ -8,6 +8,7 @@ import app.revanced.patcher.PatcherOptions
 import app.revanced.patcher.PatcherResult
 import app.revanced.patcher.apk.Apk
 import app.revanced.patcher.apk.ApkBundle
+import app.revanced.patcher.Context
 import app.revanced.patcher.extensions.PatchExtensions.compatiblePackages
 import app.revanced.patcher.extensions.PatchExtensions.include
 import app.revanced.patcher.extensions.PatchExtensions.patchName
@@ -27,6 +28,11 @@ import java.nio.file.StandardCopyOption
  * Alias for a list of patches.
  */
 internal typealias PatchList = List<PatchClass>
+
+/**
+ * Alias for return type of [PatchBundle.loadPatches].
+ */
+internal typealias PatchList = List<Class<out Patch<Context>>>
 
 private class CLIVersionProvider : IVersionProvider {
     override fun getVersion() = arrayOf(

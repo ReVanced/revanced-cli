@@ -1,17 +1,15 @@
 # 💼 Prerequisites
 
-To use the ReVanced CLI, you will need to fulfill certain requirements.
+To use ReVanced CLI, you will need to fulfill certain requirements.
 
 ## 🤝 Requirements
 
-- [Android Debug Bridge (adb)](https://developer.android.com/studio/command-line/adb), the command-line tool that lets
-  you communicate with a device (optional).
-- A x86/x86_64 host (or a custom AAPT binary for your architecture)
-- Zulu OpenJDK 17
-- An APK file (e.g. YouTube v17.49.37 or YouTube Music v5.36.51)
+- [Android Debug Bridge (adb)](https://developer.android.com/studio/command-line/adb) if you want to deploy the patched APK file on your device
+- An ABI other than ARMv7 such as x86 or x86-64 (or a custom AAPT binary that supports ARMv7)
+- Java SDK 11 (Azul JDK or OpenJDK)
 
 ## ⏭️ Whats next
 
-The next section will show, how to use the [ReVanced CLI](https://github.com/revanced/revanced-cli).
+The next section will show, how to use [ReVanced CLI](https://github.com/revanced/revanced-cli).
 
-Continue: [🛠️ Using the ReVanced CLI](1_usage.md)
+Continue: [🛠️ Using ReVanced CLI](1_usage.md)

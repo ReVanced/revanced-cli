@@ -1,16 +1,41 @@
-# [2.21.0-dev.2](https://github.com/revanced/revanced-cli/compare/v2.21.0-dev.1...v2.21.0-dev.2) (2023-05-03)
+## [2.21.2-dev.1](https://github.com/revanced/revanced-cli/compare/v2.21.1...v2.21.2-dev.1) (2023-05-07)
+
+## [2.21.1](https://github.com/revanced/revanced-cli/compare/v2.21.0...v2.21.1) (2023-05-06)
+
+## [2.21.1-dev.1](https://github.com/revanced/revanced-cli/compare/v2.21.0...v2.21.1-dev.1) (2023-05-06)
+
+# [2.21.0](https://github.com/revanced/revanced-cli/compare/v2.20.2...v2.21.0) (2023-05-04)
 
 
 ### Bug Fixes
 
-* use working JADB dependency version ([#222](https://github.com/revanced/revanced-cli/issues/222)) ([94a71ef](https://github.com/revanced/revanced-cli/commit/94a71ef2779aacae0458edff96b5fbac0e410dc2))
-
-# [2.21.0-dev.1](https://github.com/revanced/revanced-cli/compare/v2.20.2-dev.1...v2.21.0-dev.1) (2023-04-30)
+* **tests:** set order of tests ([2ef48af](https://github.com/revanced/revanced-cli/commit/2ef48af1b339ab729a05d69cb0c8c1ee1e3ab486))
+* use working JADB dependency version ([#222](https://github.com/revanced/revanced-cli/issues/222)) ([da2c918](https://github.com/revanced/revanced-cli/commit/da2c91874d5623402febfcc0677ada3d648565e1))
 
 
 ### Features
 
-* add appreciation message for new contributors ([a78d646](https://github.com/revanced/revanced-cli/commit/a78d646afc2cf4e2fa19fbb89416e0a3f6ba559a))
+* add appreciation message for new contributors ([6962fc2](https://github.com/revanced/revanced-cli/commit/6962fc2f4c0f0c96e88a823be64f8ebd1312ee17))
+
+# [2.21.0-dev.1](https://github.com/revanced/revanced-cli/compare/v2.20.2...v2.21.0-dev.1) (2023-05-04)
+
+
+### Bug Fixes
+
+* **tests:** set order of tests ([2ef48af](https://github.com/revanced/revanced-cli/commit/2ef48af1b339ab729a05d69cb0c8c1ee1e3ab486))
+* use working JADB dependency version ([#222](https://github.com/revanced/revanced-cli/issues/222)) ([da2c918](https://github.com/revanced/revanced-cli/commit/da2c91874d5623402febfcc0677ada3d648565e1))
+
+
+### Features
+
+* add appreciation message for new contributors ([6962fc2](https://github.com/revanced/revanced-cli/commit/6962fc2f4c0f0c96e88a823be64f8ebd1312ee17))
+
+## [2.20.2](https://github.com/revanced/revanced-cli/compare/v2.20.1...v2.20.2) (2023-04-30)
+
+
+### Bug Fixes
+
+* correct spelling mistake ([31fb316](https://github.com/revanced/revanced-cli/commit/31fb3166d922ae1f568f52e44cbe726dd1c891a4))
 
 ## [2.20.2-dev.1](https://github.com/revanced/revanced-cli/compare/v2.20.1...v2.20.2-dev.1) (2023-04-03)
 
