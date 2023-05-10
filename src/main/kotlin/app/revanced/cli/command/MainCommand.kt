@@ -183,7 +183,7 @@ internal object MainCommand : Runnable {
         val apkArgs = patchingArgs.apkArgs!!
 
         val apkBundle = ApkBundle(
-            if (apkArgs.apkDir != null) apkArgs.apkDir!!.listFiles()!!
+            if (apkArgs.apkDir != null) (apkArgs.apkDir?.listFiles() ?: throw Error("Folder does not exist"))
                 .filter { it.extension == "apk" } else apkArgs.apks)
 
         // prepare the patches
