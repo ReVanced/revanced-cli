@@ -1,6 +1,6 @@
-# 🛠️ Using the ReVanced CLI
+# 🛠️ Using ReVanced CLI
 
-Learn how to use the ReVanced CLI.
+Learn how to ReVanced CLI.
 
 ## ⚡ Setup (optional)
 
@@ -24,7 +24,7 @@ Learn how to use the ReVanced CLI.
 
 ## 🔨 ReVanced CLI Usage
 
-- ### Show all available options for the ReVanced CLI
+- ### Show all available options for ReVanced CLI
 
   ```bash
   java -jar revanced-cli.jar -h
@@ -38,7 +38,7 @@ Learn how to use the ReVanced CLI.
       -l
   ```
 
-- ### Use the ReVanced CLI without root permissions
+- ### Use ReVanced CLI without root permissions
 
   ```bash
   java -jar revanced-cli.jar \
