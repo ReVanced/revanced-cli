@@ -23,6 +23,7 @@ repositories {
 }
 
 dependencies {
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.1")
     implementation("org.jetbrains.kotlin:kotlin-reflect:1.8.20-RC")
     testImplementation("org.jetbrains.kotlin:kotlin-test:1.8.20-RC")
 

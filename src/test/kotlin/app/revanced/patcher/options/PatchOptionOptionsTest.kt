@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestMethodOrder
 
 class PatchOptionsTestPatch : BytecodePatch() {
-    override fun execute(context: BytecodeContext) {}
+    override suspend fun execute(context: BytecodeContext) {}
 
     companion object : OptionsContainer() {
         var key1 by option(

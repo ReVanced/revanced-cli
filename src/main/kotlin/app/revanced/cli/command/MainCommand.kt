@@ -19,6 +19,7 @@ import app.revanced.utils.Options
 import app.revanced.utils.Options.setOptions
 import app.revanced.utils.adb.Adb
 import app.revanced.utils.apk.ApkSigner
+import kotlinx.coroutines.runBlocking
 import picocli.CommandLine.*
 import java.io.File
 import java.nio.file.Files
@@ -377,9 +378,11 @@ internal object MainCommand : Runnable {
                     }
                 }.asIterable().let(this::addPatches)
 
-                execute().forEach { (patch, exception) ->
-                    if (exception != null) logger.error("Executing $patch failed:\n${exception.stackTraceToString()}")
-                    else logger.info("Executing $patch succeeded")
+                runBlocking {
+                    it.apply(false).collect { (patch, exception) ->
+                        if (exception != null) logger.error("Executing $patch failed:\n${exception.stackTraceToString()}")
+                        else logger.info("Executing $patch succeeded")
+                    }
                 }
             }.write(unsignedDirectory).apkFiles
 
