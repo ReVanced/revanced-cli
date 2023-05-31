@@ -68,7 +68,7 @@ internal object MainCommand : Runnable {
          */
         class PatchArgs {
             @Option(names = ["-b", "--bundle"], description = ["One or more bundles of patches"], required = true)
-            var patchBundles = arrayOf<String>()
+            var patchBundles = arrayOf<File>()
 
             @ArgGroup(exclusive = false)
             var listingArgs: ListingArgs? = null
@@ -200,7 +200,80 @@ internal object MainCommand : Runnable {
             PatcherOptions(
                 apkBundle,
                 PatcherLogger
-            )
+            ),
+            sequence {
+                val (packageName, packageVersion) = apkBundle.base.packageMetadata
+
+                allPatches.forEach patch@{ patch ->
+                    val patchName = patch.patchName
+
+                    val prefix = "Skipping $patchName"
+
+                    /**
+                     * Check if the patch is explicitly excluded.
+                     *
+                     * Cases:
+                     *  1. -e patch.name
+                     *  2. -i patch.name -e patch.name
+                     */
+
+                    val excluded = patchingArgs.excludedPatches.contains(patchName)
+                    if (excluded) return@patch logger.info("$prefix: Explicitly excluded")
+
+                    /**
+                     * Check if the patch is constrained to packages.
+                     */
+
+                    patch.compatiblePackages?.let { packages ->
+                        packages.singleOrNull { it.name == packageName }?.let { `package` ->
+                            /**
+                             * Check if the package version matches.
+                             * If experimental is true, version matching will be skipped.
+                             */
+
+                            val matchesVersion = patchingArgs.experimental || `package`.versions.let {
+                                it.isEmpty() || it.any { version -> version == packageVersion }
+                            }
+
+                            if (!matchesVersion) return@patch logger.warn(
+                                "$prefix: Incompatible with version $packageVersion. " +
+                                        "This patch is only compatible with version " +
+                                        packages.joinToString(";") { `package` ->
+                                            "${`package`.name}: ${`package`.versions.joinToString(", ")}"
+                                        }
+                            )
+
+                        } ?: return@patch logger.trace(
+                            "$prefix: Incompatible with $packageName. " +
+                                    "This patch is only compatible with " +
+                                    packages.joinToString(", ") { `package` -> `package`.name }
+                        )
+
+                        return@let
+                    } ?: logger.trace("$patchName: No constraint on packages.")
+
+                    /**
+                     * Check if the patch is explicitly included.
+                     *
+                     * Cases:
+                     *  1. --exclusive
+                     *  2. --exclusive -i patch.name
+                     */
+
+                    val exclusive = patchingArgs.exclusive
+                    val explicitlyIncluded = patchingArgs.includedPatches.contains(patchName)
+
+                    val implicitlyIncluded = !exclusive && patch.include // Case 3.
+                    val exclusivelyIncluded = exclusive && explicitlyIncluded // Case 2.
+
+                    val included = implicitlyIncluded || exclusivelyIncluded
+                    if (!included) return@patch logger.info("$prefix: Implicitly excluded") // Case 1.
+
+                    logger.trace("Adding $patchName")
+                    yield(patch)
+                }
+            }.asIterable(),
+            patchingArgs.mergeFiles
         )
 
         // prepare adb
@@ -303,81 +376,6 @@ internal object MainCommand : Runnable {
              * @return The resulting patched [Apk] files.
              */
             fun Patcher.run() = also {
-                addIntegrations(patchingArgs.mergeFiles)
-
-                val (packageName, packageVersion) = apkBundle.base.packageMetadata
-
-                sequence {
-                    allPatches.forEach patch@{ patch ->
-                        val patchName = patch.patchName
-
-                        val prefix = "Skipping $patchName"
-
-                        /**
-                         * Check if the patch is explicitly excluded.
-                         *
-                         * Cases:
-                         *  1. -e patch.name
-                         *  2. -i patch.name -e patch.name
-                         */
-
-                        val excluded = patchingArgs.excludedPatches.contains(patchName)
-                        if (excluded) return@patch logger.info("$prefix: Explicitly excluded")
-
-                        /**
-                         * Check if the patch is constrained to packages.
-                         */
-
-                        patch.compatiblePackages?.let { packages ->
-                            packages.singleOrNull { it.name == packageName }?.let { `package` ->
-                                /**
-                                 * Check if the package version matches.
-                                 * If experimental is true, version matching will be skipped.
-                                 */
-
-                                val matchesVersion = patchingArgs.experimental || `package`.versions.let {
-                                    it.isEmpty() || it.any { version -> version == packageVersion }
-                                }
-
-                                if (!matchesVersion) return@patch logger.warn(
-                                    "$prefix: Incompatible with version $packageVersion. " +
-                                            "This patch is only compatible with version " +
-                                            packages.joinToString(";") { `package` ->
-                                                "${`package`.name}: ${`package`.versions.joinToString(", ")}"
-                                            }
-                                )
-
-                            } ?: return@patch logger.trace(
-                                "$prefix: Incompatible with $packageName. " +
-                                        "This patch is only compatible with " +
-                                        packages.joinToString(", ") { `package` -> `package`.name }
-                            )
-
-                            return@let
-                        } ?: logger.trace("$patchName: No constraint on packages.")
-
-                        /**
-                         * Check if the patch is explicitly included.
-                         *
-                         * Cases:
-                         *  1. --exclusive
-                         *  2. --exclusive -i patch.name
-                         */
-
-                        val exclusive = patchingArgs.exclusive
-                        val explicitlyIncluded = patchingArgs.includedPatches.contains(patchName)
-
-                        val implicitlyIncluded = !exclusive && patch.include // Case 3.
-                        val exclusivelyIncluded = exclusive && explicitlyIncluded // Case 2.
-
-                        val included = implicitlyIncluded || exclusivelyIncluded
-                        if (!included) return@patch logger.info("$prefix: Implicitly excluded") // Case 1.
-
-                        logger.trace("Adding $patchName")
-                        yield(patch)
-                    }
-                }.asIterable().let(this::addPatches)
-
                 runBlocking {
                     it.apply(false).collect { (patch, exception) ->
                         if (exception != null) logger.error("Executing $patch failed:\n${exception.stackTraceToString()}")
