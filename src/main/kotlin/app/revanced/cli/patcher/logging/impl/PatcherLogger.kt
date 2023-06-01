@@ -3,7 +3,7 @@ package app.revanced.cli.patcher.logging.impl
 import app.revanced.cli.logging.impl.DefaultCliLogger
 import java.util.logging.Logger
 
-internal object PatcherLogger : app.revanced.arsc.logging.Logger {
+internal object PatcherLogger : app.revanced.patcher.logging.Logger{
     private val logger = DefaultCliLogger(Logger.getLogger(app.revanced.patcher.Patcher::class.java.name))
 
     override fun error(msg: String) = logger.error(msg)
