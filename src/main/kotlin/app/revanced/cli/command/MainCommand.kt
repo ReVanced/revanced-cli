@@ -290,12 +290,30 @@ internal object MainCommand : Runnable {
             val signedDirectory = resolve("signed").also(File::mkdirs)
 
             /**
+             * Write an [Apk] file.
+             *
+             * @param apk The apk file to write.
+             * @return The written [Apk] file.
+             */
+            fun writeApk(apk: Apk): File {
+                val path = "$apk"
+                logger.info("Writing $path")
+
+                with(apk) {
+                    return unsignedDirectory.resolve(path).also { unsignedApk ->
+                        if (unsignedApk.exists()) unsignedApk.delete()
+                        write(unsignedApk)
+                    }
+                }
+            }
+
+            /**
              * Sign a list of [Apk] files.
              *
              * @param unsignedApks The list of [Apk] files to sign.
              * @return The list of signed [Apk] files.
              */
-            fun signApks(unsignedApks: List<Pair<File, Apk>>) = if (!args.mount) {
+            fun signApks(unsignedApks: List<File>) = if (!args.mount) {
                 with(
                     ApkSigner(
                         SigningOptions(
@@ -306,14 +324,14 @@ internal object MainCommand : Runnable {
                         )
                     )
                 ) {
-                    unsignedApks.map { (unsignedFile, apk) -> // sign the unsigned apk
+                    unsignedApks.map { unsignedFile -> // sign the unsigned apk
                         logger.info("Signing ${unsignedFile.name}")
                         signedDirectory.resolve(unsignedFile.name)
                             .also { signedApk ->
                                 signApk(
                                     unsignedFile, signedApk
                                 )
-                            } to apk
+                            }
                     }
                 }
             } else {
@@ -323,16 +341,14 @@ internal object MainCommand : Runnable {
             /**
              * Move an [Apk] file to the output directory.
              *
-             * @param pair The [Apk] file to copy.
+             * @param apk The [Apk] file to copy.
              * @return The moved [Apk] file.
              */
-            fun moveToOutput(pair: Pair<File, Apk>) = pair.first.let { apk ->
-                patchingArgs.outputPath.resolve(apk.name).also {
-                    logger.info("Moving ${apk.name} to ${it.absolutePath}")
+            fun moveToOutput(apk: File) = patchingArgs.outputPath.resolve(apk.name).also {
+                logger.info("Moving ${apk.name} to ${it.absolutePath}")
 
-                    Files.move(apk.toPath(), it.toPath(), StandardCopyOption.REPLACE_EXISTING)
-                }
-            } to pair.second
+                Files.move(apk.toPath(), it.toPath(), StandardCopyOption.REPLACE_EXISTING)
+            }
 
 
             /**
@@ -382,13 +398,13 @@ internal object MainCommand : Runnable {
                         else logger.info("Executing $patch succeeded")
                     }
                 }
-            }.write(unsignedDirectory).apkFiles
+            }.finish().apkFiles.map { it.apk }
 
             with(patcher.run()) {
                 also { patchingArgs.outputPath.mkdirs() }
-                    .map { it.file to it.apk }
+                    .map(::writeApk)
                     .let(::signApks)
-                    .map(::moveToOutput)
+                    .map(::moveToOutput).zip(this)
                     .let(::install)
                     .let(::cleanUp)
             }
