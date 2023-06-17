@@ -245,7 +245,7 @@ internal object MainCommand : Runnable {
                 val packageEntryStr = buildString {
                     // Add package if flag is set
                     if (args.patchArgs?.listingArgs?.withPackages == true) {
-                        val packageName = compatiblePackage.name.substringAfterLast(".").padStart(10)
+                        val packageName = compatiblePackage.name.padStart(25)
                         append(packageName)
                         append("\t")
                     }
