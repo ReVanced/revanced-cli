@@ -5,6 +5,7 @@ import app.revanced.cli.logging.CliLogger
 import app.revanced.patcher.extensions.PatchExtensions.options
 import app.revanced.patcher.extensions.PatchExtensions.patchName
 import app.revanced.patcher.patch.NoSuchOptionException
+import app.revanced.utils.Options.PatchOption.Option
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import java.io.File
 
@@ -25,9 +26,12 @@ internal object Options {
         .map { patch ->
             PatchOption(
                 patch.patchName,
-                patch.options!!.map { option -> PatchOption.Option(option.key, option.value) }
+                patch.options!!.map { option -> Option(option.key, option.value) }
             )
-        }.let {
+        }
+        // See https://github.com/revanced/revanced-patches/pull/2434/commits/60e550550b7641705e81aa72acfc4faaebb225e7.
+        .distinctBy { it.patchName }
+        .let {
             if (prettyPrint)
                 mapper.writerWithDefaultPrettyPrinter().writeValueAsString(it)
             else
