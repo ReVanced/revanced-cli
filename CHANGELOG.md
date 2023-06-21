@@ -1,3 +1,10 @@
+## [2.21.4-dev.1](https://github.com/revanced/revanced-cli/compare/v2.21.3...v2.21.4-dev.1) (2023-06-18)
+
+
+### Bug Fixes
+
+* remove duplicate options entries. ([d0fc886](https://github.com/revanced/revanced-cli/commit/d0fc8864286adc2677f91a319a11a90272c1001d))
+
 ## [2.21.3](https://github.com/revanced/revanced-cli/compare/v2.21.2...v2.21.3) (2023-06-12)
 
 ## [2.21.3-dev.1](https://github.com/revanced/revanced-cli/compare/v2.21.2...v2.21.3-dev.1) (2023-06-07)
