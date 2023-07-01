@@ -1,3 +1,5 @@
+## [2.21.5](https://github.com/revanced/revanced-cli/compare/v2.21.4...v2.21.5) (2023-07-01)
+
 ## [2.21.5-dev.2](https://github.com/revanced/revanced-cli/compare/v2.21.5-dev.1...v2.21.5-dev.2) (2023-07-01)
 
 ## [2.21.5-dev.1](https://github.com/revanced/revanced-cli/compare/v2.21.4...v2.21.5-dev.1) (2023-06-27)
