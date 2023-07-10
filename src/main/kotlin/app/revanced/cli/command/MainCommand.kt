@@ -241,7 +241,7 @@ internal object MainCommand : Runnable {
                     }
 
                     // Add patch name
-                    val patchName = patch.patchName.padStart(25)
+                    val patchName = patch.patchName.lowercase().replace(" ", "-").padStart(25)
                     append(patchName)
 
                     // Add description if flag is set.

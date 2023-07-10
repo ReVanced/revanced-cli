@@ -1,6 +1,5 @@
 package app.revanced.utils.patcher
 
-import app.revanced.cli.command.MainCommand
 import app.revanced.cli.command.MainCommand.args
 import app.revanced.cli.command.MainCommand.logger
 import app.revanced.cli.command.PatchList
@@ -18,8 +17,8 @@ fun Patcher.addPatchesFiltered(allPatches: PatchList) {
     val includedPatches = mutableListOf<Class<out Patch<Context>>>()
     allPatches.forEach patchLoop@{ patch ->
         val compatiblePackages = patch.compatiblePackages
-        val patchName = patch.patchName
-        val args = MainCommand.args.patchArgs?.patchingArgs!!
+        val patchName = patch.patchName.lowercase().replace(" ", "-")
+        val args = args.patchArgs?.patchingArgs!!
 
         val prefix = "Skipping $patchName"
 

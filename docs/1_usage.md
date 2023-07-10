@@ -35,7 +35,7 @@ Learn how to ReVanced CLI.
   ```bash
   java -jar revanced-cli.jar
    -b revanced-patches.jar \
-   -l
+   -l # Names of all patches will be in kebab-case
   ```
 
 - ### 💉 Use ReVanced CLI to patch an APK file but deploy without root permissions
