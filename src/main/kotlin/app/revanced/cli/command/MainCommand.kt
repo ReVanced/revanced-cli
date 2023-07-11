@@ -43,6 +43,7 @@ internal object MainCommand : Runnable {
     lateinit var args: Args
 
     class Args {
+        // TODO: Move this so it is not required when listing patches
         @Option(names = ["-a", "--apk"], description = ["Input APK file to be patched"], required = true)
         lateinit var inputFile: File
 
