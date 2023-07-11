@@ -1,3 +1,10 @@
+# [2.22.0](https://github.com/revanced/revanced-cli/compare/v2.21.5...v2.22.0) (2023-07-11)
+
+
+### Features
+
+* use new patch naming convention ([f6c221d](https://github.com/revanced/revanced-cli/commit/f6c221d72dc43ebea00e5eba6bfa02751ae8ad77))
+
 # [2.22.0-dev.1](https://github.com/revanced/revanced-cli/compare/v2.21.5...v2.22.0-dev.1) (2023-07-10)
 
 
