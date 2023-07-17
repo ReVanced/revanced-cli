@@ -1,3 +1,41 @@
+# [2.22.0](https://github.com/revanced/revanced-cli/compare/v2.21.5...v2.22.0) (2023-07-11)
+
+
+### Features
+
+* use new patch naming convention ([f6c221d](https://github.com/revanced/revanced-cli/commit/f6c221d72dc43ebea00e5eba6bfa02751ae8ad77))
+
+# [2.22.0-dev.1](https://github.com/revanced/revanced-cli/compare/v2.21.5...v2.22.0-dev.1) (2023-07-10)
+
+
+### Features
+
+* use new patch naming convention ([e4908c7](https://github.com/revanced/revanced-cli/commit/e4908c71051a535f8ce3406427cebbb0941464df))
+
+## [2.21.5](https://github.com/revanced/revanced-cli/compare/v2.21.4...v2.21.5) (2023-07-01)
+
+## [2.21.5-dev.2](https://github.com/revanced/revanced-cli/compare/v2.21.5-dev.1...v2.21.5-dev.2) (2023-07-01)
+
+## [2.21.5-dev.1](https://github.com/revanced/revanced-cli/compare/v2.21.4...v2.21.5-dev.1) (2023-06-27)
+
+## [2.21.4](https://github.com/revanced/revanced-cli/compare/v2.21.3...v2.21.4) (2023-06-21)
+
+
+### Bug Fixes
+
+* remove duplicate options entries. ([d0fc886](https://github.com/revanced/revanced-cli/commit/d0fc8864286adc2677f91a319a11a90272c1001d))
+
+## [2.21.4-dev.1](https://github.com/revanced/revanced-cli/compare/v2.21.3...v2.21.4-dev.1) (2023-06-18)
+
+
+### Bug Fixes
+
+* remove duplicate options entries. ([d0fc886](https://github.com/revanced/revanced-cli/commit/d0fc8864286adc2677f91a319a11a90272c1001d))
+
+## [2.21.3](https://github.com/revanced/revanced-cli/compare/v2.21.2...v2.21.3) (2023-06-12)
+
+## [2.21.3-dev.1](https://github.com/revanced/revanced-cli/compare/v2.21.2...v2.21.3-dev.1) (2023-06-07)
+
 ## [2.21.2](https://github.com/revanced/revanced-cli/compare/v2.21.1...v2.21.2) (2023-05-24)
 
 ## [2.21.2-dev.2](https://github.com/revanced/revanced-cli/compare/v2.21.2-dev.1...v2.21.2-dev.2) (2023-05-15)

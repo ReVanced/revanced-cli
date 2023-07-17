@@ -205,7 +205,7 @@ internal object MainCommand : Runnable {
                 val (packageName, packageVersion) = apkBundle.base.packageMetadata
 
                 allPatches.forEach patch@{ patch ->
-                    val patchName = patch.patchName
+                    val patchName = patch.patchName.lowercase().replace(" ", "-")
 
                     val prefix = "Skipping $patchName"
 
@@ -433,8 +433,9 @@ internal object MainCommand : Runnable {
                         append(packageName)
                         append("\t")
                     }
-                    // Add patch name.
-                    val patchName = patch.patchName.padStart(25)
+
+                    // Add patch name
+                    val patchName = patch.patchName.lowercase().replace(" ", "-").padStart(25)
                     append(patchName)
                     // Add compatible versions, if flag is set.
                     if (args.patchArgs?.listingArgs?.withVersions == true) {
