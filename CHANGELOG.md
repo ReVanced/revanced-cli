@@ -1,3 +1,10 @@
+## [2.22.1-dev.1](https://github.com/ReVanced/revanced-cli/compare/v2.22.0...v2.22.1-dev.1) (2023-07-24)
+
+
+### Bug Fixes
+
+* print original instead of kebab cased names ([5eaad33](https://github.com/ReVanced/revanced-cli/commit/5eaad33dc1fbd24c36e1498f04e21d068e85f53e))
+
 # [2.22.0](https://github.com/revanced/revanced-cli/compare/v2.21.5...v2.22.0) (2023-07-11)
 
 
