@@ -17,12 +17,11 @@ fun Patcher.addPatchesFiltered(allPatches: PatchList) {
     val includedPatches = mutableListOf<Class<out Patch<Context>>>()
     allPatches.forEach patchLoop@{ patch ->
         val compatiblePackages = patch.compatiblePackages
-        val patchName = patch.patchName.lowercase().replace(" ", "-")
         val args = args.patchArgs?.patchingArgs!!
 
-        val prefix = "Skipping $patchName"
+        val prefix = "Skipping ${patch.patchName}"
 
-        if (compatiblePackages == null) logger.trace("$patchName: No constraint on packages.")
+        if (compatiblePackages == null) logger.trace("${patch.patchName}: No package constraints.")
         else {
             if (!compatiblePackages.any { it.name == packageName }) {
                 logger.trace("$prefix: Incompatible with $packageName. This patch is only compatible with ${
@@ -42,15 +41,16 @@ fun Patcher.addPatchesFiltered(allPatches: PatchList) {
             }
         }
 
-        if (args.excludedPatches.contains(patchName)) {
+        val kebabCasedPatchName = patch.patchName.lowercase().replace(" ", "-")
+        if (args.excludedPatches.contains(kebabCasedPatchName)) {
             logger.info("$prefix: Manually excluded")
             return@patchLoop
-        } else if ((!patch.include || args.exclusive) && !args.includedPatches.contains(patchName)) {
+        } else if ((!patch.include || args.exclusive) && !args.includedPatches.contains(kebabCasedPatchName)) {
             logger.info("$prefix: Excluded by default")
             return@patchLoop
         }
 
-        logger.trace("Adding $patchName")
+        logger.trace("Adding ${patch.patchName}")
         includedPatches.add(patch)
     }
 
