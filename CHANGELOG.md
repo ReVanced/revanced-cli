@@ -1,3 +1,10 @@
+# [2.23.0-dev.1](https://github.com/ReVanced/revanced-cli/compare/v2.22.1-dev.1...v2.23.0-dev.1) (2023-07-30)
+
+
+### Features
+
+* Improve command line argument descriptions ([f9cf7d2](https://github.com/ReVanced/revanced-cli/commit/f9cf7d21b7f1c2f11234d604a1047b9d2b165f83))
+
 ## [2.22.1-dev.1](https://github.com/ReVanced/revanced-cli/compare/v2.22.0...v2.22.1-dev.1) (2023-07-24)
 
 
