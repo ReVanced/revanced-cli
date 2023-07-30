@@ -32,7 +32,7 @@ private class CLIVersionProvider : IVersionProvider {
 }
 
 @Command(
-    name = "ReVanced-CLI",
+    name = "ReVanced CLI",
     mixinStandardHelpOptions = true,
     versionProvider = CLIVersionProvider::class
 )
@@ -44,15 +44,15 @@ internal object MainCommand : Runnable {
 
     class Args {
         // TODO: Move this so it is not required when listing patches
-        @Option(names = ["-a", "--apk"], description = ["Input APK file to be patched"], required = true)
+        @Option(names = ["-a", "--apk"], description = ["APK file to be patched"], required = true)
         lateinit var inputFile: File
 
-        @Option(names = ["--uninstall"], description = ["Uninstall the mount variant"])
-        var uninstall: Boolean = false
+        @Option(names = ["--unmount"], description = ["Unmount a patched APK file"])
+        var unmount: Boolean = false
 
         @Option(
-            names = ["-d", "--deploy-on"],
-            description = ["If specified, deploy to device over ADB with given name"]
+            names = ["-d", "--deploy"],
+            description = ["Deploy to the specified device that is connected via ADB"]
         )
         var deploy: String? = null
 
@@ -78,63 +78,72 @@ internal object MainCommand : Runnable {
         @Option(names = ["-l", "--list"], description = ["List patches"], required = true)
         var listOnly: Boolean = false
 
-        @Option(names = ["--with-versions"], description = ["List patches with compatible versions"])
+        @Option(names = ["--with-versions"], description = ["List patches with version compatibilities"])
         var withVersions: Boolean = false
 
-        @Option(names = ["--with-packages"], description = ["List patches with compatible packages"])
+        @Option(names = ["--with-packages"], description = ["List patches with package compatibilities"])
         var withPackages: Boolean = false
     }
 
     class PatchingArgs {
-        @Option(names = ["-o", "--out"], description = ["Output file path"], required = true)
+        @Option(names = ["-o", "--out"], description = ["Path to save the patched APK file to"], required = true)
         lateinit var outputPath: String
 
-        @Option(names = ["-e", "--exclude"], description = ["Explicitly exclude patches"])
+        @Option(names = ["-e", "--exclude"], description = ["Exclude patches"])
         var excludedPatches = arrayOf<String>()
 
         @Option(
             names = ["--exclusive"],
-            description = ["Only installs the patches you include, not including any patch by default"]
+            description = ["Only include patches that were explicitly specified to be included"]
         )
         var exclusive = false
 
         @Option(names = ["-i", "--include"], description = ["Include patches"])
         var includedPatches = arrayOf<String>()
 
-        @Option(names = ["--experimental"], description = ["Disable patch version compatibility patch"])
+        @Option(names = ["--experimental"], description = ["Ignore patches incompatibility to versions"])
         var experimental: Boolean = false
 
-        @Option(names = ["-m", "--merge"], description = ["One or more dex file containers to merge"])
+        @Option(names = ["-m", "--merge"], description = ["One or more DEX files or containers to merge into the APK"])
         var mergeFiles = listOf<File>()
 
-        @Option(names = ["--mount"], description = ["If specified, instead of installing, mount"])
+        @Option(
+            names = ["--mount"],
+            description = ["Mount the patched APK file over the original file instead of installing it"]
+        )
         var mount: Boolean = false
 
-        @Option(names = ["--cn"], description = ["Overwrite the default CN for the signed file"])
+        @Option(names = ["--cn"], description = ["The common name of the signer of the patched APK file"])
         var cn = "ReVanced"
 
-        @Option(names = ["--keystore"], description = ["File path to your keystore"])
+        @Option(names = ["--keystore"], description = ["Path to the keystore to sign the patched APK file with"])
         var keystorePath: String? = null
 
-        @Option(names = ["-p", "--password"], description = ["Overwrite the default password for the signed file"])
+        @Option(
+            names = ["-p", "--password"],
+            description = ["The password of the keystore to sign the patched APK file with"]
+        )
         var password = "ReVanced"
 
-        @Option(names = ["-t", "--temp-dir"], description = ["Temporary resource cache directory"])
+        @Option(names = ["-t", "--temp-dir"], description = ["Path to temporary resource cache directory"])
         var cacheDirectory = "revanced-cache"
 
         @Option(
             names = ["-c", "--clean"],
-            description = ["Clean the temporary resource cache directory. This will be done anyways when running the patcher"]
+            description = ["Clean up the temporary resource cache directory after patching"]
         )
         var clean: Boolean = false
 
-        @Option(names = ["--custom-aapt2-binary"], description = ["Path to custom aapt2 binary"])
+        @Option(
+            names = ["--custom-aapt2-binary"],
+            description = ["Path to custom AAPT binary to compile resources with"]
+        )
         var aaptPath: String = ""
     }
 
     override fun run() {
         if (args.patchArgs?.listingArgs?.listOnly == true) return printListOfPatches()
-        if (args.uninstall) return uninstall()
+        if (args.unmount) return unmount()
 
         val pArgs = this.args.patchArgs?.patchingArgs ?: return
         val outputFile = File(pArgs.outputPath) // the file to write to
@@ -215,7 +224,7 @@ internal object MainCommand : Runnable {
         logger.info(result)
     }
 
-    private fun uninstall() {
+    private fun unmount() {
         val adb: Adb? = args.deploy?.let {
             Adb(
                 File("placeholder_file"),
