@@ -23,14 +23,14 @@ repositories {
 }
 
 dependencies {
-    implementation("org.jetbrains.kotlin:kotlin-reflect:1.8.20-RC")
+    implementation("org.jetbrains.kotlin:kotlin-reflect:1.8.20")
 
-    implementation("app.revanced:revanced-patcher:11.0.3")
-    implementation("info.picocli:picocli:4.7.1")
+    implementation("app.revanced:revanced-patcher:12.0.0")
+    implementation("info.picocli:picocli:4.7.3")
     implementation("com.github.revanced:jadb:2531a28109") // updated fork
-    implementation("com.android.tools.build:apksig:8.1.0-alpha09")
+    implementation("com.android.tools.build:apksig:8.1.0")
     implementation("org.bouncycastle:bcpkix-jdk15on:1.70")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.14.+")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.14.3")
     testImplementation("org.jetbrains.kotlin:kotlin-test:1.8.20-RC")
 }
 
