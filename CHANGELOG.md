@@ -1,3 +1,5 @@
+# [2.23.0-dev.3](https://github.com/ReVanced/revanced-cli/compare/v2.23.0-dev.2...v2.23.0-dev.3) (2023-08-03)
+
 # [2.23.0-dev.2](https://github.com/ReVanced/revanced-cli/compare/v2.23.0-dev.1...v2.23.0-dev.2) (2023-08-03)
 
 # [2.23.0-dev.1](https://github.com/ReVanced/revanced-cli/compare/v2.22.1-dev.1...v2.23.0-dev.1) (2023-07-30)
