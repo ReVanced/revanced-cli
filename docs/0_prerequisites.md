@@ -15,4 +15,4 @@ To use ReVanced CLI, you will need to fulfill certain requirements.
 
 The next section will show you how to use ReVanced CLI
 
-Continue to: [🛠️ Using ReVanced CLI](1_usage.md)
+Continue: [🛠️ Using ReVanced CLI](1_usage.md)
