@@ -10,7 +10,6 @@ To use ReVanced CLI, you will need to fulfill certain requirements.
 - ReVanced Patches
 - ReVanced Integrations, if the patches require it
 
-
 ## ⏭️ Whats next
 
 The next section will show you how to use ReVanced CLI
