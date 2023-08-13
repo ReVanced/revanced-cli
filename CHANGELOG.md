@@ -1,3 +1,10 @@
+# [2.23.0-dev.4](https://github.com/ReVanced/revanced-cli/compare/v2.23.0-dev.3...v2.23.0-dev.4) (2023-08-13)
+
+
+### Features
+
+* show full package name when listing patches ([#240](https://github.com/ReVanced/revanced-cli/issues/240)) ([7174364](https://github.com/ReVanced/revanced-cli/commit/7174364ef8ef5d6ce8351a8340f9c1a5b58eac3c))
+
 # [2.23.0-dev.3](https://github.com/ReVanced/revanced-cli/compare/v2.23.0-dev.2...v2.23.0-dev.3) (2023-08-03)
 
 # [2.23.0-dev.2](https://github.com/ReVanced/revanced-cli/compare/v2.23.0-dev.1...v2.23.0-dev.2) (2023-08-03)
