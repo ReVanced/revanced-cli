@@ -11,6 +11,7 @@ val githubPassword: String = project.findProperty("gpr.key") as? String ?: Syste
 repositories {
     mavenCentral()
     mavenLocal()
+    google()
     maven {
         url = uri("https://maven.pkg.github.com/revanced/revanced-patcher")
         credentials {
@@ -19,15 +20,14 @@ repositories {
         }
     }
     maven { url = uri("https://jitpack.io") }
-    google()
 }
 
 dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect:1.8.22")
 
-    implementation("app.revanced:revanced-patcher:12.1.1")
+    implementation("app.revanced:revanced-patcher:13.0.0")
     implementation("info.picocli:picocli:4.7.3")
-    implementation("com.github.revanced:jadb:2531a28109") // updated fork
+    implementation("com.github.revanced:jadb:2531a28109") // Updated fork
     implementation("com.android.tools.build:apksig:8.1.0")
     implementation("org.bouncycastle:bcpkix-jdk15on:1.70")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.14.3")
