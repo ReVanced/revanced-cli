@@ -23,9 +23,9 @@ repositories {
 }
 
 dependencies {
+    implementation("app.revanced:revanced-patcher:14.0.0")
     implementation("org.jetbrains.kotlin:kotlin-reflect:1.8.22")
-
-    implementation("app.revanced:revanced-patcher:13.0.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.1")
     implementation("info.picocli:picocli:4.7.3")
     implementation("com.github.revanced:jadb:2531a28109") // Updated fork
     implementation("com.android.tools.build:apksig:8.1.0")

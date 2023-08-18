@@ -2,7 +2,10 @@ package app.revanced.patcher.options
 
 import app.revanced.patcher.data.BytecodeContext
 import app.revanced.patcher.data.Context
-import app.revanced.patcher.patch.*
+import app.revanced.patcher.patch.BytecodePatch
+import app.revanced.patcher.patch.OptionsContainer
+import app.revanced.patcher.patch.Patch
+import app.revanced.patcher.patch.PatchOption
 import app.revanced.utils.Options
 import app.revanced.utils.Options.setOptions
 import org.junit.jupiter.api.MethodOrderer
@@ -11,8 +14,8 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestMethodOrder
 
 class PatchOptionsTestPatch : BytecodePatch() {
-    override fun execute(context: BytecodeContext): PatchResult {
-        return PatchResultSuccess()
+    override fun execute(context: BytecodeContext) {
+        // Do nothing
     }
 
     companion object : OptionsContainer() {
@@ -32,7 +35,7 @@ class PatchOptionsTestPatch : BytecodePatch() {
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 internal object PatchOptionOptionsTest {
-    private var patches = listOf(PatchOptionsTestPatch::class.java as Class<out Patch<Context>>)
+    private var patches = listOf(PatchOptionsTestPatch::class.java as Class<out Patch<Context<*>>>)
 
     @Test
     @Order(1)
