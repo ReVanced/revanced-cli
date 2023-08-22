@@ -30,12 +30,15 @@ Learn how to ReVanced CLI.
   java -jar revanced-cli.jar -h
   ```
 
-- ### 📃 List all available patches from supplied patch bundles
+- ### 📃 List patches from supplied patch bundles
 
   ```bash
-  java -jar revanced-cli.jar
-   -b revanced-patches.jar \
-   -l # Names of all patches will be in kebab-case
+  java -jar revanced-cli.jar \
+   list-patches \
+   --with-packages \
+   --with-versions \
+   --with-options \
+   revanced-patches.jar
   ```
 
 - ### 💉 Use ReVanced CLI to patch an APK file but deploy without root permissions

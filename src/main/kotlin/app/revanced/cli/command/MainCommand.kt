@@ -9,7 +9,6 @@ import app.revanced.patcher.PatchBundleLoader
 import app.revanced.patcher.Patcher
 import app.revanced.patcher.PatcherOptions
 import app.revanced.patcher.extensions.PatchExtensions.compatiblePackages
-import app.revanced.patcher.extensions.PatchExtensions.description
 import app.revanced.patcher.extensions.PatchExtensions.include
 import app.revanced.patcher.extensions.PatchExtensions.patchName
 import app.revanced.patcher.patch.PatchClass
@@ -17,9 +16,13 @@ import app.revanced.utils.Options
 import app.revanced.utils.Options.setOptions
 import app.revanced.utils.adb.AdbManager
 import kotlinx.coroutines.runBlocking
+import picocli.CommandLine
 import picocli.CommandLine.*
 import java.io.File
 
+fun main(args: Array<String>) {
+    CommandLine(MainCommand).execute(*args)
+}
 
 internal typealias PatchList = List<PatchClass>
 
@@ -31,13 +34,15 @@ private class CLIVersionProvider : IVersionProvider {
 
 @Command(
     name = "ReVanced CLI",
+    description = ["Command line application to use ReVanced"],
     mixinStandardHelpOptions = true,
-    versionProvider = CLIVersionProvider::class
+    versionProvider = CLIVersionProvider::class,
+    subcommands = [ListPatchesCommand::class]
 )
 internal object MainCommand : Runnable {
     val logger = DefaultCliLogger()
 
-    @ArgGroup(exclusive = false, multiplicity = "1")
+    // @ArgGroup(exclusive = false, multiplicity = "1")
     lateinit var args: Args
 
     /**
@@ -62,9 +67,6 @@ internal object MainCommand : Runnable {
         class PatchArgs {
             @Option(names = ["-b", "--bundle"], description = ["One or more bundles of patches"], required = true)
             var patchBundles = emptyList<File>()
-
-            @ArgGroup(exclusive = false)
-            var listingArgs: ListingArgs? = null
 
             @ArgGroup(exclusive = false)
             var patchingArgs: PatchingArgs? = null
@@ -140,27 +142,12 @@ internal object MainCommand : Runnable {
                 )
                 var aaptBinaryPath = File("")
             }
-
-            /**
-             * Arguments for printing patches to the console.
-             */
-            class ListingArgs {
-                @Option(names = ["-l", "--list"], description = ["List patches"], required = true)
-                var listOnly: Boolean = false
-
-                @Option(names = ["--with-versions"], description = ["List patches and their compatible versions"])
-                var withVersions: Boolean = false
-
-                @Option(names = ["--with-packages"], description = ["List patches and their compatible packages"])
-                var withPackages: Boolean = false
-            }
         }
     }
 
     override fun run() {
         val patchArgs = args.patchArgs
 
-        if (patchArgs?.listingArgs?.listOnly == true) return printListOfPatches()
         if (args.packageName != null) return uninstall()
 
         val patchingArgs = patchArgs?.patchingArgs ?: return
@@ -266,41 +253,6 @@ internal object MainCommand : Runnable {
         }.uninstall(args.packageName!!)
     } ?: logger.error("No device serial specified")
 
-    private fun printListOfPatches() {
-        val logged = mutableListOf<String>()
-        for (patch in PatchBundleLoader.Jar(*args.patchArgs!!.patchBundles.toTypedArray())) {
-            if (patch.patchName in logged) continue
-            for (compatiblePackage in patch.compatiblePackages ?: continue) {
-                val packageEntryStr = buildString {
-                    // Add package if flag is set
-                    if (args.patchArgs?.listingArgs?.withPackages == true) {
-                        val packageName = compatiblePackage.name.padStart(25)
-                        append(packageName)
-                        append("\t")
-                    }
-
-                    // Add patch name
-                    val patchName = patch.patchName.lowercase().replace(" ", "-").padStart(25)
-                    append(patchName)
-
-                    // Add description if flag is set.
-                    append("\t")
-                    append(patch.description)
-
-                    // Add compatible versions, if flag is set
-                    if (args.patchArgs?.listingArgs?.withVersions == true) {
-                        val compatibleVersions = compatiblePackage.versions.joinToString(separator = ", ")
-                        append("\t")
-                        append(compatibleVersions)
-                    }
-                }
-
-                logged.add(patch.patchName)
-                logger.info(packageEntryStr)
-            }
-        }
-    }
-
     private fun Patcher.filterPatchSelection(patches: PatchList) = buildList {
         val packageName = context.packageMetadata.packageName
         val packageVersion = context.packageMetadata.packageVersion
@@ -373,5 +325,9 @@ internal object MainCommand : Runnable {
 
             add(patch)
         }
+    }
+
+    fun main(args: Array<String>) {
+        CommandLine(MainCommand).execute(*args)
     }
 }
