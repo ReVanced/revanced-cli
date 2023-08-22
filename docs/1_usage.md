@@ -41,6 +41,14 @@ Learn how to ReVanced CLI.
    revanced-patches.jar
   ```
 
+- ### ⚙️ Supply options to patches using ReVanced CLI
+
+  Some patches provide options. Currently, ReVanced CLI will generate and consume an `options.json` file at the location that is specified in `-o`. If the option is not specified, the options file will be generated in the current working directory.
+
+  The options file contains all options from supplied patch bundles.
+
+  > **Note**: The `options.json` file will be generated at the first time you use ReVanced CLI to patch an APK file for now. This will be changed in the future.
+
 - ### 💉 Use ReVanced CLI to patch an APK file but deploy without root permissions
 
   This will deploy the patched APK file on your device by installing it.
@@ -50,7 +58,7 @@ Learn how to ReVanced CLI.
    -a input.apk \
    -o patched-output.apk \
    -b revanced-patches.jar \
-   -d device-name
+   -d device-serial
   ```
 
 - ### 👾 Use ReVanced CLI to patch an APK file but deploy with root permissions
@@ -64,16 +72,17 @@ Learn how to ReVanced CLI.
    -o patched-output.apk \
    -b revanced-patches.jar \
    -e vanced-microg-support \
-   -d device-name \
+   -d device-serial \
    --mount
   ```
 
   > **Note**: Some patches from [ReVanced Patches](https://github.com/revanced/revanced-patches) also require [ReVanced Integrations](https://github.com/revanced/revanced-integrations). Supply them with the option `-m`. ReVanced Patcher will merge ReVanced Integrations automatically, depending on if the supplied patches require them.
+  package
 
-- ### ⚙️ Supply options to patches using ReVanced CLI
-
-  Some patches provide options. Currently, ReVanced CLI will generate and consume an `options.json` file at the location that is specified in `-o`. If the option is not specified, the options file will be generated in the current working directory.
-  
-  The options file contains all options from supplied patch bundles.
-
-  > **Note**: The `options.json` file will be generated at the first time you use ReVanced CLI to patch an APK file for now. This will be changed in the future.
+- ### 🗑️ Uninstall a patched 
+  ```bash
+  java -jar revanced-cli.jar \
+   uninstall \
+   -p package-name \
+   device-serial
+  ```

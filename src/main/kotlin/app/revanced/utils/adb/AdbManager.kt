@@ -27,7 +27,7 @@ import java.io.File
  */
 internal sealed class AdbManager(deviceSerial: String? = null, protected val logger: CliLogger? = null) : Closeable {
     protected val device = JadbConnection().devices.find { device -> device.serial == deviceSerial }
-        ?: throw IllegalArgumentException("The device with the serial $deviceSerial can not be found.")
+        ?: throw DeviceNotFoundException(deviceSerial)
 
     init {
         logger?.trace("Established connection to $deviceSerial")
@@ -127,4 +127,9 @@ internal sealed class AdbManager(deviceSerial: String? = null, protected val log
      * @param file The [Apk] file.
      */
     internal class Apk(val file: File, val packageName: String? = null)
+
+    internal class DeviceNotFoundException(deviceSerial: String?) :
+        Exception(deviceSerial?.let {
+            "The device with the ADB device serial \"$deviceSerial\" can not be found"
+        } ?: "No ADB device found")
 }

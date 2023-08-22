@@ -37,10 +37,10 @@ private class CLIVersionProvider : IVersionProvider {
     description = ["Command line application to use ReVanced"],
     mixinStandardHelpOptions = true,
     versionProvider = CLIVersionProvider::class,
-    subcommands = [ListPatchesCommand::class]
+    subcommands = [ListPatchesCommand::class, UninstallCommand::class]
 )
 internal object MainCommand : Runnable {
-    val logger = DefaultCliLogger()
+    internal val logger = DefaultCliLogger()
 
     // @ArgGroup(exclusive = false, multiplicity = "1")
     lateinit var args: Args
@@ -145,11 +145,12 @@ internal object MainCommand : Runnable {
         }
     }
 
+    fun main(args: Array<String>) {
+        CommandLine(MainCommand).execute(*args)
+    }
+
     override fun run() {
         val patchArgs = args.patchArgs
-
-        if (args.packageName != null) return uninstall()
-
         val patchingArgs = patchArgs?.patchingArgs ?: return
 
         if (!patchingArgs.inputFile.exists()) return logger.error("Input file ${patchingArgs.inputFile} does not exist.")
@@ -241,18 +242,6 @@ internal object MainCommand : Runnable {
         logger.info(result)
     }
 
-    /**
-     * Uninstall the specified package from the specified device.
-     *
-     */
-    private fun uninstall() = args.deviceSerial?.let { serial ->
-        if (args.mount) {
-            AdbManager.RootAdbManager(serial, logger)
-        } else {
-            AdbManager.UserAdbManager(serial, logger)
-        }.uninstall(args.packageName!!)
-    } ?: logger.error("No device serial specified")
-
     private fun Patcher.filterPatchSelection(patches: PatchList) = buildList {
         val packageName = context.packageMetadata.packageName
         val packageVersion = context.packageMetadata.packageVersion
@@ -325,9 +314,5 @@ internal object MainCommand : Runnable {
 
             add(patch)
         }
-    }
-
-    fun main(args: Array<String>) {
-        CommandLine(MainCommand).execute(*args)
     }
 }
