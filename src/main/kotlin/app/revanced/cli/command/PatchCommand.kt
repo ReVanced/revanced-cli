@@ -179,7 +179,7 @@ internal object PatchCommand: Runnable {
             PatcherOptions(
                 apk,
                 resourceCachePath,
-                aaptBinaryPath.absolutePath,
+                aaptBinaryPath.path,
                 resourceCachePath.absolutePath,
                 PatcherLogger
             )
@@ -291,8 +291,8 @@ internal object PatchCommand: Runnable {
                     if (!matchesVersion) return@patch logger.warn(
                         "${patch.patchName} is incompatible with version $packageVersion. " +
                                 "This patch is only compatible with version " +
-                                packages.joinToString(";") { `package` ->
-                                    "${`package`.name}: ${`package`.versions.joinToString(", ")}"
+                                packages.joinToString(";") { pkg ->
+                                    "${pkg.name}: ${pkg.versions.joinToString(", ")}"
                                 }
                     )
 
