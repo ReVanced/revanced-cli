@@ -1,3 +1,10 @@
+# [3.0.0-dev.2](https://github.com/ReVanced/revanced-cli/compare/v3.0.0-dev.1...v3.0.0-dev.2) (2023-08-23)
+
+
+### Bug Fixes
+
+* specify correct class containing entry-point ([1fcc591](https://github.com/ReVanced/revanced-cli/commit/1fcc591222ab67112f2b78174a8b94106846838c))
+
 # [3.0.0-dev.1](https://github.com/ReVanced/revanced-cli/compare/v2.23.0-dev.5...v3.0.0-dev.1) (2023-08-23)
 
 
