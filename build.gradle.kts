@@ -49,5 +49,8 @@ tasks {
     // Dummy task to fix the Gradle semantic-release plugin.
     // Remove this if you forked it to support building only.
     // Tracking issue: https://github.com/KengoTODA/gradle-semantic-release-plugin/issues/435
-    register<DefaultTask>("publish") { }
+    register<DefaultTask>("publish") {
+        group = "publish"
+        description = "Dummy task"
+    }
 }
