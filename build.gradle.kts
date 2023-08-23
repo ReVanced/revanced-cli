@@ -12,14 +12,16 @@ repositories {
     mavenCentral()
     mavenLocal()
     google()
-    maven {
-        url = uri("https://maven.pkg.github.com/revanced/revanced-patcher")
-        credentials {
-            username = githubUsername
-            password = githubPassword
+    maven { url = uri("https://jitpack.io") }
+    listOf("revanced-patcher", "jadb").forEach { repo ->
+        maven {
+            url = uri("https://maven.pkg.github.com/revanced/$repo")
+            credentials {
+                username = githubUsername
+                password = githubPassword
+            }
         }
     }
-    maven { url = uri("https://jitpack.io") }
 }
 
 dependencies {
