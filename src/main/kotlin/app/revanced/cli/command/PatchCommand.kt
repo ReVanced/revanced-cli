@@ -345,7 +345,7 @@ internal object PatchCommand: Runnable {
         result: PatcherResult,
         outputFile: File
     ): File {
-        logger.info("Aligning $name to ${outputFile.name}")
+        logger.info("Aligning $name")
 
         if (outputFile.exists()) outputFile.delete()
 
