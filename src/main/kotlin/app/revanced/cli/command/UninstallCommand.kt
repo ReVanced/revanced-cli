@@ -7,7 +7,7 @@ import picocli.CommandLine.Help.Visibility.ALWAYS
 
 @Command(
     name = "uninstall",
-    description = ["Uninstall a patched package from the devices with the supplied ADB device serials"]
+    description = ["Uninstall a patched APK file from the devices with the supplied ADB device serials"]
 )
 internal object UninstallCommand : Runnable {
     @Parameters(
