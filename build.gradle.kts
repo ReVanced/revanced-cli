@@ -31,10 +31,6 @@ tasks {
         expand("projectVersion" to project.version)
     }
 
-    build {
-        dependsOn(shadowJar)
-    }
-
     shadowJar {
         manifest {
             attributes("Main-Class" to "app.revanced.cli.command.MainCommandKt")
@@ -44,6 +40,10 @@ tasks {
             exclude(dependency("org.bouncycastle:.*"))
             exclude(dependency("app.revanced:.*"))
         }
+    }
+
+    build {
+        dependsOn(shadowJar)
     }
 
     // Dummy task to fix the Gradle semantic-release plugin.
