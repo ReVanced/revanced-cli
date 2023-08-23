@@ -34,7 +34,7 @@ internal object PatchCommand: Runnable {
     lateinit var apk: File
 
     @CommandLine.Option(
-        names = ["-b", "--bundle"],
+        names = ["-b", "--patch-bundle"],
         description = ["One or more bundles of patches"],
         required = true
     )
