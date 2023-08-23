@@ -164,7 +164,7 @@ internal object PatchCommand: Runnable {
         val patches = PatchBundleLoader.Jar(*patchBundles.toTypedArray())
         val integrations = integrations
 
-        logger.info("Setting up patch options")
+        logger.info("Setting patch options")
 
         optionsFile.let {
             if (it.exists()) patches.setOptions(it, logger)
