@@ -17,7 +17,7 @@ Learn how to ReVanced CLI.
    adb shell su -c exit
    ```
 
-2. Get your device serial
+2. Get your device's serial
 
    ```bash
    adb devices
@@ -54,7 +54,7 @@ Learn how to ReVanced CLI.
   ```
 
   > **Note**: A default `options.json` file will be automatically generated, if it does not exist 
-  without any need of intervention when using the `patch` command.
+  without any need for intervention when using the `patch` command.
 
 - ### 💉 Use ReVanced CLI to patch an APK file but install without root permissions
 
@@ -89,7 +89,7 @@ Learn how to ReVanced CLI.
   Supply them with the option `-m`. If any patches accepted by ReVanced Patcher require ReVanced Integrations, 
   they will be merged into the APK file automatically.
 
-- ### 🗑️ Uninstall a patched 
+- ### 🗑️ Uninstall a patched APK file
   ```bash
   java -jar revanced-cli.jar uninstall \
    --package-name <package-name> \
