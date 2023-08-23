@@ -8,41 +8,41 @@ import app.revanced.patcher.extensions.PatchExtensions.options
 import app.revanced.patcher.extensions.PatchExtensions.patchName
 import app.revanced.patcher.patch.PatchClass
 import app.revanced.patcher.patch.PatchOption
-import picocli.CommandLine
+import picocli.CommandLine.*
 import picocli.CommandLine.Help.Visibility.ALWAYS
 import java.io.File
 
 
-@CommandLine.Command(name = "list-patches", description = ["List patches from supplied patch bundles"])
-class ListPatchesCommand : Runnable {
-    @CommandLine.Parameters(
+@Command(name = "list-patches", description = ["List patches from supplied patch bundles"])
+internal object ListPatchesCommand : Runnable {
+    @Parameters(
         description = ["Paths to patch bundles"],
         arity = "1..*"
     )
     lateinit var patchBundles: Array<File>
 
-    @CommandLine.Option(
+    @Option(
         names = ["-d", "--with-descriptions"],
         description = ["List their descriptions"],
         showDefaultValue = ALWAYS
     )
     var withDescriptions: Boolean = true
 
-    @CommandLine.Option(
+    @Option(
         names = ["-p", "--with-packages"],
         description = ["List the packages the patches are compatible with"],
         showDefaultValue = ALWAYS
     )
     var withPackages: Boolean = false
 
-    @CommandLine.Option(
+    @Option(
         names = ["-v", "--with-versions"],
         description = ["List the versions of the packages the patches are compatible with"],
         showDefaultValue = ALWAYS
     )
     var withVersions: Boolean = false
 
-    @CommandLine.Option(
+    @Option(
         names = ["-o", "--with-options"],
         description = ["List the options of the patches"],
         showDefaultValue = ALWAYS
@@ -89,6 +89,6 @@ class ListPatchesCommand : Runnable {
             }
         }
 
-        MainCommand.logger.info(PatchBundleLoader.Jar(*patchBundles).joinToString("\n\n") { it.buildString() })
+        logger.info(PatchBundleLoader.Jar(*patchBundles).joinToString("\n\n") { it.buildString() })
     }
 }

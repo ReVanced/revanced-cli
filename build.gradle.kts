@@ -24,7 +24,7 @@ repositories {
 
 dependencies {
     implementation("app.revanced:revanced-patcher:14.0.0")
-    implementation("org.jetbrains.kotlin:kotlin-reflect:1.8.22")
+    implementation("org.jetbrains.kotlin:kotlin-reflect:1.9.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.1")
     implementation("info.picocli:picocli:4.7.3")
     implementation("com.github.revanced:jadb:2531a28109") // Updated fork
@@ -34,9 +34,8 @@ dependencies {
     testImplementation("org.jetbrains.kotlin:kotlin-test:1.8.20-RC")
 }
 
-kotlin {
-    jvmToolchain(11)
-}
+kotlin { jvmToolchain(11) }
+
 
 tasks {
     test {
@@ -45,9 +44,15 @@ tasks {
             events("PASSED", "SKIPPED", "FAILED")
         }
     }
+
+    processResources {
+        expand("projectVersion" to project.version)
+    }
+
     build {
         dependsOn(shadowJar)
     }
+
     shadowJar {
         manifest {
             attributes("Main-Class" to "app.revanced.cli.main.MainKt")
@@ -61,9 +66,5 @@ tasks {
     // Dummy task to fix the Gradle semantic-release plugin.
     // Remove this if you forked it to support building only.
     // Tracking issue: https://github.com/KengoTODA/gradle-semantic-release-plugin/issues/435
-    register<DefaultTask>("publish") {
-        group = "publish"
-        description = "Dummy task"
-        dependsOn(build)
-    }
+    register<DefaultTask>("publish") { }
 }
