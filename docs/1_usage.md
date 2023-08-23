@@ -56,8 +56,6 @@ Learn how to ReVanced CLI.
   > **Note**: A default `options.json` file will be automatically generated, if it does not exist 
   without any need of intervention when using the `patch` command.
 
-  ```bash
-
 - ### 💉 Use ReVanced CLI to patch an APK file but install without root permissions
 
   This will install the patched APK file regularly on your device.
