@@ -1,0 +1,25 @@
+[versions]
+shadow = "8.1.1"
+apksig = "8.1.0"
+bcpkix-jdk15on = "1.70"
+jackson-module-kotlin = "2.14.3"
+jadb = "2531a28109"
+kotlin-reflect = "1.9.0"
+kotlin-test = "1.8.20-RC"
+kotlinx-coroutines-core = "1.7.1"
+picocli = "4.7.3"
+revanced-patcher = "14.0.0"
+
+[libraries]
+apksig = { module = "com.android.tools.build:apksig", version.ref = "apksig" }
+bcpkix-jdk15on = { module = "org.bouncycastle:bcpkix-jdk15on", version.ref = "bcpkix-jdk15on" }
+jackson-module-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin", version.ref = "jackson-module-kotlin" }
+jadb = { module = "com.github.revanced:jadb", version.ref = "jadb" }
+kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin-reflect" }
+kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin-test" }
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines-core" }
+picocli = { module = "info.picocli:picocli", version.ref = "picocli" }
+revanced-patcher = { module = "app.revanced:revanced-patcher", version.ref = "revanced-patcher" }
+
+[plugins]
+shadow = { id = "com.github.johnrengelman.shadow", version.ref = "shadow" }

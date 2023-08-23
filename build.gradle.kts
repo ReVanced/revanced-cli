@@ -1,43 +1,23 @@
 plugins {
     kotlin("jvm") version "1.8.20"
-    id("com.github.johnrengelman.shadow") version "7.1.2"
+    alias(libs.plugins.shadow)
 }
 
 group = "app.revanced"
 
-val githubUsername: String = project.findProperty("gpr.user") as? String ?: System.getenv("GITHUB_ACTOR")
-val githubPassword: String = project.findProperty("gpr.key") as? String ?: System.getenv("GITHUB_TOKEN")
-
-repositories {
-    mavenCentral()
-    mavenLocal()
-    google()
-    maven { url = uri("https://jitpack.io") }
-    listOf("revanced-patcher", "jadb").forEach { repo ->
-        maven {
-            url = uri("https://maven.pkg.github.com/revanced/$repo")
-            credentials {
-                username = githubUsername
-                password = githubPassword
-            }
-        }
-    }
-}
-
 dependencies {
-    implementation("app.revanced:revanced-patcher:14.0.0")
-    implementation("org.jetbrains.kotlin:kotlin-reflect:1.9.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.1")
-    implementation("info.picocli:picocli:4.7.3")
-    implementation("com.github.revanced:jadb:2531a28109") // Updated fork
-    implementation("com.android.tools.build:apksig:8.1.0")
-    implementation("org.bouncycastle:bcpkix-jdk15on:1.70")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.14.3")
-    testImplementation("org.jetbrains.kotlin:kotlin-test:1.8.20-RC")
+    implementation(libs.revanced.patcher)
+    implementation(libs.kotlin.reflect)
+    implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.picocli)
+    implementation(libs.jadb) // Updated fork
+    implementation(libs.apksig)
+    implementation(libs.bcpkix.jdk15on)
+    implementation(libs.jackson.module.kotlin)
+    testImplementation(libs.kotlin.test)
 }
 
 kotlin { jvmToolchain(11) }
-
 
 tasks {
     test {
@@ -65,6 +45,7 @@ tasks {
             exclude(dependency("app.revanced:.*"))
         }
     }
+
     // Dummy task to fix the Gradle semantic-release plugin.
     // Remove this if you forked it to support building only.
     // Tracking issue: https://github.com/KengoTODA/gradle-semantic-release-plugin/issues/435
