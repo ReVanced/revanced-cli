@@ -8,7 +8,7 @@ import picocli.CommandLine.IVersionProvider
 import java.util.*
 
 fun main(args: Array<String>) {
-    CommandLine(Main).execute(*args)
+    CommandLine(MainCommand).execute(*args)
 }
 
 internal typealias PatchList = List<PatchClass>
@@ -18,7 +18,7 @@ internal val logger = DefaultCliLogger()
 object CLIVersionProvider : IVersionProvider {
     override fun getVersion(): Array<String> {
         Properties().apply {
-            load(Main::class.java.getResourceAsStream("/app/revanced/cli/version.properties"))
+            load(MainCommand::class.java.getResourceAsStream("/app/revanced/cli/version.properties"))
         }.let {
             return arrayOf("ReVanced CLI v${it.getProperty("version")}")
         }
@@ -37,4 +37,4 @@ object CLIVersionProvider : IVersionProvider {
         OptionsCommand::class,
     ]
 )
-internal object Main
+internal object MainCommand

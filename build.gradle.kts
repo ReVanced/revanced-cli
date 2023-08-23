@@ -37,7 +37,7 @@ tasks {
 
     shadowJar {
         manifest {
-            attributes("Main-Class" to "app.revanced.cli.main.MainKt")
+            attributes("Main-Class" to "app.revanced.cli.command.MainCommandKt")
         }
         minimize {
             exclude(dependency("org.jetbrains.kotlin:.*"))
