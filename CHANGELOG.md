@@ -1,3 +1,29 @@
+# [3.0.0-dev.1](https://github.com/ReVanced/revanced-cli/compare/v2.23.0-dev.5...v3.0.0-dev.1) (2023-08-23)
+
+
+### Bug Fixes
+
+* do not use absolute path from custom AAPT2 binary option ([a9c2a5f](https://github.com/ReVanced/revanced-cli/commit/a9c2a5f096627dbbf8ab1b8da26fb14529ce6bc3))
+* use correct option name ([f8972ea](https://github.com/ReVanced/revanced-cli/commit/f8972eac3e5ee0a4a186c12cbe711925656d657b))
+
+
+* refactor!: restructure code ([07da528](https://github.com/ReVanced/revanced-cli/commit/07da528ce2223582f84bf64d2fec69714c647ddc))
+
+
+### Features
+
+* add options command ([9edbbf3](https://github.com/ReVanced/revanced-cli/commit/9edbbf31635603f89fc7bc5dcc6c023d4cdbb5a6))
+* use better logging text ([b0e748d](https://github.com/ReVanced/revanced-cli/commit/b0e748daff527ee7f417b3069882e074896fc131))
+* use separate command to list patches ([b74213f](https://github.com/ReVanced/revanced-cli/commit/b74213f66e0d04d3a0ae6197d069631388e06580))
+* use separate command to patch ([32da961](https://github.com/ReVanced/revanced-cli/commit/32da961d57537e99b39fd92b625a1c73f8314bc6))
+* use separate command to uninstall ([c0cc909](https://github.com/ReVanced/revanced-cli/commit/c0cc90962646cfffd5e2730ae556423271a7990b))
+* use simpler log ([ba758f0](https://github.com/ReVanced/revanced-cli/commit/ba758f00f4ce18791439b7e72fe1ad2e7f11f8af))
+
+
+### BREAKING CHANGES
+
+* This introduces major changes to how ReVanced CLI is used from the command line.
+
 # [2.23.0-dev.5](https://github.com/ReVanced/revanced-cli/compare/v2.23.0-dev.4...v2.23.0-dev.5) (2023-08-14)
 
 # [2.23.0-dev.4](https://github.com/ReVanced/revanced-cli/compare/v2.23.0-dev.3...v2.23.0-dev.4) (2023-08-13)
