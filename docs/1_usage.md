@@ -40,13 +40,21 @@ Learn how to ReVanced CLI.
    revanced-patches.jar
   ```
 
-- ### ⚙️ Supply options to patches using ReVanced CLI
+- ### ⚙️ Generate options from patches using ReVanced CLI
 
-  Some patches provide options. Currently, ReVanced CLI will generate and consume an `options.json` file at the location that is specified in `-o`. If the option is not specified, the options file will be generated in the current working directory.
+  Some patches accept options.
+ 
+- ```bash
+  java -jar revanced-cli.jar options \
+   --overwrite \
+   --update \
+   revanced-patches.jar
+  ```
 
-  The options file contains all options from supplied patch bundles.
+  > **Note**: A default `options.json` file will be automatically generated, if it does not exist 
+  without any need of intervention.
 
-  > **Note**: The `options.json` file will be generated at the first time you use ReVanced CLI to patch an APK file for now. This will be changed in the future.
+  ```bash
 
 - ### 💉 Use ReVanced CLI to patch an APK file but install without root permissions
 

@@ -33,7 +33,8 @@ object CLIVersionProvider : IVersionProvider {
     subcommands = [
         ListPatchesCommand::class,
         PatchCommand::class,
-        UninstallCommand::class
+        UninstallCommand::class,
+        OptionsCommand::class,
     ]
 )
 internal object Main
