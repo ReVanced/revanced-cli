@@ -1,7 +1,7 @@
-package app.revanced.utils.signing.align.zip
+package app.revanced.utils.align.zip
 
-import app.revanced.utils.signing.align.zip.structures.ZipEndRecord
-import app.revanced.utils.signing.align.zip.structures.ZipEntry
+import app.revanced.utils.align.zip.structures.ZipEndRecord
+import app.revanced.utils.align.zip.structures.ZipEntry
 import java.io.Closeable
 import java.io.File
 import java.io.RandomAccessFile
@@ -11,15 +11,15 @@ import java.util.zip.CRC32
 import java.util.zip.Deflater
 
 class ZipFile(file: File) : Closeable {
-    var entries: MutableList<ZipEntry> = mutableListOf()
+    private var entries: MutableList<ZipEntry> = mutableListOf()
 
     private val filePointer: RandomAccessFile = RandomAccessFile(file, "rw")
-    private var CDNeedsRewrite = false
+    private var centralDirectoryNeedsRewrite = false
 
     private val compressionLevel = 5
 
     init {
-        //if file isn't empty try to load entries
+        // If file isn't empty try to load entries.
         if (file.length() > 0) {
             val endRecord = findEndRecord()
 
@@ -29,17 +29,17 @@ class ZipFile(file: File) : Closeable {
             entries = readEntries(endRecord).toMutableList()
         }
 
-        //seek back to start for writing
+        // Seek back to start for writing.
         filePointer.seek(0)
     }
 
     private fun findEndRecord(): ZipEndRecord {
-        //look from end to start since end record is at the end
+        // Look from end to start since end record is at the end.
         for (i in filePointer.length() - 1 downTo 0) {
             filePointer.seek(i)
-            //possible beginning of signature
+            // Possible beginning of signature.
             if (filePointer.readByte() == 0x50.toByte()) {
-                //seek back to get the full int
+                // Seek back to get the full int.
                 filePointer.seek(i)
                 val possibleSignature = filePointer.readUIntLE()
                 if (possibleSignature == ZipEndRecord.ECD_SIGNATURE) {
@@ -76,7 +76,7 @@ class ZipFile(file: File) : Closeable {
     }
 
     private fun writeCD() {
-        val CDStart = filePointer.channel.position().toUInt()
+        val centralDirectoryStartOffset = filePointer.channel.position().toUInt()
 
         entries.forEach {
             filePointer.channel.write(it.toCDE())
@@ -89,8 +89,8 @@ class ZipFile(file: File) : Closeable {
             0u,
             entriesCount,
             entriesCount,
-            filePointer.channel.position().toUInt() - CDStart,
-            CDStart,
+            filePointer.channel.position().toUInt() - centralDirectoryStartOffset,
+            centralDirectoryStartOffset,
             ""
         )
 
@@ -98,7 +98,7 @@ class ZipFile(file: File) : Closeable {
     }
 
     private fun addEntry(entry: ZipEntry, data: ByteBuffer) {
-        CDNeedsRewrite = true
+        centralDirectoryNeedsRewrite = true
 
         entry.localHeaderOffset = filePointer.channel.position().toUInt()
 
@@ -114,8 +114,7 @@ class ZipFile(file: File) : Closeable {
         compressor.finish()
 
         val uncompressedSize = data.size
-        val compressedData =
-            ByteArray(uncompressedSize) //i'm guessing compression won't make the data bigger
+        val compressedData = ByteArray(uncompressedSize) // I'm guessing compression won't make the data bigger.
 
         val compressedDataLength = compressor.deflate(compressedData)
         val compressedBuffer =
@@ -126,7 +125,7 @@ class ZipFile(file: File) : Closeable {
         val crc = CRC32()
         crc.update(data)
 
-        entry.compression = 8u //deflate compression
+        entry.compression = 8u // Deflate compression.
         entry.uncompressedSize = uncompressedSize.toUInt()
         entry.compressedSize = compressedDataLength.toUInt()
         entry.crc32 = crc.value.toUInt()
@@ -136,14 +135,14 @@ class ZipFile(file: File) : Closeable {
 
     private fun addEntryCopyData(entry: ZipEntry, data: ByteBuffer, alignment: Int? = null) {
         alignment?.let {
-            //calculate where data would end up
+            // Calculate where data would end up.
             val dataOffset = filePointer.filePointer + entry.LFHSize
 
             val mod = dataOffset % alignment
 
-            //wrong alignment
+            // Wrong alignment.
             if (mod != 0L) {
-                //add padding at end of extra field
+                // Add padding at end of extra field.
                 entry.localExtraField =
                     entry.localExtraField.copyOf((entry.localExtraField.size + (alignment - mod)).toInt())
             }
@@ -152,7 +151,7 @@ class ZipFile(file: File) : Closeable {
         addEntry(entry, data)
     }
 
-    fun getDataForEntry(entry: ZipEntry): ByteBuffer {
+    private fun getDataForEntry(entry: ZipEntry): ByteBuffer {
         return filePointer.channel.map(
             FileChannel.MapMode.READ_ONLY,
             entry.dataOffset.toLong(),
@@ -160,9 +159,15 @@ class ZipFile(file: File) : Closeable {
         )
     }
 
+    /**
+     * Copies all entries from [file] to this file but skip already existing entries.
+     *
+     * @param file The file to copy entries from.
+     * @param entryAlignment A function that returns the alignment for a given entry.
+     */
     fun copyEntriesFromFileAligned(file: ZipFile, entryAlignment: (entry: ZipEntry) -> Int?) {
         for (entry in file.entries) {
-            if (entries.any { it.fileName == entry.fileName }) continue //don't add duplicates
+            if (entries.any { it.fileName == entry.fileName }) continue // Skip duplicates
 
             val data = file.getDataForEntry(entry)
             addEntryCopyData(entry, data, entryAlignment(entry))
@@ -170,7 +175,7 @@ class ZipFile(file: File) : Closeable {
     }
 
     override fun close() {
-        if (CDNeedsRewrite) writeCD()
+        if (centralDirectoryNeedsRewrite) writeCD()
         filePointer.close()
     }
 }

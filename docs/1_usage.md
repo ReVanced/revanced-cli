@@ -10,7 +10,7 @@ Learn how to ReVanced CLI.
    adb shell exit
    ```
 
-   If you want to deploy the patched APK file on your device by mounting it on top of the original APK file, you will need root access. This is optional.
+   If you want to install the patched APK file on your device by mounting it on top of the original APK file, you will need root access. This is optional.
 
    ```bash
    adb shell su -c exit
@@ -33,8 +33,7 @@ Learn how to ReVanced CLI.
 - ### 📃 List patches from supplied patch bundles
 
   ```bash
-  java -jar revanced-cli.jar \
-   list-patches \
+  java -jar revanced-cli.jar list-patches \
    --with-packages \
    --with-versions \
    --with-options \
@@ -49,31 +48,31 @@ Learn how to ReVanced CLI.
 
   > **Note**: The `options.json` file will be generated at the first time you use ReVanced CLI to patch an APK file for now. This will be changed in the future.
 
-- ### 💉 Use ReVanced CLI to patch an APK file but deploy without root permissions
+- ### 💉 Use ReVanced CLI to patch an APK file but install without root permissions
 
-  This will deploy the patched APK file on your device by installing it.
+  This will install the patched APK file regularly on your device.
 
   ```bash
-  java -jar revanced-cli.jar \
-   -a input.apk \
-   -o patched-output.apk \
+  java -jar revanced-cli.jar patch \
    -b revanced-patches.jar \
-   -d device-serial
+   -o patched-output.apk \
+   -d device-serial \
+   input-apk
   ```
 
-- ### 👾 Use ReVanced CLI to patch an APK file but deploy with root permissions
+- ### 👾 Use ReVanced CLI to patch an APK file but install with root permissions
 
-  This will deploy the patched APK file on your device by mounting it on top of the original APK file.
+  This will install the patched APK file on your device by mounting it on top of the original APK file.
 
   ```bash
   adb install input.apk
-  java -jar revanced-cli.jar \
-   -a input.apk \
+  java -jar revanced-cli.jar patch \
    -o patched-output.apk \
    -b revanced-patches.jar \
-   -e vanced-microg-support \
+   -e some-patch \
    -d device-serial \
-   --mount
+   --mount \
+   input-apk
   ```
 
   > **Note**: Some patches from [ReVanced Patches](https://github.com/revanced/revanced-patches) also require [ReVanced Integrations](https://github.com/revanced/revanced-integrations). Supply them with the option `-m`. ReVanced Patcher will merge ReVanced Integrations automatically, depending on if the supplied patches require them.
@@ -81,8 +80,7 @@ Learn how to ReVanced CLI.
 
 - ### 🗑️ Uninstall a patched 
   ```bash
-  java -jar revanced-cli.jar \
-   uninstall \
+  java -jar revanced-cli.jar uninstall \
    -p package-name \
    device-serial
   ```
