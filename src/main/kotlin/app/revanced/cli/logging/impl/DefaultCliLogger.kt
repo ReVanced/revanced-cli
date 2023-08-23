@@ -1,12 +1,12 @@
 package app.revanced.cli.logging.impl
 
-import app.revanced.cli.command.MainCommand
+import app.revanced.cli.command.Main
 import app.revanced.cli.logging.CliLogger
 import java.util.logging.Logger
 import java.util.logging.SimpleFormatter
 
 internal class DefaultCliLogger(
-    private val logger: Logger = Logger.getLogger(MainCommand::class.java.name),
+    private val logger: Logger = Logger.getLogger(Main::class.java.name),
     private val errorLogger: Logger = Logger.getLogger(logger.name + "Err")
 ) : CliLogger {
 

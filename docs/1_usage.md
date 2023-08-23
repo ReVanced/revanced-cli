@@ -10,13 +10,14 @@ Learn how to ReVanced CLI.
    adb shell exit
    ```
 
-   If you want to deploy the patched APK file on your device by mounting it on top of the original APK file, you will need root access. This is optional.
+   Optionally, you can install the patched APK file on your device by mounting it on top of the original APK file. 
+   You will need root permissions for this. Check if you have root permissions by running the following command:
 
    ```bash
    adb shell su -c exit
    ```
 
-2. Get the name of your device
+2. Get your device serial
 
    ```bash
    adb devices
@@ -30,47 +31,69 @@ Learn how to ReVanced CLI.
   java -jar revanced-cli.jar -h
   ```
 
-- ### 📃 List all available patches from supplied patch bundles
+- ### 📃 List patches from supplied patch bundles
 
   ```bash
-  java -jar revanced-cli.jar
-   -b revanced-patches.jar \
-   -l # Names of all patches will be in kebab-case
+  java -jar revanced-cli.jar list-patches \
+   --with-packages \
+   --with-versions \
+   --with-options \
+   revanced-patches.jar [<patch-bundle> ...]
   ```
 
-- ### 💉 Use ReVanced CLI to patch an APK file but deploy without root permissions
+- ### ⚙️ Generate options from patches using ReVanced CLI
 
-  This will deploy the patched APK file on your device by installing it.
+  This will generate an `options.json` file for the patches from a list of supplied patch bundles.
+  The file can be supplied to ReVanced CLI later on.
+ 
+- ```bash
+  java -jar revanced-cli.jar options \
+   --path options.json \
+   --overwrite \
+   revanced-patches.jar [<patch-bundle> ...]
+  ```
+
+  > **Note**: A default `options.json` file will be automatically generated, if it does not exist 
+  without any need of intervention when using the `patch` command.
 
   ```bash
-  java -jar revanced-cli.jar \
-   -a input.apk \
-   -o patched-output.apk \
-   -b revanced-patches.jar \
-   -d device-name
+
+- ### 💉 Use ReVanced CLI to patch an APK file but install without root permissions
+
+  This will install the patched APK file regularly on your device.
+
+  ```bash
+  java -jar revanced-cli.jar patch \
+   --patch-bundle revanced-patches.jar \
+   --out output.apk \
+   --device-serial <device-serial> \
+   input.apk
   ```
 
-- ### 👾 Use ReVanced CLI to patch an APK file but deploy with root permissions
+- ### 👾 Use ReVanced CLI to patch an APK file but install with root permissions
 
-  This will deploy the patched APK file on your device by mounting it on top of the original APK file.
+  This will install the patched APK file on your device by mounting it on top of the original APK file.
 
   ```bash
   adb install input.apk
-  java -jar revanced-cli.jar \
-   -a input.apk \
-   -o patched-output.apk \
-   -b revanced-patches.jar \
-   -e vanced-microg-support \
-   -d device-name \
-   --mount
+  java -jar revanced-cli.jar patch \
+   --patch-bundle revanced-patches.jar \
+   --include some-other-patch \
+   --exclude some-patch \
+   --out patched-output.apk \
+   --device-serial <device-serial> \
+   --mount \
+   input.apk
   ```
 
-  > **Note**: Some patches from [ReVanced Patches](https://github.com/revanced/revanced-patches) also require [ReVanced Integrations](https://github.com/revanced/revanced-integrations). Supply them with the option `-m`. ReVanced Patcher will merge ReVanced Integrations automatically, depending on if the supplied patches require them.
+  > **Note**: Some patches may require integrations
+  such as [ReVanced Integrations](https://github.com/revanced/revanced-integrations). 
+  Supply them with the option `-m`. If any patches accepted by ReVanced Patcher require ReVanced Integrations, 
+  they will be merged into the APK file automatically.
 
-- ### ⚙️ Supply options to patches using ReVanced CLI
-
-  Some patches provide options. Currently, ReVanced CLI will generate and consume an `options.json` file at the location that is specified in `-o`. If the option is not specified, the options file will be generated in the current working directory.
-  
-  The options file contains all options from supplied patch bundles.
-
-  > **Note**: The `options.json` file will be generated at the first time you use ReVanced CLI to patch an APK file for now. This will be changed in the future.
+- ### 🗑️ Uninstall a patched 
+  ```bash
+  java -jar revanced-cli.jar uninstall \
+   --package-name <package-name> \
+   <device-serial>
+  ```

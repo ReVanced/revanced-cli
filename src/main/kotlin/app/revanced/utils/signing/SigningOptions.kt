@@ -1,4 +1,4 @@
-package app.revanced.cli.signing
+package app.revanced.utils.signing
 
 data class SigningOptions(
     val cn: String,
