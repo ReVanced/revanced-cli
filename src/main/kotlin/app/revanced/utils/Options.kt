@@ -62,14 +62,17 @@ internal object Options {
 
             val patchOptions = deserialize(json)
 
-            patches.forEach { patch ->
+            patches.forEach patch@{ patch ->
                 patchOptions.find { option -> option.patchName == patch.patchName }?.let {
                     it.options.forEach { option ->
                         try {
                             patch.options?.set(option.key, option.value)
-                                ?: logger.warning("${patch.patchName} has no options")
+                                ?: run{
+                                    logger.warning("${patch.patchName} has no options")
+                                    return@patch
+                                }
                         } catch (e: NoSuchOptionException) {
-                            logger.info(e.message ?: "Unknown error")
+                            logger.info(e.toString())
                         }
                     }
                 }
