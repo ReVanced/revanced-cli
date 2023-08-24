@@ -1,3 +1,10 @@
+# [3.0.0-dev.7](https://github.com/ReVanced/revanced-cli/compare/v3.0.0-dev.6...v3.0.0-dev.7) (2023-08-24)
+
+
+### Bug Fixes
+
+* print stack trace when a patch failed ([924c1f8](https://github.com/ReVanced/revanced-cli/commit/924c1f80ec0d17a3bdc07a0fb2015e44c49162e4))
+
 # [3.0.0-dev.6](https://github.com/ReVanced/revanced-cli/compare/v3.0.0-dev.5...v3.0.0-dev.6) (2023-08-24)
 
 # [3.0.0-dev.5](https://github.com/ReVanced/revanced-cli/compare/v3.0.0-dev.4...v3.0.0-dev.5) (2023-08-24)
