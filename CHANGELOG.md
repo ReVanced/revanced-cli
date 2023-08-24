@@ -1,3 +1,10 @@
+# [3.0.0-dev.8](https://github.com/ReVanced/revanced-cli/compare/v3.0.0-dev.7...v3.0.0-dev.8) (2023-08-24)
+
+
+### Bug Fixes
+
+* do not delete output file ([0f3e090](https://github.com/ReVanced/revanced-cli/commit/0f3e090418771e951dfd15e5c193421f72cbe459))
+
 # [3.0.0-dev.7](https://github.com/ReVanced/revanced-cli/compare/v3.0.0-dev.6...v3.0.0-dev.7) (2023-08-24)
 
 
