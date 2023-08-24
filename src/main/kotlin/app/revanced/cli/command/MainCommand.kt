@@ -1,19 +1,46 @@
 package app.revanced.cli.command
 
-import app.revanced.cli.logging.impl.DefaultCliLogger
 import app.revanced.patcher.patch.PatchClass
 import picocli.CommandLine
 import picocli.CommandLine.Command
 import picocli.CommandLine.IVersionProvider
 import java.util.*
+import java.util.logging.*
+
 
 fun main(args: Array<String>) {
+    System.setProperty("java.util.logging.SimpleFormatter.format", "%4\$s: %5\$s %n")
+    Logger.getLogger("").apply {
+        handlers.forEach {
+            it.close()
+            removeHandler(it)
+        }
+
+        object : Handler() {
+            override fun publish(record: LogRecord) = formatter.format(record).let {
+                if (record.level.intValue() > Level.INFO.intValue()) {
+                    System.err.write(it.toByteArray())
+                } else {
+                    System.out.write(it.toByteArray())
+                }
+            }
+
+            override fun flush() {
+                System.out.flush()
+                System.err.flush()
+            }
+
+            override fun close() = flush()
+        }.also {
+            it.level = Level.ALL
+            it.formatter = SimpleFormatter()
+        }.let(::addHandler)
+    }
+
     CommandLine(MainCommand).execute(*args)
 }
 
 internal typealias PatchList = List<PatchClass>
-
-internal val logger = DefaultCliLogger()
 
 object CLIVersionProvider : IVersionProvider {
     override fun getVersion(): Array<String> {

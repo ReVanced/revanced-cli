@@ -6,12 +6,15 @@ import app.revanced.utils.Options.setOptions
 import picocli.CommandLine
 import picocli.CommandLine.Help.Visibility.ALWAYS
 import java.io.File
+import java.util.logging.Logger
 
 @CommandLine.Command(
     name = "options",
     description = ["Generate options file from patches"],
 )
 internal object OptionsCommand : Runnable {
+    private val logger = Logger.getLogger(OptionsCommand::class.java.name)
+
     @CommandLine.Parameters(
         description = ["Paths to patch bundles"],
         arity = "1..*"
@@ -41,10 +44,10 @@ internal object OptionsCommand : Runnable {
 
     override fun run() = if (!path.exists() || overwrite)
         with(PatchBundleLoader.Jar(*patchBundles)) {
-            if (update) setOptions(path, logger)
+            if (update) setOptions(path)
 
             Options.serialize(this, prettyPrint = true)
                 .let(path::writeText)
         }
-    else logger.error("Options file already exists, use --override to override it")
+    else logger.severe("Options file already exists, use --override to override it")
 }

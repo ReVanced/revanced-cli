@@ -1,6 +1,5 @@
 package app.revanced.cli.command
 
-import app.revanced.cli.patcher.logging.impl.PatcherLogger
 import app.revanced.patcher.PatchBundleLoader
 import app.revanced.patcher.Patcher
 import app.revanced.patcher.PatcherOptions
@@ -20,6 +19,7 @@ import kotlinx.coroutines.runBlocking
 import picocli.CommandLine
 import picocli.CommandLine.Help.Visibility.ALWAYS
 import java.io.File
+import java.util.logging.Logger
 
 
 @CommandLine.Command(
@@ -27,6 +27,8 @@ import java.io.File
     description = ["Patch the supplied APK file with the supplied patches and integrations"]
 )
 internal object PatchCommand: Runnable {
+    private val logger = Logger.getLogger(PatchCommand::class.java.name)
+
     @CommandLine.Parameters(
         description = ["APK file to be patched"],
         arity = "1..1"
@@ -144,15 +146,13 @@ internal object PatchCommand: Runnable {
         // region Prepare
 
         if (!apk.exists()) {
-            logger.error("Input file ${apk.name} does not exist")
+            logger.severe("Input file ${apk.name} does not exist")
             return
         }
 
         val adbManager = deviceSerial?.let { serial ->
-            if (mount) AdbManager.RootAdbManager(serial, logger) else AdbManager.UserAdbManager(
-                serial,
-                logger
-            )
+            if (mount) AdbManager.RootAdbManager(serial)
+            else AdbManager.UserAdbManager(serial)
         }
 
         // endregion
@@ -167,7 +167,7 @@ internal object PatchCommand: Runnable {
         logger.info("Setting patch options")
 
         optionsFile.let {
-            if (it.exists()) patches.setOptions(it, logger)
+            if (it.exists()) patches.setOptions(it)
             else Options.serialize(patches, prettyPrint = true).let(it::writeText)
         }
 
@@ -181,7 +181,6 @@ internal object PatchCommand: Runnable {
                 resourceCachePath,
                 aaptBinaryPath.path,
                 resourceCachePath.absolutePath,
-                PatcherLogger
             )
         )
 
@@ -193,7 +192,7 @@ internal object PatchCommand: Runnable {
             runBlocking {
                 apply(false).collect { patchResult ->
                     patchResult.exception?.let {
-                        logger.error("${patchResult.patchName} failed:\n${patchResult.exception}")
+                        logger.severe("${patchResult.patchName} failed:\n${patchResult.exception}")
                     } ?: logger.info("${patchResult.patchName} succeeded")
                 }
             }
@@ -288,7 +287,7 @@ internal object PatchCommand: Runnable {
                         it.isEmpty() || it.any { version -> version == packageVersion }
                     }
 
-                    if (!matchesVersion) return@patch logger.warn(
+                    if (!matchesVersion) return@patch logger.warning(
                         "${patch.patchName} is incompatible with version $packageVersion. " +
                                 "This patch is only compatible with version " +
                                 packages.joinToString(";") { pkg ->
@@ -296,14 +295,14 @@ internal object PatchCommand: Runnable {
                                 }
                     )
 
-                } ?: return@patch logger.trace(
+                } ?: return@patch logger.fine(
                     "${patch.patchName} is incompatible with $packageName. " +
                             "This patch is only compatible with " +
                             packages.joinToString(", ") { `package` -> `package`.name }
                 )
 
                 return@let
-            } ?: logger.trace("$formattedPatchName: No constraint on packages.")
+            } ?: logger.fine("$formattedPatchName: No constraint on packages.")
 
             /**
              * Check if the patch is explicitly included.
@@ -329,7 +328,7 @@ internal object PatchCommand: Runnable {
             val included = implicitlyIncluded || exclusivelyIncluded
             if (!included) return@patch logger.info("${patch.patchName} excluded by default") // Case 1.
 
-            logger.trace("Adding $formattedPatchName")
+            logger.fine("Adding $formattedPatchName")
 
             add(patch)
         }

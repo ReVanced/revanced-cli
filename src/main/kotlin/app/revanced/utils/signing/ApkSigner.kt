@@ -1,6 +1,5 @@
 package app.revanced.utils.signing
 
-import app.revanced.cli.command.logger
 import com.android.apksig.ApkSigner
 import org.bouncycastle.asn1.x500.X500Name
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo
@@ -16,10 +15,13 @@ import java.math.BigInteger
 import java.security.*
 import java.security.cert.X509Certificate
 import java.util.*
+import java.util.logging.Logger
 
 internal class ApkSigner(
     private val signingOptions: SigningOptions
 ) {
+    private val logger = Logger.getLogger(ApkSigner::class.java.name)
+
     private val signer: ApkSigner.Builder
     private val passwordCharArray = signingOptions.password.toCharArray()
 

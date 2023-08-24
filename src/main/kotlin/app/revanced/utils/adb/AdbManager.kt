@@ -1,6 +1,5 @@
 package app.revanced.utils.adb
 
-import app.revanced.cli.logging.CliLogger
 import app.revanced.utils.adb.AdbManager.Apk
 import app.revanced.utils.adb.Constants.COMMAND_CREATE_DIR
 import app.revanced.utils.adb.Constants.COMMAND_DELETE
@@ -19,18 +18,21 @@ import se.vidstige.jadb.managers.Package
 import se.vidstige.jadb.managers.PackageManager
 import java.io.Closeable
 import java.io.File
+import java.util.logging.Logger
 
 /**
  * Adb manager. Used to install and uninstall [Apk] files.
  *
  * @param deviceSerial The serial of the device.
  */
-internal sealed class AdbManager(deviceSerial: String? = null, protected val logger: CliLogger? = null) : Closeable {
+internal sealed class AdbManager(deviceSerial: String? = null) : Closeable {
+    protected val logger: Logger = Logger.getLogger(AdbManager::class.java.name)
+
     protected val device = JadbConnection().devices.find { device -> device.serial == deviceSerial }
         ?: throw DeviceNotFoundException(deviceSerial)
 
     init {
-        logger?.trace("Established connection to $deviceSerial")
+        logger.fine("Established connection to $deviceSerial")
     }
 
     /**
@@ -39,7 +41,7 @@ internal sealed class AdbManager(deviceSerial: String? = null, protected val log
      * @param apk The [Apk] file.
      */
     open fun install(apk: Apk) {
-        logger?.info("Finished installing ${apk.file.name}")
+        logger.info("Finished installing ${apk.file.name}")
     }
 
     /**
@@ -48,23 +50,23 @@ internal sealed class AdbManager(deviceSerial: String? = null, protected val log
      * @param packageName The package name.
      */
     open fun uninstall(packageName: String) {
-        logger?.info("Finished uninstalling $packageName")
+        logger.info("Finished uninstalling $packageName")
     }
 
     /**
      * Closes the [AdbManager] instance.
      */
     override fun close() {
-        logger?.trace("Closed")
+        logger.fine("Closed")
     }
 
-    class RootAdbManager(deviceSerial: String, logger: CliLogger? = null) : AdbManager(deviceSerial, logger) {
+    class RootAdbManager(deviceSerial: String) : AdbManager(deviceSerial) {
         init {
             if (!device.hasSu()) throw IllegalArgumentException("Root required on $deviceSerial. Task failed")
         }
 
         override fun install(apk: Apk) {
-            logger?.info("Installing by mounting")
+            logger.info("Installing by mounting")
 
             val applyReplacement = getPlaceholderReplacement(
                 apk.packageName ?: throw IllegalArgumentException("Package name is required")
@@ -86,7 +88,7 @@ internal sealed class AdbManager(deviceSerial: String? = null, protected val log
         }
 
         override fun uninstall(packageName: String) {
-            logger?.info("Uninstalling $packageName by unmounting and deleting the package")
+            logger.info("Uninstalling $packageName by unmounting and deleting the package")
 
             val applyReplacement = getPlaceholderReplacement(packageName)
 
@@ -103,7 +105,7 @@ internal sealed class AdbManager(deviceSerial: String? = null, protected val log
         }
     }
 
-    class UserAdbManager(deviceSerial: String, logger: CliLogger? = null) : AdbManager(deviceSerial, logger) {
+    class UserAdbManager(deviceSerial: String) : AdbManager(deviceSerial) {
         private val packageManager = PackageManager(device)
 
         override fun install(apk: Apk) {
@@ -113,7 +115,7 @@ internal sealed class AdbManager(deviceSerial: String? = null, protected val log
         }
 
         override fun uninstall(packageName: String) {
-            logger?.info("Uninstalling $packageName")
+            logger.info("Uninstalling $packageName")
 
             packageManager.uninstall(Package(packageName))
 
