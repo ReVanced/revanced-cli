@@ -204,7 +204,6 @@ internal object PatchCommand : Runnable {
 
         if (purge) {
             logger.info("Purging temporary files")
-            outputFilePath.delete()
             purge(resourceCachePath)
         }
 
