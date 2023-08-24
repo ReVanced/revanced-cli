@@ -96,6 +96,7 @@ internal sealed class AdbManager(deviceSerial: String? = null) : Closeable {
             device.run(UMOUNT.applyReplacement(packageName))
             device.run(DELETE.applyReplacement(PATCHED_APK_PATH).applyReplacement())
             device.run(DELETE.applyReplacement(MOUNT_PATH).applyReplacement())
+            device.run(DELETE.applyReplacement(TMP_PATH).applyReplacement())
 
             super.uninstall(packageName)
         }
