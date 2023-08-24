@@ -18,8 +18,8 @@ internal fun JadbDevice.run(command: String, su: Boolean = false) = with(this.st
 internal fun JadbDevice.hasSu() =
     this.startCommand("su -h", false).waitFor() == 0
 
-internal fun JadbDevice.copyFile(file: File, targetFile: String) =
-    push(file, RemoteFile(targetFile))
+internal fun JadbDevice.push(file: File, targetFilePath: String) =
+    push(file, RemoteFile(targetFilePath))
 
 internal fun JadbDevice.createFile(targetFile: String, content: String) =
     push(content.byteInputStream(), System.currentTimeMillis(), 644, RemoteFile(targetFile))

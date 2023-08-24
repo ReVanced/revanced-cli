@@ -1,18 +1,18 @@
 package app.revanced.utils.adb
 
 import app.revanced.utils.adb.AdbManager.Apk
-import app.revanced.utils.adb.Constants.COMMAND_CREATE_DIR
-import app.revanced.utils.adb.Constants.COMMAND_DELETE
-import app.revanced.utils.adb.Constants.COMMAND_INSTALL_MOUNT
-import app.revanced.utils.adb.Constants.COMMAND_PREPARE_MOUNT_APK
-import app.revanced.utils.adb.Constants.COMMAND_RESTART
-import app.revanced.utils.adb.Constants.COMMAND_UMOUNT
-import app.revanced.utils.adb.Constants.CONTENT_MOUNT_SCRIPT
-import app.revanced.utils.adb.Constants.PATH_INIT_PUSH
-import app.revanced.utils.adb.Constants.PATH_INSTALLATION
-import app.revanced.utils.adb.Constants.PATH_MOUNT
-import app.revanced.utils.adb.Constants.PATH_PATCHED_APK
+import app.revanced.utils.adb.Constants.CREATE_DIR
+import app.revanced.utils.adb.Constants.DELETE
+import app.revanced.utils.adb.Constants.INSTALLATION_PATH
+import app.revanced.utils.adb.Constants.INSTALL_MOUNT
+import app.revanced.utils.adb.Constants.INSTALL_PATCHED_APK
+import app.revanced.utils.adb.Constants.MOUNT_PATH
+import app.revanced.utils.adb.Constants.MOUNT_SCRIPT
+import app.revanced.utils.adb.Constants.PATCHED_APK_PATH
 import app.revanced.utils.adb.Constants.PLACEHOLDER
+import app.revanced.utils.adb.Constants.RESTART
+import app.revanced.utils.adb.Constants.TMP_PATH
+import app.revanced.utils.adb.Constants.UMOUNT
 import se.vidstige.jadb.JadbConnection
 import se.vidstige.jadb.managers.Package
 import se.vidstige.jadb.managers.PackageManager
@@ -72,17 +72,17 @@ internal sealed class AdbManager(deviceSerial: String? = null) : Closeable {
                 apk.packageName ?: throw IllegalArgumentException("Package name is required")
             )
 
-            device.copyFile(apk.file, PATH_INIT_PUSH)
+            device.push(apk.file, TMP_PATH)
 
-            device.run("$COMMAND_CREATE_DIR $PATH_INSTALLATION")
-            device.run(COMMAND_PREPARE_MOUNT_APK.applyReplacement())
+            device.run("$CREATE_DIR $INSTALLATION_PATH")
+            device.run(INSTALL_PATCHED_APK.applyReplacement())
 
-            device.createFile(PATH_INIT_PUSH, CONTENT_MOUNT_SCRIPT.applyReplacement())
+            device.createFile(TMP_PATH, MOUNT_SCRIPT.applyReplacement())
 
-            device.run(COMMAND_INSTALL_MOUNT.applyReplacement())
-            device.run(COMMAND_UMOUNT.applyReplacement()) // Sanity check.
-            device.run(PATH_MOUNT.applyReplacement())
-            device.run(COMMAND_RESTART.applyReplacement())
+            device.run(INSTALL_MOUNT.applyReplacement())
+            device.run(UMOUNT.applyReplacement()) // Sanity check.
+            device.run(MOUNT_PATH.applyReplacement())
+            device.run(RESTART.applyReplacement())
 
             super.install(apk)
         }
@@ -92,9 +92,9 @@ internal sealed class AdbManager(deviceSerial: String? = null) : Closeable {
 
             val applyReplacement = getPlaceholderReplacement(packageName)
 
-            device.run(COMMAND_UMOUNT.applyReplacement(packageName))
-            device.run(COMMAND_DELETE.applyReplacement(PATH_PATCHED_APK).applyReplacement())
-            device.run(COMMAND_DELETE.applyReplacement(PATH_MOUNT).applyReplacement())
+            device.run(UMOUNT.applyReplacement(packageName))
+            device.run(DELETE.applyReplacement(PATCHED_APK_PATH).applyReplacement())
+            device.run(DELETE.applyReplacement(MOUNT_PATH).applyReplacement())
 
             super.uninstall(packageName)
         }
