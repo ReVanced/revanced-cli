@@ -127,6 +127,7 @@ internal sealed class AdbManager(deviceSerial: String? = null) : Closeable {
      * Apk file for [AdbManager].
      *
      * @param file The [Apk] file.
+     * @param packageName The package name of the [Apk] file.
      */
     internal class Apk(val file: File, val packageName: String? = null)
 
