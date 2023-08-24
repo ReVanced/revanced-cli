@@ -19,6 +19,8 @@ import kotlinx.coroutines.runBlocking
 import picocli.CommandLine
 import picocli.CommandLine.Help.Visibility.ALWAYS
 import java.io.File
+import java.io.PrintWriter
+import java.io.StringWriter
 import java.util.logging.Logger
 
 
@@ -174,7 +176,10 @@ internal object PatchCommand : Runnable {
             runBlocking {
                 apply(false).collect { patchResult ->
                     patchResult.exception?.let {
-                        logger.severe("${patchResult.patchName} failed:\n${patchResult.exception}")
+                        StringWriter().use { writer ->
+                            it.printStackTrace(PrintWriter(writer))
+                            logger.severe("${patchResult.patchName} failed: $writer")
+                        }
                     } ?: logger.info("${patchResult.patchName} succeeded")
                 }
             }
