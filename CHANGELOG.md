@@ -1,3 +1,10 @@
+# [3.0.0-dev.4](https://github.com/ReVanced/revanced-cli/compare/v3.0.0-dev.3...v3.0.0-dev.4) (2023-08-24)
+
+
+### Features
+
+* properly make use of logging facade ([41898d7](https://github.com/ReVanced/revanced-cli/commit/41898d7547690e3130372414515c5645e5dc2634))
+
 # [3.0.0-dev.3](https://github.com/ReVanced/revanced-cli/compare/v3.0.0-dev.2...v3.0.0-dev.3) (2023-08-23)
 
 # [3.0.0-dev.2](https://github.com/ReVanced/revanced-cli/compare/v3.0.0-dev.1...v3.0.0-dev.2) (2023-08-23)
