@@ -1,3 +1,19 @@
+# [3.0.0-dev.5](https://github.com/ReVanced/revanced-cli/compare/v3.0.0-dev.4...v3.0.0-dev.5) (2023-08-24)
+
+
+### Bug Fixes
+
+* also delete temporary files when uninstalling ([52c3be2](https://github.com/ReVanced/revanced-cli/commit/52c3be23f2915dccaee7f9941413c8f81e14acc8))
+* delete temporary files after root installation ([a3d8705](https://github.com/ReVanced/revanced-cli/commit/a3d8705e89732a0dd4f51de28c405b6af13c8633))
+* fix running commands not running ([2c7fcaf](https://github.com/ReVanced/revanced-cli/commit/2c7fcaf4add65a12052afc5bef779dbc73debd69))
+* only check once for patch options ([11c3a6c](https://github.com/ReVanced/revanced-cli/commit/11c3a6cfd4fe59ba5d703358634a1853e1cc22a5))
+
+
+### Features
+
+* add install command ([0350b7f](https://github.com/ReVanced/revanced-cli/commit/0350b7f1a276d9dc795b22442ba4f202855ea090))
+* use friendly descriptions ([3dd875d](https://github.com/ReVanced/revanced-cli/commit/3dd875d14cca488ade6d21bbd4cce0d481692134))
+
 # [3.0.0-dev.4](https://github.com/ReVanced/revanced-cli/compare/v3.0.0-dev.3...v3.0.0-dev.4) (2023-08-24)
 
 
