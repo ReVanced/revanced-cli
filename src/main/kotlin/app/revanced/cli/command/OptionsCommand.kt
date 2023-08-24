@@ -16,38 +16,31 @@ internal object OptionsCommand : Runnable {
     private val logger = Logger.getLogger(OptionsCommand::class.java.name)
 
     @CommandLine.Parameters(
-        description = ["Paths to patch bundles"],
-        arity = "1..*"
+        description = ["Paths to patch bundles"], arity = "1..*"
     )
-    lateinit var patchBundles: Array<File>
+    private lateinit var patchBundles: Array<File>
 
     @CommandLine.Option(
-        names = ["-p", "--path"],
-        description = ["Path to patch options JSON file"],
-        showDefaultValue = ALWAYS
+        names = ["-p", "--path"], description = ["Path to patch options JSON file"], showDefaultValue = ALWAYS
     )
-    var path: File = File("options.json")
+    private var path: File = File("options.json")
 
     @CommandLine.Option(
-        names = ["-o", "--overwrite"],
-        description = ["Overwrite existing options file"],
-        showDefaultValue = ALWAYS
+        names = ["-o", "--overwrite"], description = ["Overwrite existing options file"], showDefaultValue = ALWAYS
     )
-    var overwrite: Boolean = false
+    private var overwrite: Boolean = false
 
     @CommandLine.Option(
         names = ["-u", "--update"],
         description = ["Update existing options by adding missing and removing non-existent options"],
         showDefaultValue = ALWAYS
     )
-    var update: Boolean = false
+    private var update: Boolean = false
 
-    override fun run() = if (!path.exists() || overwrite)
-        with(PatchBundleLoader.Jar(*patchBundles)) {
-            if (update) setOptions(path)
+    override fun run() = if (!path.exists() || overwrite) with(PatchBundleLoader.Jar(*patchBundles)) {
+        if (update) setOptions(path)
 
-            Options.serialize(this, prettyPrint = true)
-                .let(path::writeText)
-        }
+        Options.serialize(this, prettyPrint = true).let(path::writeText)
+    }
     else logger.severe("Options file already exists, use --override to override it")
 }

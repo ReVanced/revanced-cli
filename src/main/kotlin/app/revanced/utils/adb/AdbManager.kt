@@ -89,7 +89,7 @@ internal sealed class AdbManager(deviceSerial: String? = null) : Closeable {
         }
 
         override fun uninstall(packageName: String) {
-            logger.info("Uninstalling $packageName by unmounting and deleting the package")
+            logger.info("Uninstalling $packageName by unmounting")
 
             val applyReplacement = getPlaceholderReplacement(packageName)
 

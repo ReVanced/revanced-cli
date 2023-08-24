@@ -23,84 +23,69 @@ import java.util.logging.Logger
 
 
 @CommandLine.Command(
-    name = "patch",
-    description = ["Patch the supplied APK file with the supplied patches and integrations"]
+    name = "patch", description = ["Patch the supplied APK file with the supplied patches and integrations"]
 )
-internal object PatchCommand: Runnable {
+internal object PatchCommand : Runnable {
     private val logger = Logger.getLogger(PatchCommand::class.java.name)
 
     @CommandLine.Parameters(
-        description = ["APK file to be patched"],
-        arity = "1..1"
+        description = ["APK file to be patched"], arity = "1..1"
     )
-    lateinit var apk: File
+    private lateinit var apk: File
 
     @CommandLine.Option(
-        names = ["-b", "--patch-bundle"],
-        description = ["One or more bundles of patches"],
-        required = true
+        names = ["-b", "--patch-bundle"], description = ["One or more bundles of patches"], required = true
     )
-    var patchBundles = emptyList<File>()
+    private var patchBundles = emptyList<File>()
 
     @CommandLine.Option(
-        names = ["-m", "--merge"],
-        description = ["One or more DEX files or containers to merge into the APK"]
+        names = ["-m", "--merge"], description = ["One or more DEX files or containers to merge into the APK"]
     )
-    var integrations = listOf<File>()
+    private var integrations = listOf<File>()
 
     @CommandLine.Option(
-        names = ["-i", "--include"],
-        description = ["List of patches to include"]
+        names = ["-i", "--include"], description = ["List of patches to include"]
     )
-    var includedPatches = arrayOf<String>()
+    private var includedPatches = arrayOf<String>()
 
     @CommandLine.Option(
-        names = ["-e", "--exclude"],
-        description = ["List of patches to exclude"]
+        names = ["-e", "--exclude"], description = ["List of patches to exclude"]
     )
-    var excludedPatches = arrayOf<String>()
+    private var excludedPatches = arrayOf<String>()
 
     @CommandLine.Option(
-        names = ["--options"],
-        description = ["Path to patch options JSON file"],
-        showDefaultValue = ALWAYS
+        names = ["--options"], description = ["Path to patch options JSON file"], showDefaultValue = ALWAYS
     )
-    var optionsFile: File = File("options.json")
+    private var optionsFile: File = File("options.json")
 
     @CommandLine.Option(
         names = ["--exclusive"],
         description = ["Only include patches that are explicitly specified to be included"],
         showDefaultValue = ALWAYS
     )
-    var exclusive = false
+    private var exclusive = false
 
     @CommandLine.Option(
         names = ["--experimental"],
         description = ["Ignore patches incompatibility to versions"],
         showDefaultValue = ALWAYS
     )
-    var experimental: Boolean = false
+    private var experimental: Boolean = false
 
     @CommandLine.Option(
-        names = ["-o", "--out"],
-        description = ["Path to save the patched APK file to"],
-        required = true
+        names = ["-o", "--out"], description = ["Path to save the patched APK file to"], required = true
     )
-    lateinit var outputFilePath: File
+    private lateinit var outputFilePath: File
 
     @CommandLine.Option(
-        names = ["-d", "--device-serial"],
-        description = ["ADB device serial to install to"],
-        showDefaultValue = ALWAYS
+        names = ["-d", "--device-serial"], description = ["ADB device serial to install to"], showDefaultValue = ALWAYS
     )
-    var deviceSerial: String? = null
+    private var deviceSerial: String? = null
 
     @CommandLine.Option(
-        names = ["--mount"],
-        description = ["Install by mounting the patched package"],
-        showDefaultValue = ALWAYS
+        names = ["--mount"], description = ["Install by mounting the patched APK file"], showDefaultValue = ALWAYS
     )
-    var mount: Boolean = false
+    private var mount: Boolean = false
 
     @CommandLine.Option(
         names = ["--common-name"],
@@ -108,39 +93,36 @@ internal object PatchCommand: Runnable {
         showDefaultValue = ALWAYS
 
     )
-    var commonName = "ReVanced"
+    private var commonName = "ReVanced"
 
     @CommandLine.Option(
-        names = ["--keystore"],
-        description = ["Path to the keystore to sign the patched APK file with"]
+        names = ["--keystore"], description = ["Path to the keystore to sign the patched APK file with"]
     )
-    var keystorePath: String? = null
+    private var keystorePath: String? = null
 
     @CommandLine.Option(
-        names = ["--password"],
-        description = ["The password of the keystore to sign the patched APK file with"]
+        names = ["--password"], description = ["The password of the keystore to sign the patched APK file with"]
     )
-    var password = "ReVanced"
+    private var password = "ReVanced"
 
     @CommandLine.Option(
         names = ["-r", "--resource-cache"],
         description = ["Path to temporary resource cache directory"],
         showDefaultValue = ALWAYS
     )
-    var resourceCachePath = File("revanced-resource-cache")
+    private var resourceCachePath = File("revanced-resource-cache")
 
     @CommandLine.Option(
-        names = ["--custom-aapt2-binary"],
-        description = ["Path to a custom AAPT binary to compile resources with"]
+        names = ["--custom-aapt2-binary"], description = ["Path to a custom AAPT binary to compile resources with"]
     )
-    var aaptBinaryPath = File("")
+    private var aaptBinaryPath = File("")
 
     @CommandLine.Option(
         names = ["-p", "--purge"],
         description = ["Purge the temporary resource cache directory after patching"],
         showDefaultValue = ALWAYS
     )
-    var purge: Boolean = false
+    private var purge: Boolean = false
 
     override fun run() {
         // region Prepare
@@ -206,8 +188,7 @@ internal object PatchCommand: Runnable {
 
         val alignAndSignedFile = sign(
             apk.newAlignedFile(
-                result,
-                resourceCachePath.resolve("${outputFilePath.nameWithoutExtension}_aligned.apk")
+                result, resourceCachePath.resolve("${outputFilePath.nameWithoutExtension}_aligned.apk")
             )
         )
 
@@ -287,19 +268,16 @@ internal object PatchCommand: Runnable {
                         it.isEmpty() || it.any { version -> version == packageVersion }
                     }
 
-                    if (!matchesVersion) return@patch logger.warning(
-                        "${patch.patchName} is incompatible with version $packageVersion. " +
-                                "This patch is only compatible with version " +
-                                packages.joinToString(";") { pkg ->
-                                    "${pkg.name}: ${pkg.versions.joinToString(", ")}"
-                                }
-                    )
+                    if (!matchesVersion) return@patch logger.warning("${patch.patchName} is incompatible with version $packageVersion. " + "This patch is only compatible with version " + packages.joinToString(
+                        ";"
+                    ) { pkg ->
+                        "${pkg.name}: ${pkg.versions.joinToString(", ")}"
+                    })
 
-                } ?: return@patch logger.fine(
-                    "${patch.patchName} is incompatible with $packageName. " +
-                            "This patch is only compatible with " +
-                            packages.joinToString(", ") { `package` -> `package`.name }
-                )
+                }
+                    ?: return@patch logger.fine("${patch.patchName} is incompatible with $packageName. " + "This patch is only compatible with " + packages.joinToString(
+                        ", "
+                    ) { `package` -> `package`.name })
 
                 return@let
             } ?: logger.fine("$formattedPatchName: No constraint on packages.")
@@ -341,8 +319,7 @@ internal object PatchCommand: Runnable {
      * @param outputFile The file to save the aligned APK to.
      */
     private fun File.newAlignedFile(
-        result: PatcherResult,
-        outputFile: File
+        result: PatcherResult, outputFile: File
     ): File {
         logger.info("Aligning $name")
 
@@ -351,23 +328,20 @@ internal object PatchCommand: Runnable {
         ZipFile(outputFile).use { file ->
             result.dexFiles.forEach {
                 file.addEntryCompressData(
-                    ZipEntry.createWithName(it.name),
-                    it.stream.readBytes()
+                    ZipEntry.createWithName(it.name), it.stream.readBytes()
                 )
             }
 
             result.resourceFile?.let {
                 file.copyEntriesFromFileAligned(
-                    ZipFile(it),
-                    ZipAligner::getEntryAlignment
+                    ZipFile(it), ZipAligner::getEntryAlignment
                 )
             }
 
             // TODO: Do not compress result.doNotCompress
 
             file.copyEntriesFromFileAligned(
-                ZipFile(this),
-                ZipAligner::getEntryAlignment
+                ZipFile(this), ZipAligner::getEntryAlignment
             )
         }
 
@@ -380,32 +354,25 @@ internal object PatchCommand: Runnable {
      * @param inputFile The APK file to sign.
      * @return The signed APK file. If [mount] is true, the input file will be returned.
      */
-    private fun sign(inputFile: File) = if (mount)
-        inputFile
+    private fun sign(inputFile: File) = if (mount) inputFile
     else {
         logger.info("Signing ${inputFile.name}")
 
-        val keyStoreFilePath = keystorePath ?: outputFilePath
-            .absoluteFile.parentFile.resolve("${outputFilePath.nameWithoutExtension}.keystore").canonicalPath
+        val keyStoreFilePath = keystorePath
+            ?: outputFilePath.absoluteFile.parentFile.resolve("${outputFilePath.nameWithoutExtension}.keystore").canonicalPath
 
         val options = SigningOptions(
-            commonName,
-            password,
-            keyStoreFilePath
+            commonName, password, keyStoreFilePath
         )
 
-        ApkSigner(options)
-            .signApk(
-                inputFile,
-                resourceCachePath.resolve("${outputFilePath.nameWithoutExtension}_signed.apk")
+        ApkSigner(options).signApk(
+                inputFile, resourceCachePath.resolve("${outputFilePath.nameWithoutExtension}_signed.apk")
             )
     }
 
     private fun purge(resourceCachePath: File) {
-        val result = if (resourceCachePath.deleteRecursively())
-            "Purged resource cache directory"
-        else
-            "Failed to purge resource cache directory"
+        val result = if (resourceCachePath.deleteRecursively()) "Purged resource cache directory"
+        else "Failed to purge resource cache directory"
         logger.info(result)
     }
 }

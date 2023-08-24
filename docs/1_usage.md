@@ -86,12 +86,26 @@ Learn how to ReVanced CLI.
 
   > **Note**: Some patches may require integrations
   such as [ReVanced Integrations](https://github.com/revanced/revanced-integrations). 
-  Supply them with the option `-m`. If any patches accepted by ReVanced Patcher require ReVanced Integrations, 
+  Supply them with the option `--merge`. If any patches accepted by ReVanced Patcher require ReVanced Integrations, 
   they will be merged into the APK file automatically.
 
 - ### 🗑️ Uninstall a patched APK file
   ```bash
-  java -jar revanced-cli.jar uninstall \
+  java -jar revanced-cli.jar utility uninstall \
    --package-name <package-name> \
    <device-serial>
   ```
+
+  > **Note**: You can unmount an APK file
+  with the option `--unmount`.
+
+- ### ️ ⚙️ Manually install an APK file
+
+  ```bash
+  java -jar revanced-cli.jar utility install \
+   -a input.apk \
+   <device-serial>
+  ```
+
+  > **Note**: You can mount an APK file 
+  by supplying the package name of the app to mount the supplied APK file to over the option `--mount`.

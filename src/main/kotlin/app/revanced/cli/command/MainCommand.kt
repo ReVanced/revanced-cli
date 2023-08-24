@@ -1,5 +1,6 @@
 package app.revanced.cli.command
 
+import app.revanced.cli.command.utility.UtilityCommand
 import app.revanced.patcher.patch.PatchClass
 import picocli.CommandLine
 import picocli.CommandLine.Command
@@ -42,7 +43,7 @@ fun main(args: Array<String>) {
 
 internal typealias PatchList = List<PatchClass>
 
-object CLIVersionProvider : IVersionProvider {
+private object CLIVersionProvider : IVersionProvider {
     override fun getVersion(): Array<String> {
         Properties().apply {
             load(MainCommand::class.java.getResourceAsStream("/app/revanced/cli/version.properties"))
@@ -60,8 +61,8 @@ object CLIVersionProvider : IVersionProvider {
     subcommands = [
         ListPatchesCommand::class,
         PatchCommand::class,
-        UninstallCommand::class,
         OptionsCommand::class,
+        UtilityCommand::class,
     ]
 )
-internal object MainCommand
+private object MainCommand

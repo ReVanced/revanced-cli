@@ -1,4 +1,4 @@
-package app.revanced.cli.command
+package app.revanced.cli.command.utility
 
 import app.revanced.utils.adb.AdbManager
 import picocli.CommandLine.*
@@ -13,28 +13,21 @@ import java.util.logging.Logger
 internal object UninstallCommand : Runnable {
     private val logger = Logger.getLogger(UninstallCommand::class.java.name)
 
-    @Parameters(
-        description = ["ADB device serials"],
-        arity = "1..*"
-    )
-    lateinit var deviceSerials: Array<String>
+    @Parameters(description = ["ADB device serials"], arity = "1..*")
+    private lateinit var deviceSerials: Array<String>
 
-    @Option(
-        names = ["-p", "--package-name"],
-        description = ["Package name to uninstall"],
-        required = true
-    )
-    lateinit var packageName: String
+    @Option(names = ["-p", "--package-name"], description = ["Package name to uninstall"], required = true)
+    private lateinit var packageName: String
 
     @Option(
         names = ["-u", "--unmount"],
-        description = ["Uninstall by unmounting the patched package"],
+        description = ["Uninstall by unmounting the patched APK file"],
         showDefaultValue = ALWAYS
     )
-    var unmount: Boolean = false
+    private var unmount: Boolean = false
 
     override fun run() = try {
-        deviceSerials.forEach {deviceSerial ->
+        deviceSerials.forEach { deviceSerial ->
             if (unmount) {
                 AdbManager.RootAdbManager(deviceSerial)
             } else {

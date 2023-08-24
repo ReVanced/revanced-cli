@@ -19,38 +19,33 @@ internal object ListPatchesCommand : Runnable {
     private val logger = Logger.getLogger(ListPatchesCommand::class.java.name)
 
     @Parameters(
-        description = ["Paths to patch bundles"],
-        arity = "1..*"
+        description = ["Paths to patch bundles"], arity = "1..*"
     )
-    lateinit var patchBundles: Array<File>
+    private lateinit var patchBundles: Array<File>
 
     @Option(
-        names = ["-d", "--with-descriptions"],
-        description = ["List their descriptions"],
-        showDefaultValue = ALWAYS
+        names = ["-d", "--with-descriptions"], description = ["List their descriptions"], showDefaultValue = ALWAYS
     )
-    var withDescriptions: Boolean = true
+    private var withDescriptions: Boolean = true
 
     @Option(
         names = ["-p", "--with-packages"],
         description = ["List the packages the patches are compatible with"],
         showDefaultValue = ALWAYS
     )
-    var withPackages: Boolean = false
+    private var withPackages: Boolean = false
 
     @Option(
         names = ["-v", "--with-versions"],
-        description = ["List the versions of the packages the patches are compatible with"],
+        description = ["List the versions of the apps the patches are compatible with"],
         showDefaultValue = ALWAYS
     )
-    var withVersions: Boolean = false
+    private var withVersions: Boolean = false
 
     @Option(
-        names = ["-o", "--with-options"],
-        description = ["List the options of the patches"],
-        showDefaultValue = ALWAYS
+        names = ["-o", "--with-options"], description = ["List the options of the patches"], showDefaultValue = ALWAYS
     )
-    var withOptions: Boolean = false
+    private var withOptions: Boolean = false
 
     override fun run() {
         fun Package.buildString() = buildString {
@@ -58,8 +53,7 @@ internal object ListPatchesCommand : Runnable {
                 appendLine("Package name: $name")
                 appendLine("Compatible versions:")
                 append(versions.joinToString("\n") { version -> version }.prependIndent("\t"))
-            } else
-                append("Package name: $name")
+            } else append("Package name: $name")
         }
 
         fun PatchOption<*>.buildString() = buildString {
