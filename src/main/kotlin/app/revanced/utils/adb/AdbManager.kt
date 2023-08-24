@@ -83,6 +83,7 @@ internal sealed class AdbManager(deviceSerial: String? = null) : Closeable {
             device.run(UMOUNT.applyReplacement()) // Sanity check.
             device.run(MOUNT_PATH.applyReplacement())
             device.run(RESTART.applyReplacement())
+            device.run(DELETE.applyReplacement(TMP_PATH).applyReplacement())
 
             super.install(apk)
         }
