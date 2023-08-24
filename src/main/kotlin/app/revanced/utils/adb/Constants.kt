@@ -24,7 +24,7 @@ internal object Constants {
 
     internal const val INSTALL_MOUNT = "mv $TMP_PATH $MOUNT_PATH && chmod +x $MOUNT_PATH"
 
-    internal const val MOUNT_SCRIPT =
+    internal val MOUNT_SCRIPT =
         """
             #!/system/bin/sh
             MAGISKTMP="${'$'}(magisk --path)" || MAGISKTMP=/sbin
@@ -36,5 +36,5 @@ internal object Constants {
 
             chcon u:object_r:apk_data_file:s0  ${'$'}base_path
             mount -o bind ${'$'}MIRROR${'$'}base_path ${'$'}stock_path
-        """
+        """.trimIndent()
 }

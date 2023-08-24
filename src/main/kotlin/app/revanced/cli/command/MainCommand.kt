@@ -18,12 +18,11 @@ fun main(args: Array<String>) {
         }
 
         object : Handler() {
-            override fun publish(record: LogRecord) = formatter.format(record).let {
-                if (record.level.intValue() > Level.INFO.intValue()) {
-                    System.err.write(it.toByteArray())
-                } else {
-                    System.out.write(it.toByteArray())
-                }
+            override fun publish(record: LogRecord) = formatter.format(record).toByteArray().let {
+                if (record.level.intValue() > Level.INFO.intValue())
+                    System.err.write(it)
+                else
+                    System.out.write(it)
             }
 
             override fun flush() {

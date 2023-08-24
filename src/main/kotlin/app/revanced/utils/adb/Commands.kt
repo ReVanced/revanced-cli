@@ -2,17 +2,21 @@ package app.revanced.utils.adb
 
 import se.vidstige.jadb.JadbDevice
 import se.vidstige.jadb.RemoteFile
+import se.vidstige.jadb.ShellProcessBuilder
 import java.io.File
-import java.util.concurrent.Callable
-import java.util.concurrent.Executors
 
-// return the input or output stream, depending on which first returns a value
-internal fun JadbDevice.run(command: String, su: Boolean = false) = with(this.startCommand(command, su)) {
-    Executors.newFixedThreadPool(2).let { service ->
-        arrayOf(inputStream, errorStream).map { stream ->
-            Callable { stream.bufferedReader().use { it.readLine() } }
-        }.let { tasks -> service.invokeAny(tasks).also { service.shutdown() } }
-    }
+
+internal fun JadbDevice.buildCommand(command: String, su: Boolean = true): ShellProcessBuilder {
+    if (su) return shellProcessBuilder("su -c \'$command\'")
+
+    val args = command.split(" ") as ArrayList<String>
+    val cmd = args.removeFirst()
+
+    return shellProcessBuilder(cmd, *args.toTypedArray())
+}
+
+internal fun JadbDevice.run(command: String, su: Boolean = true): Int {
+    return this.buildCommand(command, su).start().waitFor()
 }
 
 internal fun JadbDevice.hasSu() =
