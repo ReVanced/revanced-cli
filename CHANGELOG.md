@@ -1,3 +1,10 @@
+# [3.0.0-dev.10](https://github.com/ReVanced/revanced-cli/compare/v3.0.0-dev.9...v3.0.0-dev.10) (2023-08-25)
+
+
+### Bug Fixes
+
+* filtration of patches malfunctioning ([2d5a7fd](https://github.com/ReVanced/revanced-cli/commit/2d5a7fdf1eb2e13f5013a790b03f09851b167fe0))
+
 # [3.0.0-dev.9](https://github.com/ReVanced/revanced-cli/compare/v3.0.0-dev.8...v3.0.0-dev.9) (2023-08-25)
 
 
