@@ -130,7 +130,16 @@ internal object PatchCommand : Runnable {
         // region Prepare
 
         if (!apk.exists()) {
-            logger.severe("Input file ${apk.name} does not exist")
+            logger.severe("APK file ${apk.name} does not exist")
+            return
+        }
+
+        integrations.filter { !it.exists() }.let {
+            if (it.isEmpty()) return@let
+
+            it.forEach { integration ->
+                logger.severe("Integration file ${integration.name} does not exist")
+            }
             return
         }
 
