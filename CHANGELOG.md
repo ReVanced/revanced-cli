@@ -1,3 +1,10 @@
+# [3.0.0-dev.9](https://github.com/ReVanced/revanced-cli/compare/v3.0.0-dev.8...v3.0.0-dev.9) (2023-08-25)
+
+
+### Features
+
+* Check for missing integrations ([c93186f](https://github.com/ReVanced/revanced-cli/commit/c93186fb9700907e65f33442e88073783cc163de))
+
 # [3.0.0-dev.8](https://github.com/ReVanced/revanced-cli/compare/v3.0.0-dev.7...v3.0.0-dev.8) (2023-08-24)
 
 
