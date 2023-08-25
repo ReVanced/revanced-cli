@@ -68,11 +68,11 @@ internal object PatchCommand : Runnable {
     private var exclusive = false
 
     @CommandLine.Option(
-        names = ["--experimental"],
-        description = ["Ignore patches incompatibility to versions"],
+        names = ["-f","--force"],
+        description = ["Force inclusion of patches that are incompatible with the supplied APK file's version"],
         showDefaultValue = ALWAYS
     )
-    private var experimental: Boolean = false
+    private var force: Boolean = false
 
     @CommandLine.Option(
         names = ["-o", "--out"], description = ["Path to save the patched APK file to"], required = true
@@ -225,8 +225,8 @@ internal object PatchCommand : Runnable {
      * - [includedPatches] (explicitly included)
      * - [excludedPatches] (explicitly excluded)
      * - [exclusive] (only include patches that are explicitly included)
-     * - [experimental] (ignore patches incompatibility to versions)
-     * - package name and version of the input APK file (if [experimental] is false)
+     * - [force] (ignore patches incompatibility to versions)
+     * - Package name and version of the input APK file (if [force] is false)
      *
      * @param patches The patches to filter.
      * @return The filtered patches.
@@ -238,46 +238,22 @@ internal object PatchCommand : Runnable {
         patches.forEach patch@{ patch ->
             val formattedPatchName = patch.patchName.lowercase().replace(" ", "-")
 
-            /**
-             * Check if the patch is explicitly excluded.
-             *
-             * Cases:
-             *  1. -e patch.name
-             *  2. -i patch.name -e patch.name
-             */
+            val explicitlyExcluded = excludedPatches.contains(formattedPatchName)
+            if (explicitlyExcluded) return@patch logger.info("Excluding ${patch.patchName}")
 
-            /**
-             * Check if the patch is explicitly excluded.
-             *
-             * Cases:
-             *  1. -e patch.name
-             *  2. -i patch.name -e patch.name
-             */
+            // If the patch is explicitly included, it will be included if [exclusive] is false.
+            val explicitlyIncluded = exclusive && includedPatches.contains(formattedPatchName)
 
-            val excluded = excludedPatches.contains(formattedPatchName)
-            if (excluded) return@patch logger.info("Excluding ${patch.patchName}")
+            // If the patch is implicitly included, it will be only included if [exclusive] is false.
+            val implicitlyIncluded = !exclusive && patch.include
 
-            /**
-             * Check if the patch is constrained to packages.
-             */
+            val included = implicitlyIncluded || explicitlyIncluded
+            if (!included) return@patch logger.info("${patch.patchName} excluded by default") // Case 1.
 
-            /**
-             * Check if the patch is constrained to packages.
-             */
-
+            // At last make sure the patch is compatible with the supplied APK files package name and version.
             patch.compatiblePackages?.let { packages ->
                 packages.singleOrNull { it.name == packageName }?.let { `package` ->
-                    /**
-                     * Check if the package version matches.
-                     * If experimental is true, version matching will be skipped.
-                     */
-
-                    /**
-                     * Check if the package version matches.
-                     * If experimental is true, version matching will be skipped.
-                     */
-
-                    val matchesVersion = experimental || `package`.versions.let {
+                    val matchesVersion = force || `package`.versions.let {
                         it.isEmpty() || it.any { version -> version == packageVersion }
                     }
 
@@ -287,37 +263,12 @@ internal object PatchCommand : Runnable {
                         "${pkg.name}: ${pkg.versions.joinToString(", ")}"
                     })
 
-                }
-                    ?: return@patch logger.fine("${patch.patchName} is incompatible with $packageName. " + "This patch is only compatible with " + packages.joinToString(
-                        ", "
-                    ) { `package` -> `package`.name })
+                } ?: return@patch logger.fine("${patch.patchName} is incompatible with $packageName. "
+                        + "This patch is only compatible with "
+                        + packages.joinToString(", ") { `package` -> `package`.name })
 
                 return@let
             } ?: logger.fine("$formattedPatchName: No constraint on packages.")
-
-            /**
-             * Check if the patch is explicitly included.
-             *
-             * Cases:
-             *  1. --exclusive
-             *  2. --exclusive -i patch.name
-             */
-
-            /**
-             * Check if the patch is explicitly included.
-             *
-             * Cases:
-             *  1. --exclusive
-             *  2. --exclusive -i patch.name
-             */
-
-            val explicitlyIncluded = includedPatches.contains(formattedPatchName)
-
-            val implicitlyIncluded = !exclusive && patch.include // Case 3.
-            val exclusivelyIncluded = exclusive && explicitlyIncluded // Case 2.
-
-            val included = implicitlyIncluded || exclusivelyIncluded
-            if (!included) return@patch logger.info("${patch.patchName} excluded by default") // Case 1.
 
             logger.fine("Adding $formattedPatchName")
 
