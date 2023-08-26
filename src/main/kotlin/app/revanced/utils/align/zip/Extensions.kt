@@ -1,4 +1,4 @@
-package app.revanced.utils.signing.align.zip
+package app.revanced.utils.align.zip
 
 import java.io.DataInput
 import java.io.DataOutput

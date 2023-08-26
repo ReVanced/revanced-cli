@@ -1,54 +1,37 @@
 package app.revanced.utils.adb
 
 internal object Constants {
-    // template placeholder to replace a string in commands
-    internal const val PLACEHOLDER = "TEMPLATE_PACKAGE_NAME"
+    internal const val PLACEHOLDER = "PLACEHOLDER"
 
-    // utility commands
-    private const val COMMAND_CHMOD_MOUNT = "chmod +x"
-    internal const val COMMAND_PID_OF = "pidof -s"
-    internal const val COMMAND_CREATE_DIR = "mkdir -p"
-    internal const val COMMAND_LOGCAT = "logcat -c && logcat | grep AndroidRuntime"
-    internal const val COMMAND_RESTART = "pm resolve-activity --brief $PLACEHOLDER | tail -n 1 | xargs am start -n && kill ${'$'}($COMMAND_PID_OF $PLACEHOLDER)"
+    internal const val TMP_PATH = "/data/local/tmp/revanced.tmp"
+    internal const val INSTALLATION_PATH = "/data/adb/revanced/"
+    internal const val PATCHED_APK_PATH = "$INSTALLATION_PATH$PLACEHOLDER.apk"
+    internal const val MOUNT_PATH = "/data/adb/service.d/mount_revanced_$PLACEHOLDER.sh"
 
-    // default mount file name
-    private const val NAME_MOUNT_SCRIPT = "mount_revanced_$PLACEHOLDER.sh"
+    internal const val DELETE = "rm -rf $PLACEHOLDER"
+    internal const val CREATE_DIR = "mkdir -p"
+    internal const val RESTART = "pm resolve-activity --brief $PLACEHOLDER | tail -n 1 | " +
+            "xargs am start -n && kill ${'$'}(pidof -s $PLACEHOLDER)"
 
-    // initial directory to push files to via adb push
-    internal const val PATH_INIT_PUSH = "/data/local/tmp/revanced.delete"
+    internal const val INSTALL_PATCHED_APK = "base_path=\"$PATCHED_APK_PATH\" && " +
+            "mv $TMP_PATH ${'$'}base_path && " +
+            "chmod 644 ${'$'}base_path && " +
+            "chown system:system ${'$'}base_path && " +
+            "chcon u:object_r:apk_data_file:s0  ${'$'}base_path"
 
-    // revanced path
-    internal const val PATH_REVANCED = "/data/adb/revanced/"
-
-    // revanced apk path
-    internal const val PATH_REVANCED_APP = "$PATH_REVANCED$PLACEHOLDER.apk"
-
-    // delete command
-    internal const val COMMAND_DELETE = "rm -rf $PLACEHOLDER"
-
-    // mount script path
-    internal const val PATH_MOUNT = "/data/adb/service.d/$NAME_MOUNT_SCRIPT"
-
-    // move to revanced apk path & set permissions
-    internal const val COMMAND_PREPARE_MOUNT_APK =
-        "base_path=\"$PATH_REVANCED_APP\" && mv $PATH_INIT_PUSH ${'$'}base_path && chmod 644 ${'$'}base_path && chown system:system ${'$'}base_path && chcon u:object_r:apk_data_file:s0  ${'$'}base_path"
-
-    // unmount command
-    internal const val COMMAND_UMOUNT =
+    internal const val UMOUNT =
         "grep $PLACEHOLDER /proc/mounts | while read -r line; do echo ${'$'}line | cut -d \" \" -f 2 | sed 's/apk.*/apk/' | xargs -r umount -l; done"
 
-    // install mount script & set permissions
-    internal const val COMMAND_INSTALL_MOUNT = "mv $PATH_INIT_PUSH $PATH_MOUNT && $COMMAND_CHMOD_MOUNT $PATH_MOUNT"
+    internal const val INSTALL_MOUNT = "mv $TMP_PATH $MOUNT_PATH && chmod +x $MOUNT_PATH"
 
-    // mount script
-    internal val CONTENT_MOUNT_SCRIPT =
+    internal val MOUNT_SCRIPT =
         """
             #!/system/bin/sh
             MAGISKTMP="${'$'}(magisk --path)" || MAGISKTMP=/sbin
             MIRROR="${'$'}MAGISKTMP/.magisk/mirror"
             while [ "${'$'}(getprop sys.boot_completed | tr -d '\r')" != "1" ]; do sleep 1; done
             
-            base_path="$PATH_REVANCED_APP"
+            base_path="$PATCHED_APK_PATH"
             stock_path=${'$'}( pm path $PLACEHOLDER | grep base | sed 's/package://g' )
 
             chcon u:object_r:apk_data_file:s0  ${'$'}base_path

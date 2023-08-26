@@ -1,16 +1,18 @@
 package app.revanced.utils
 
 import app.revanced.cli.command.PatchList
-import app.revanced.cli.logging.CliLogger
 import app.revanced.patcher.extensions.PatchExtensions.options
 import app.revanced.patcher.extensions.PatchExtensions.patchName
 import app.revanced.patcher.patch.NoSuchOptionException
 import app.revanced.utils.Options.PatchOption.Option
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import java.io.File
+import java.util.logging.Logger
 
 
 internal object Options {
+    private val logger = Logger.getLogger(Options::class.java.name)
+
     private var mapper = jacksonObjectMapper()
 
     /**
@@ -53,22 +55,24 @@ internal object Options {
      * Sets the options for the patches in the list.
      *
      * @param json The JSON string containing the options.
-     * @param logger The logger to use for logging.
      */
-    fun PatchList.setOptions(json: String, logger: CliLogger? = null) {
+    fun PatchList.setOptions(json: String) {
         filter { it.options?.any() == true }.let { patches ->
             if (patches.isEmpty()) return
 
             val patchOptions = deserialize(json)
 
-            patches.forEach { patch ->
+            patches.forEach patch@{ patch ->
                 patchOptions.find { option -> option.patchName == patch.patchName }?.let {
                     it.options.forEach { option ->
                         try {
                             patch.options?.set(option.key, option.value)
-                                ?: logger?.warn("${patch.patchName} has no options")
+                                ?: run{
+                                    logger.warning("${patch.patchName} has no options")
+                                    return@patch
+                                }
                         } catch (e: NoSuchOptionException) {
-                            logger?.error(e.message ?: "Unknown error")
+                            logger.info(e.toString())
                         }
                     }
                 }
@@ -80,10 +84,9 @@ internal object Options {
      * Sets the options for the patches in the list.
      *
      * @param file The file containing the JSON string containing the options.
-     * @param logger The logger to use for logging.
      * @see setOptions
      */
-    fun PatchList.setOptions(file: File, logger: CliLogger? = null) = setOptions(file.readText(), logger)
+    fun PatchList.setOptions(file: File) = setOptions(file.readText())
 
     /**
      * Data class for a patch and its [Option]s.

@@ -1,6 +1,6 @@
-package app.revanced.utils.signing.align
+package app.revanced.utils.align
 
-import app.revanced.utils.signing.align.zip.structures.ZipEntry
+import app.revanced.utils.align.zip.structures.ZipEntry
 
 internal object ZipAligner {
     private const val DEFAULT_ALIGNMENT = 4

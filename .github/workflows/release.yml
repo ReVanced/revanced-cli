@@ -33,9 +33,10 @@ jobs:
             build
             node_modules
           key: ${{ runner.os }}-gradle-npm-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties', 'package-lock.json') }}
-      - name: Build with Gradle
+      - name: Build
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        # Cleaning is necessary to avoid uploading two identical artifacts with different versions
         run: ./gradlew clean --no-daemon
       - name: Setup semantic-release
         run: npm install
