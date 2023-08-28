@@ -1,3 +1,10 @@
+## [3.0.2-dev.1](https://github.com/ReVanced/revanced-cli/compare/v3.0.1...v3.0.2-dev.1) (2023-08-28)
+
+
+### Bug Fixes
+
+* do not filter explicitly included patches ([a3d8f00](https://github.com/ReVanced/revanced-cli/commit/a3d8f004ec405f696d99d96c74ca41b573ecf425))
+
 ## [3.0.1](https://github.com/ReVanced/revanced-cli/compare/v3.0.0...v3.0.1) (2023-08-28)
 
 ## [3.0.1-dev.1](https://github.com/ReVanced/revanced-cli/compare/v3.0.0...v3.0.1-dev.1) (2023-08-28)
