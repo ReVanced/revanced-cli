@@ -1,6 +1,6 @@
 [versions]
 shadow = "8.1.1"
-apksig = "8.1.0"
+apksig = "8.1.1"
 bcpkix-jdk15on = "1.70"
 jackson-module-kotlin = "2.14.3"
 jadb = "2531a28109"
@@ -8,7 +8,7 @@ kotlin-reflect = "1.9.0"
 kotlin-test = "1.8.20-RC"
 kotlinx-coroutines-core = "1.7.1"
 picocli = "4.7.3"
-revanced-patcher = "14.1.0"
+revanced-patcher = "14.2.1"
 
 [libraries]
 apksig = { module = "com.android.tools.build:apksig", version.ref = "apksig" }
