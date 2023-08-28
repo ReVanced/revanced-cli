@@ -25,7 +25,7 @@ import java.util.logging.Logger
 
 
 @CommandLine.Command(
-    name = "patch", description = ["Patch the supplied APK file with the supplied patches and integrations"]
+    name = "patch", description = ["Patch an APK file"]
 )
 internal object PatchCommand : Runnable {
     private val logger = Logger.getLogger(PatchCommand::class.java.name)
