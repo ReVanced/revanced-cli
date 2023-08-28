@@ -1,3 +1,15 @@
+# [3.1.0-dev.1](https://github.com/ReVanced/revanced-cli/compare/v3.0.2-dev.2...v3.1.0-dev.1) (2023-08-28)
+
+
+### Bug Fixes
+
+* format patches input ([bbb1a63](https://github.com/ReVanced/revanced-cli/commit/bbb1a63abd80dcbecdcf362158c0429cf3e6318f))
+
+
+### Features
+
+* Simplify command description ([3b3f7c7](https://github.com/ReVanced/revanced-cli/commit/3b3f7c7a7a7b2795e3d1fad776f6b457f2e68c7b))
+
 ## [3.0.2-dev.2](https://github.com/ReVanced/revanced-cli/compare/v3.0.2-dev.1...v3.0.2-dev.2) (2023-08-28)
 
 
