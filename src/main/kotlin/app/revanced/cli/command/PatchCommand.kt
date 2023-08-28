@@ -232,13 +232,20 @@ internal object PatchCommand : Runnable {
      * @return The filtered patches.
      */
     private fun Patcher.filterPatchSelection(patches: PatchList) = buildList {
+        // TODO: Remove this eventually because
+        //  patches named "patch-name" and "patch name" will conflict.
+        fun String.format() = lowercase().replace(" ", "-")
+
+        val formattedExcludedPatches = excludedPatches.map { it.format() }
+        val formattedIncludedPatches = includedPatches.map { it.format() }
+
         val packageName = context.packageMetadata.packageName
         val packageVersion = context.packageMetadata.packageVersion
 
         patches.forEach patch@{ patch ->
-            val formattedPatchName = patch.patchName.lowercase().replace(" ", "-")
+            val formattedPatchName = patch.patchName.format()
 
-            val explicitlyExcluded = excludedPatches.contains(formattedPatchName)
+            val explicitlyExcluded = formattedExcludedPatches.contains(formattedPatchName)
             if (explicitlyExcluded) return@patch logger.info("Excluding ${patch.patchName}")
 
             // Make sure the patch is compatible with the supplied APK files package name and version.
@@ -248,12 +255,13 @@ internal object PatchCommand : Runnable {
                         it.isEmpty() || it.any { version -> version == packageVersion }
                     }
 
-                    if (!matchesVersion) return@patch logger.warning("${patch.patchName} is incompatible with version $packageVersion. " + "This patch is only compatible with version " + packages.joinToString(
-                        ";"
-                    ) { pkg ->
-                        "${pkg.name}: ${pkg.versions.joinToString(", ")}"
-                    })
-
+                    if (!matchesVersion) return@patch logger.warning(
+                        "${patch.patchName} is incompatible with version $packageVersion. "
+                                + "This patch is only compatible with version "
+                                + packages.joinToString(";") { pkg ->
+                            "${pkg.name}: ${pkg.versions.joinToString(", ")}"
+                        }
+                    )
                 } ?: return@patch logger.fine("${patch.patchName} is incompatible with $packageName. "
                         + "This patch is only compatible with "
                         + packages.joinToString(", ") { `package` -> `package`.name })
@@ -264,7 +272,7 @@ internal object PatchCommand : Runnable {
             // If the patch is implicitly included, it will be only included if [exclusive] is false.
             val implicitlyIncluded = !exclusive && patch.include
             // If the patch is explicitly included, it will be included even if [exclusive] is false.
-            val explicitlyIncluded = includedPatches.contains(formattedPatchName)
+            val explicitlyIncluded = formattedIncludedPatches.contains(formattedPatchName)
 
             val included = implicitlyIncluded || explicitlyIncluded
             if (!included) return@patch logger.info("${patch.patchName} excluded by default") // Case 1.
