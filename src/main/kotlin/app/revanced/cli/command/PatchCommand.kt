@@ -241,8 +241,8 @@ internal object PatchCommand : Runnable {
             val explicitlyExcluded = excludedPatches.contains(formattedPatchName)
             if (explicitlyExcluded) return@patch logger.info("Excluding ${patch.patchName}")
 
-            // If the patch is explicitly included, it will be included if [exclusive] is false.
-            val explicitlyIncluded = exclusive && includedPatches.contains(formattedPatchName)
+            // If the patch is explicitly included, it will be included regardless
+            val explicitlyIncluded = includedPatches.contains(formattedPatchName)
 
             // If the patch is implicitly included, it will be only included if [exclusive] is false.
             val implicitlyIncluded = !exclusive && patch.include
