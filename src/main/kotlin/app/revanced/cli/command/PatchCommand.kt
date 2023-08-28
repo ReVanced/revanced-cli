@@ -241,15 +241,7 @@ internal object PatchCommand : Runnable {
             val explicitlyExcluded = excludedPatches.contains(formattedPatchName)
             if (explicitlyExcluded) return@patch logger.info("Excluding ${patch.patchName}")
 
-            // If the patch is implicitly included, it will be only included if [exclusive] is false.
-            val implicitlyIncluded = !exclusive && patch.include
-            // If the patch is explicitly included, it will be included even if [exclusive] is false.
-            val explicitlyIncluded = includedPatches.contains(formattedPatchName)
-
-            val included = implicitlyIncluded || explicitlyIncluded
-            if (!included) return@patch logger.info("${patch.patchName} excluded by default") // Case 1.
-
-            // At last make sure the patch is compatible with the supplied APK files package name and version.
+            // Make sure the patch is compatible with the supplied APK files package name and version.
             patch.compatiblePackages?.let { packages ->
                 packages.singleOrNull { it.name == packageName }?.let { `package` ->
                     val matchesVersion = force || `package`.versions.let {
@@ -268,6 +260,14 @@ internal object PatchCommand : Runnable {
 
                 return@let
             } ?: logger.fine("$formattedPatchName: No constraint on packages.")
+
+            // If the patch is implicitly included, it will be only included if [exclusive] is false.
+            val implicitlyIncluded = !exclusive && patch.include
+            // If the patch is explicitly included, it will be included even if [exclusive] is false.
+            val explicitlyIncluded = includedPatches.contains(formattedPatchName)
+
+            val included = implicitlyIncluded || explicitlyIncluded
+            if (!included) return@patch logger.info("${patch.patchName} excluded by default") // Case 1.
 
             logger.fine("Adding $formattedPatchName")
 
