@@ -1,3 +1,29 @@
+# [3.1.0-dev.1](https://github.com/ReVanced/revanced-cli/compare/v3.0.2-dev.2...v3.1.0-dev.1) (2023-08-28)
+
+
+### Bug Fixes
+
+* format patches input ([bbb1a63](https://github.com/ReVanced/revanced-cli/commit/bbb1a63abd80dcbecdcf362158c0429cf3e6318f))
+
+
+### Features
+
+* Simplify command description ([3b3f7c7](https://github.com/ReVanced/revanced-cli/commit/3b3f7c7a7a7b2795e3d1fad776f6b457f2e68c7b))
+
+## [3.0.2-dev.2](https://github.com/ReVanced/revanced-cli/compare/v3.0.2-dev.1...v3.0.2-dev.2) (2023-08-28)
+
+
+### Bug Fixes
+
+* check for package compatibility at first ([9fe5a0b](https://github.com/ReVanced/revanced-cli/commit/9fe5a0b6d93304f630436ed0e954723d9a27b0f6))
+
+## [3.0.2-dev.1](https://github.com/ReVanced/revanced-cli/compare/v3.0.1...v3.0.2-dev.1) (2023-08-28)
+
+
+### Bug Fixes
+
+* do not filter explicitly included patches ([a3d8f00](https://github.com/ReVanced/revanced-cli/commit/a3d8f004ec405f696d99d96c74ca41b573ecf425))
+
 ## [3.0.1](https://github.com/ReVanced/revanced-cli/compare/v3.0.0...v3.0.1) (2023-08-28)
 
 ## [3.0.1-dev.1](https://github.com/ReVanced/revanced-cli/compare/v3.0.0...v3.0.1-dev.1) (2023-08-28)
