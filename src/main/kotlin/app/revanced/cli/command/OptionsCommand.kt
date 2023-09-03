@@ -23,7 +23,7 @@ internal object OptionsCommand : Runnable {
     @CommandLine.Option(
         names = ["-p", "--path"], description = ["Path to patch options JSON file"], showDefaultValue = ALWAYS
     )
-    private var path: File = File("options.json")
+    private var filePath: File = File("options.json")
 
     @CommandLine.Option(
         names = ["-o", "--overwrite"], description = ["Overwrite existing options file"], showDefaultValue = ALWAYS
@@ -37,10 +37,10 @@ internal object OptionsCommand : Runnable {
     )
     private var update: Boolean = false
 
-    override fun run() = if (!path.exists() || overwrite) with(PatchBundleLoader.Jar(*patchBundles)) {
-        if (update) setOptions(path)
+    override fun run() = if (!filePath.exists() || overwrite) with(PatchBundleLoader.Jar(*patchBundles)) {
+        if (update && filePath.exists()) setOptions(filePath)
 
-        Options.serialize(this, prettyPrint = true).let(path::writeText)
+        Options.serialize(this, prettyPrint = true).let(filePath::writeText)
     }
     else logger.severe("Options file already exists, use --override to override it")
 }
