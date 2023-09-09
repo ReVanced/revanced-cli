@@ -1,3 +1,10 @@
+## [3.1.1](https://github.com/ReVanced/revanced-cli/compare/v3.1.0...v3.1.1) (2023-09-09)
+
+
+### Bug Fixes
+
+* Create options if it does not exist when updating them ([ca809f0](https://github.com/ReVanced/revanced-cli/commit/ca809f0948379e3a825f24d7a49aba8b6b8767d1))
+
 ## [3.1.1-dev.1](https://github.com/ReVanced/revanced-cli/compare/v3.1.0...v3.1.1-dev.1) (2023-09-03)
 
 
