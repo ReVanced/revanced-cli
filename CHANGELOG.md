@@ -1,3 +1,10 @@
+## [3.1.2-dev.1](https://github.com/ReVanced/revanced-cli/compare/v3.1.1...v3.1.2-dev.1) (2023-09-12)
+
+
+### Bug Fixes
+
+* Log correct options command ([#262](https://github.com/ReVanced/revanced-cli/issues/262)) ([96c196d](https://github.com/ReVanced/revanced-cli/commit/96c196dcb14e37ad91b751af61ee8382547c1ca3))
+
 ## [3.1.1](https://github.com/ReVanced/revanced-cli/compare/v3.1.0...v3.1.1) (2023-09-09)
 
 
