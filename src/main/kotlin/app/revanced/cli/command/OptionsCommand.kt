@@ -42,5 +42,5 @@ internal object OptionsCommand : Runnable {
 
         Options.serialize(this, prettyPrint = true).let(filePath::writeText)
     }
-    else logger.severe("Options file already exists, use --override to override it")
+    else logger.severe("Options file already exists, use --overwrite to override it")
 }
