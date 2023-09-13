@@ -181,7 +181,7 @@ internal object PatchCommand : Runnable {
                     patchResult.exception?.let {
                         StringWriter().use { writer ->
                             it.printStackTrace(PrintWriter(writer))
-                            logger.severe("${patchResult.patch.name} failed: $writer")
+                            logger.severe("${patchResult.patch.name} failed:\n$writer")
                         }
                     } ?: logger.info("${patchResult.patch.name} succeeded")
                 }
