@@ -241,7 +241,7 @@ internal object PatchCommand : Runnable {
             val formattedPatchName = patchName.format()
 
             val explicitlyExcluded = formattedExcludedPatches.contains(formattedPatchName)
-            if (explicitlyExcluded) return@patch logger.info("Excluding ${patchName}")
+            if (explicitlyExcluded) return@patch logger.info("Excluding $patchName")
 
             // Make sure the patch is compatible with the supplied APK files package name and version.
             patch.compatiblePackages?.let { packages ->
