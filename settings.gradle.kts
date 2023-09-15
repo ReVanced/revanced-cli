@@ -20,4 +20,4 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "revanced-cli"
+include("revanced-cli")
