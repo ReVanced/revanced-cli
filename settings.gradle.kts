@@ -20,4 +20,4 @@ dependencyResolutionManagement {
     }
 }
 
-include("revanced-cli")
+include("revanced-cli", "revanced-lib")

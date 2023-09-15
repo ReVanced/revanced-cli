@@ -4,6 +4,8 @@ plugins {
 }
 
 dependencies {
+    implementation(project(":revanced-lib"))
+
     implementation(libs.revanced.patcher)
     implementation(libs.kotlin.reflect)
     implementation(libs.kotlinx.coroutines.core)
