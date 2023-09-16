@@ -1,14 +1,14 @@
-package app.revanced.utils.align.zip.structures
+package app.revanced.lib.zip.structures
 
-import app.revanced.utils.align.zip.putUInt
-import app.revanced.utils.align.zip.putUShort
-import app.revanced.utils.align.zip.readUIntLE
-import app.revanced.utils.align.zip.readUShortLE
+import app.revanced.lib.zip.putUInt
+import app.revanced.lib.zip.putUShort
+import app.revanced.lib.zip.readUIntLE
+import app.revanced.lib.zip.readUShortLE
 import java.io.DataInput
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
-data class ZipEndRecord(
+internal class ZipEndRecord(
     val diskNumber: UShort,
     val startingDiskNumber: UShort,
     val diskEntries: UShort,

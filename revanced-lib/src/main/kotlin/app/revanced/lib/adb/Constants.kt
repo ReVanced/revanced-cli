@@ -1,4 +1,4 @@
-package app.revanced.utils.adb
+package app.revanced.lib.adb
 
 internal object Constants {
     internal const val PLACEHOLDER = "PLACEHOLDER"

@@ -8,7 +8,8 @@ kotlin-reflect = "1.9.0"
 kotlin-test = "1.8.20-RC"
 kotlinx-coroutines-core = "1.7.3"
 picocli = "4.7.3"
-revanced-patcher = "15.0.0-dev.2"
+revanced-patcher = "15.0.0-dev.4"
+binary-compatibility-validator = "0.13.2"
 
 [libraries]
 apksig = { module = "com.android.tools.build:apksig", version.ref = "apksig" }
@@ -23,3 +24,4 @@ revanced-patcher = { module = "app.revanced:revanced-patcher", version.ref = "re
 
 [plugins]
 shadow = { id = "com.github.johnrengelman.shadow", version.ref = "shadow" }
+binary-compatibility-validator = { id = "org.jetbrains.kotlinx.binary-compatibility-validator", version.ref = "binary-compatibility-validator" }

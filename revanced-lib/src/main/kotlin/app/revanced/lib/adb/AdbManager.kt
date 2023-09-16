@@ -1,22 +1,21 @@
-package app.revanced.utils.adb
+package app.revanced.lib.adb
 
-import app.revanced.utils.adb.AdbManager.Apk
-import app.revanced.utils.adb.Constants.CREATE_DIR
-import app.revanced.utils.adb.Constants.DELETE
-import app.revanced.utils.adb.Constants.INSTALLATION_PATH
-import app.revanced.utils.adb.Constants.INSTALL_MOUNT
-import app.revanced.utils.adb.Constants.INSTALL_PATCHED_APK
-import app.revanced.utils.adb.Constants.MOUNT_PATH
-import app.revanced.utils.adb.Constants.MOUNT_SCRIPT
-import app.revanced.utils.adb.Constants.PATCHED_APK_PATH
-import app.revanced.utils.adb.Constants.PLACEHOLDER
-import app.revanced.utils.adb.Constants.RESTART
-import app.revanced.utils.adb.Constants.TMP_PATH
-import app.revanced.utils.adb.Constants.UMOUNT
+import app.revanced.lib.adb.AdbManager.Apk
+import app.revanced.lib.adb.Constants.CREATE_DIR
+import app.revanced.lib.adb.Constants.DELETE
+import app.revanced.lib.adb.Constants.INSTALLATION_PATH
+import app.revanced.lib.adb.Constants.INSTALL_MOUNT
+import app.revanced.lib.adb.Constants.INSTALL_PATCHED_APK
+import app.revanced.lib.adb.Constants.MOUNT_PATH
+import app.revanced.lib.adb.Constants.MOUNT_SCRIPT
+import app.revanced.lib.adb.Constants.PATCHED_APK_PATH
+import app.revanced.lib.adb.Constants.PLACEHOLDER
+import app.revanced.lib.adb.Constants.RESTART
+import app.revanced.lib.adb.Constants.TMP_PATH
+import app.revanced.lib.adb.Constants.UMOUNT
 import se.vidstige.jadb.JadbConnection
 import se.vidstige.jadb.managers.Package
 import se.vidstige.jadb.managers.PackageManager
-import java.io.Closeable
 import java.io.File
 import java.util.logging.Logger
 
@@ -25,7 +24,7 @@ import java.util.logging.Logger
  *
  * @param deviceSerial The serial of the device.
  */
-internal sealed class AdbManager(deviceSerial: String? = null) : Closeable {
+sealed class AdbManager private constructor(deviceSerial: String? = null) {
     protected val logger: Logger = Logger.getLogger(AdbManager::class.java.name)
 
     protected val device = JadbConnection().devices.find { device -> device.serial == deviceSerial }
@@ -53,14 +52,20 @@ internal sealed class AdbManager(deviceSerial: String? = null) : Closeable {
         logger.info("Finished uninstalling $packageName")
     }
 
-    /**
-     * Closes the [AdbManager] instance.
-     */
-    override fun close() {
-        logger.fine("Closed")
+    companion object {
+        /**
+         * Gets an [AdbManager] for the supplied device serial.
+         *
+         * @param deviceSerial The device serial.
+         * @param root Whether to use root or not.
+         * @return The [AdbManager].
+         * @throws DeviceNotFoundException If the device can not be found.
+         */
+        fun getAdbManager(deviceSerial: String, root: Boolean = false): AdbManager =
+            if (root) RootAdbManager(deviceSerial) else UserAdbManager(deviceSerial)
     }
 
-    class RootAdbManager(deviceSerial: String) : AdbManager(deviceSerial) {
+    class RootAdbManager internal constructor(deviceSerial: String) : AdbManager(deviceSerial) {
         init {
             if (!device.hasSu()) throw IllegalArgumentException("Root required on $deviceSerial. Task failed")
         }
@@ -107,7 +112,7 @@ internal sealed class AdbManager(deviceSerial: String? = null) : Closeable {
         }
     }
 
-    class UserAdbManager(deviceSerial: String) : AdbManager(deviceSerial) {
+    class UserAdbManager internal constructor(deviceSerial: String) : AdbManager(deviceSerial) {
         private val packageManager = PackageManager(device)
 
         override fun install(apk: Apk) {
@@ -131,9 +136,9 @@ internal sealed class AdbManager(deviceSerial: String? = null) : Closeable {
      * @param file The [Apk] file.
      * @param packageName The package name of the [Apk] file.
      */
-    internal class Apk(val file: File, val packageName: String? = null)
+    class Apk(val file: File, val packageName: String? = null)
 
-    internal class DeviceNotFoundException(deviceSerial: String?) :
+    class DeviceNotFoundException internal constructor(deviceSerial: String?) :
         Exception(deviceSerial?.let {
             "The device with the ADB device serial \"$deviceSerial\" can not be found"
         } ?: "No ADB device found")

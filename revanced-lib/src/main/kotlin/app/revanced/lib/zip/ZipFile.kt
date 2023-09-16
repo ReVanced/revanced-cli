@@ -1,7 +1,7 @@
-package app.revanced.utils.align.zip
+package app.revanced.lib.zip
 
-import app.revanced.utils.align.zip.structures.ZipEndRecord
-import app.revanced.utils.align.zip.structures.ZipEntry
+import app.revanced.lib.zip.structures.ZipEndRecord
+import app.revanced.lib.zip.structures.ZipEntry
 import java.io.Closeable
 import java.io.File
 import java.io.RandomAccessFile

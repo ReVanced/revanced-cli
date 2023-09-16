@@ -5,15 +5,10 @@ plugins {
 
 dependencies {
     implementation(project(":revanced-lib"))
-
     implementation(libs.revanced.patcher)
-    implementation(libs.kotlin.reflect)
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.picocli)
-    implementation(libs.jadb) // Updated fork
-    implementation(libs.apksig)
-    implementation(libs.bcpkix.jdk15on)
-    implementation(libs.jackson.module.kotlin)
+
     testImplementation(libs.kotlin.test)
 }
 

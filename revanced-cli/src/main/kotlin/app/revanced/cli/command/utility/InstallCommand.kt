@@ -1,6 +1,6 @@
 package app.revanced.cli.command.utility
 
-import app.revanced.utils.adb.AdbManager
+import app.revanced.lib.adb.AdbManager
 import picocli.CommandLine.*
 import java.io.File
 import java.util.logging.Logger
@@ -28,15 +28,11 @@ internal object InstallCommand : Runnable {
     )
     private var packageName: String? = null
 
-    override fun run() = try {
-        deviceSerials.forEach { deviceSerial ->
-            if (packageName != null) {
-                AdbManager.RootAdbManager(deviceSerial)
-            } else {
-                AdbManager.UserAdbManager(deviceSerial)
-            }.install(AdbManager.Apk(apk, packageName))
+    override fun run() = deviceSerials.forEach { deviceSerial ->
+        try {
+            AdbManager.getAdbManager(deviceSerial, packageName != null).install(AdbManager.Apk(apk, packageName))
+        } catch (e: AdbManager.DeviceNotFoundException) {
+            logger.severe(e.toString())
         }
-    } catch (e: AdbManager.DeviceNotFoundException) {
-        logger.severe(e.toString())
     }
 }

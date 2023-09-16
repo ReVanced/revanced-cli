@@ -1,15 +1,19 @@
-package app.revanced.utils
+@file:Suppress("MemberVisibilityCanBePrivate")
+
+package app.revanced.lib
 
 
+import app.revanced.lib.Options.Patch.Option
+import app.revanced.patcher.PatchClass
 import app.revanced.patcher.PatchSet
 import app.revanced.patcher.patch.options.PatchOptionException
-import app.revanced.utils.Options.PatchOption.Option
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import java.io.File
 import java.util.logging.Logger
 
+private typealias PatchList = List<PatchClass>
 
-internal object Options {
+object Options {
     private val logger = Logger.getLogger(Options::class.java.name)
 
     private var mapper = jacksonObjectMapper()
@@ -24,7 +28,7 @@ internal object Options {
     fun serialize(patches: PatchSet, prettyPrint: Boolean = false): String = patches
         .filter { it.options.any() }
         .map { patch ->
-            PatchOption(
+            Patch(
                 patch.name!!,
                 patch.options.values.map { option -> Option(option.key, option.value) }
             )
@@ -42,12 +46,11 @@ internal object Options {
      * Deserializes the options for the patches in the list.
      *
      * @param json The JSON string containing the options.
-     * @return The list of [PatchOption]s.
-     * @see PatchOption
+     * @return The list of [Patch]s.
+     * @see Patch
      * @see PatchList
      */
-    @Suppress("MemberVisibilityCanBePrivate")
-    fun deserialize(json: String): Array<PatchOption> = mapper.readValue(json, Array<PatchOption>::class.java)
+    fun deserialize(json: String): Array<Patch> = mapper.readValue(json, Array<Patch>::class.java)
 
     /**
      * Sets the options for the patches in the list.
@@ -88,7 +91,7 @@ internal object Options {
      * @property patchName The name of the patch.
      * @property options The [Option]s for the patch.
      */
-    internal data class PatchOption(
+    class Patch internal constructor(
         val patchName: String,
         val options: List<Option>
     ) {
@@ -99,6 +102,6 @@ internal object Options {
          * @property key The name of the option.
          * @property value The value of the option.
          */
-        internal data class Option(val key: String, val value: Any?)
+        class Option internal constructor(val key: String, val value: Any?)
     }
 }

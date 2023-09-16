@@ -1,8 +1,8 @@
 package app.revanced.cli.command
 
+import app.revanced.lib.Options
+import app.revanced.lib.Options.setOptions
 import app.revanced.patcher.PatchBundleLoader
-import app.revanced.utils.Options
-import app.revanced.utils.Options.setOptions
 import picocli.CommandLine
 import picocli.CommandLine.Help.Visibility.ALWAYS
 import java.io.File
@@ -37,10 +37,17 @@ internal object OptionsCommand : Runnable {
     )
     private var update: Boolean = false
 
-    override fun run() = if (!filePath.exists() || overwrite) with(PatchBundleLoader.Jar(*patchBundles)) {
-        if (update && filePath.exists()) setOptions(filePath)
+    override fun run() = try {
+        PatchBundleLoader.Jar(*patchBundles).let { patches ->
+            if (!filePath.exists() || overwrite) {
+                if (update && filePath.exists()) patches.setOptions(filePath)
 
-        Options.serialize(this, prettyPrint = true).let(filePath::writeText)
+                Options.serialize(patches, prettyPrint = true).let(filePath::writeText)
+            } else throw OptionsFileAlreadyExistsException()
+        }
+    } catch (ex: OptionsFileAlreadyExistsException) {
+        logger.severe("Options file already exists, use --overwrite to override it")
     }
-    else logger.severe("Options file already exists, use --overwrite to override it")
+
+    class OptionsFileAlreadyExistsException : Exception()
 }

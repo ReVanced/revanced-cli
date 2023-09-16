@@ -1,6 +1,6 @@
 package app.revanced.cli.command.utility
 
-import app.revanced.utils.adb.AdbManager
+import app.revanced.lib.adb.AdbManager
 import picocli.CommandLine.*
 import picocli.CommandLine.Help.Visibility.ALWAYS
 import java.util.logging.Logger
@@ -26,15 +26,11 @@ internal object UninstallCommand : Runnable {
     )
     private var unmount: Boolean = false
 
-    override fun run() = try {
-        deviceSerials.forEach { deviceSerial ->
-            if (unmount) {
-                AdbManager.RootAdbManager(deviceSerial)
-            } else {
-                AdbManager.UserAdbManager(deviceSerial)
-            }.uninstall(packageName)
+    override fun run() = deviceSerials.forEach { deviceSerial ->
+        try {
+            AdbManager.getAdbManager(deviceSerial, unmount).uninstall(packageName)
+        } catch (e: AdbManager.DeviceNotFoundException) {
+            logger.severe(e.toString())
         }
-    } catch (e: AdbManager.DeviceNotFoundException) {
-        logger.severe(e.toString())
     }
 }

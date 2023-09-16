@@ -1,4 +1,4 @@
-package app.revanced.utils.signing
+package app.revanced.lib.signing
 
 import com.android.apksig.ApkSigner
 import org.bouncycastle.asn1.x500.X500Name
@@ -17,10 +17,10 @@ import java.security.cert.X509Certificate
 import java.util.*
 import java.util.logging.Logger
 
-internal class ApkSigner(
+class ApkSigner(
     private val signingOptions: SigningOptions
 ) {
-    private val logger = Logger.getLogger(ApkSigner::class.java.name)
+    private val logger = Logger.getLogger(app.revanced.lib.signing.ApkSigner::class.java.name)
 
     private val signer: ApkSigner.Builder
     private val passwordCharArray = signingOptions.password.toCharArray()
@@ -30,7 +30,7 @@ internal class ApkSigner(
 
         val keyStore = KeyStore.getInstance("BKS", "BC")
         val alias = keyStore.let { store ->
-            FileInputStream(File(signingOptions.keyStoreFilePath).also {
+            FileInputStream(signingOptions.keyStoreOutputFilePath.also {
                 if (!it.exists()) {
                     logger.info("Creating keystore at ${it.absolutePath}")
                     newKeystore(it)
@@ -43,13 +43,13 @@ internal class ApkSigner(
 
         with(
             ApkSigner.SignerConfig.Builder(
-                signingOptions.cn,
+                signingOptions.commonName,
                 keyStore.getKey(alias, passwordCharArray) as PrivateKey,
                 listOf(keyStore.getCertificate(alias) as X509Certificate)
             ).build()
         ) {
             this@ApkSigner.signer = ApkSigner.Builder(listOf(this))
-            signer.setCreatedBy(signingOptions.cn)
+            signer.setCreatedBy(signingOptions.commonName)
         }
     }
 
@@ -67,7 +67,7 @@ internal class ApkSigner(
         val pair = gen.generateKeyPair()
         var serialNumber: BigInteger
         do serialNumber = BigInteger.valueOf(SecureRandom().nextLong()) while (serialNumber < BigInteger.ZERO)
-        val x500Name = X500Name("CN=${signingOptions.cn}")
+        val x500Name = X500Name("CN=${signingOptions.commonName}")
         val builder = X509v3CertificateBuilder(
             x500Name,
             serialNumber,
@@ -81,12 +81,10 @@ internal class ApkSigner(
         return JcaX509CertificateConverter().getCertificate(builder.build(signer)) to pair.private
     }
 
-    fun signApk(input: File, output: File): File {
+    fun signApk(input: File, output: File) {
         signer.setInputApk(input)
         signer.setOutputApk(output)
 
         signer.build().sign()
-
-        return output
     }
 }

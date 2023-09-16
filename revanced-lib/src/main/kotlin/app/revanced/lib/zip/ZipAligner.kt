@@ -1,8 +1,8 @@
-package app.revanced.utils.align
+package app.revanced.lib.zip
 
-import app.revanced.utils.align.zip.structures.ZipEntry
+import app.revanced.lib.zip.structures.ZipEntry
 
-internal object ZipAligner {
+object ZipAligner {
     private const val DEFAULT_ALIGNMENT = 4
     private const val LIBRARY_ALIGNMENT = 4096
 

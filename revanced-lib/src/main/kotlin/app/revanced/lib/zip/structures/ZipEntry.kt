@@ -1,64 +1,62 @@
-package app.revanced.utils.align.zip.structures
+package app.revanced.lib.zip.structures
 
-import app.revanced.utils.align.zip.*
+import app.revanced.lib.zip.*
 import java.io.DataInput
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
-data class ZipEntry(
-    val version: UShort,
-    val versionNeeded: UShort,
-    val flags: UShort,
-    var compression: UShort,
-    val modificationTime: UShort,
-    val modificationDate: UShort,
-    var crc32: UInt,
-    var compressedSize: UInt,
-    var uncompressedSize: UInt,
-    val diskNumber: UShort,
-    val internalAttributes: UShort,
-    val externalAttributes: UInt,
-    var localHeaderOffset: UInt,
-    val fileName: String,
-    val extraField: ByteArray,
-    val fileComment: String,
-    var localExtraField: ByteArray = ByteArray(0), //separate for alignment
+class ZipEntry private constructor(
+    internal val version: UShort,
+    internal val versionNeeded: UShort,
+    internal val flags: UShort,
+    internal var compression: UShort,
+    internal val modificationTime: UShort,
+    internal val modificationDate: UShort,
+    internal var crc32: UInt,
+    internal var compressedSize: UInt,
+    internal var uncompressedSize: UInt,
+    internal val diskNumber: UShort,
+    internal val internalAttributes: UShort,
+    internal val externalAttributes: UInt,
+    internal var localHeaderOffset: UInt,
+    internal val fileName: String,
+    internal val extraField: ByteArray,
+    internal val fileComment: String,
+    internal var localExtraField: ByteArray = ByteArray(0), //separate for alignment
 ) {
-    val LFHSize: Int
+    internal val LFHSize: Int
         get() = LFH_HEADER_SIZE + fileName.toByteArray(Charsets.UTF_8).size + localExtraField.size
 
-    val dataOffset: UInt
+    internal val dataOffset: UInt
         get() = localHeaderOffset + LFHSize.toUInt()
 
+    constructor(fileName: String) : this(
+        0x1403u, //made by unix, version 20
+        0u,
+        0u,
+        0u,
+        0x0821u, //seems to be static time google uses, no idea
+        0x0221u, //same as above
+        0u,
+        0u,
+        0u,
+        0u,
+        0u,
+        0u,
+        0u,
+        fileName,
+        ByteArray(0),
+        ""
+    )
+
     companion object {
-        const val CDE_HEADER_SIZE = 46
-        const val CDE_SIGNATURE = 0x02014b50u
+        internal const val CDE_HEADER_SIZE = 46
+        internal const val CDE_SIGNATURE = 0x02014b50u
 
-        const val LFH_HEADER_SIZE = 30
-        const val LFH_SIGNATURE = 0x04034b50u
+        internal  const val LFH_HEADER_SIZE = 30
+        internal const val LFH_SIGNATURE = 0x04034b50u
 
-        fun createWithName(fileName: String): ZipEntry {
-            return ZipEntry(
-                0x1403u, //made by unix, version 20
-                0u,
-                0u,
-                0u,
-                0x0821u, //seems to be static time google uses, no idea
-                0x0221u, //same as above
-                0u,
-                0u,
-                0u,
-                0u,
-                0u,
-                0u,
-                0u,
-                fileName,
-                ByteArray(0),
-                ""
-            )
-        }
-
-        fun fromCDE(input: DataInput): ZipEntry {
+        internal fun fromCDE(input: DataInput): ZipEntry {
             val signature = input.readUIntLE()
 
             if (signature != CDE_SIGNATURE)
@@ -123,12 +121,12 @@ data class ZipEntry(
         }
     }
 
-    fun readLocalExtra(buffer: ByteBuffer) {
+    internal  fun readLocalExtra(buffer: ByteBuffer) {
         buffer.order(ByteOrder.LITTLE_ENDIAN)
         localExtraField = ByteArray(buffer.getUShort().toInt())
     }
 
-    fun toLFH(): ByteBuffer {
+    internal fun toLFH(): ByteBuffer {
         val nameBytes = fileName.toByteArray(Charsets.UTF_8)
 
         val buffer = ByteBuffer.allocate(LFH_HEADER_SIZE + nameBytes.size + localExtraField.size)
@@ -153,7 +151,7 @@ data class ZipEntry(
         return buffer
     }
 
-    fun toCDE(): ByteBuffer {
+    internal fun toCDE(): ByteBuffer {
         val nameBytes = fileName.toByteArray(Charsets.UTF_8)
         val commentBytes = fileComment.toByteArray(Charsets.UTF_8)
 

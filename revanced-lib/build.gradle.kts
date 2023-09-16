@@ -1,16 +1,19 @@
 plugins {
     kotlin("jvm") version "1.9.0"
+    alias(libs.plugins.binary.compatibility.validator)
     `maven-publish`
 }
 
 dependencies {
+    implementation(libs.revanced.patcher)
+    implementation(libs.kotlin.reflect)
+    implementation(libs.jadb) // Updated fork
+    implementation(libs.apksig)
+    implementation(libs.bcpkix.jdk15on)
+    implementation(libs.jackson.module.kotlin)
+
+    testImplementation(libs.revanced.patcher)
     testImplementation(libs.kotlin.test)
-}
-
-kotlin { jvmToolchain(11) }
-
-java {
-    withSourcesJar()
 }
 
 tasks {
@@ -20,6 +23,12 @@ tasks {
             events("PASSED", "SKIPPED", "FAILED")
         }
     }
+}
+
+kotlin { jvmToolchain(11) }
+
+java {
+    withSourcesJar()
 }
 
 publishing {
@@ -42,7 +51,7 @@ publishing {
 
             pom {
                 name = "ReVanced Library"
-                description = "Library for ReVanced"
+                description = "Library containing common utilities for ReVanced"
                 url = "https://revanced.app"
 
                 licenses {

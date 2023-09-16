@@ -1,11 +1,11 @@
 package app.revanced.patcher.options
 
+import app.revanced.lib.Options
+import app.revanced.lib.Options.setOptions
 import app.revanced.patcher.data.BytecodeContext
 import app.revanced.patcher.patch.BytecodePatch
 import app.revanced.patcher.patch.options.types.BooleanPatchOption.Companion.booleanPatchOption
 import app.revanced.patcher.patch.options.types.StringPatchOption.Companion.stringPatchOption
-import app.revanced.utils.Options
-import app.revanced.utils.Options.setOptions
 import org.junit.jupiter.api.MethodOrderer
 import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
@@ -22,7 +22,7 @@ object PatchOptionsTestPatch : BytecodePatch(name = "PatchOptionsTestPatch") {
 }
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
-internal object PatchOptionOptionsTest {
+internal object PatchOptionsTest {
     private var patches = setOf(PatchOptionsTestPatch)
 
     @Test

@@ -1,4 +1,4 @@
-package app.revanced.utils.adb
+package app.revanced.lib.adb
 
 import se.vidstige.jadb.JadbDevice
 import se.vidstige.jadb.RemoteFile

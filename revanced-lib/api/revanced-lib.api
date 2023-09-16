@@ -1,0 +1,111 @@
+public final class app/revanced/lib/ApkUtils {
+	public static final field INSTANCE Lapp/revanced/lib/ApkUtils;
+	public final fun alignAndSign (Ljava/io/File;Ljava/io/File;Lapp/revanced/lib/signing/SigningOptions;Lapp/revanced/patcher/PatcherResult;)V
+}
+
+public final class app/revanced/lib/Options {
+	public static final field INSTANCE Lapp/revanced/lib/Options;
+	public final fun deserialize (Ljava/lang/String;)[Lapp/revanced/lib/Options$Patch;
+	public final fun serialize (Ljava/util/Set;Z)Ljava/lang/String;
+	public static synthetic fun serialize$default (Lapp/revanced/lib/Options;Ljava/util/Set;ZILjava/lang/Object;)Ljava/lang/String;
+	public final fun setOptions (Ljava/util/Set;Ljava/io/File;)V
+	public final fun setOptions (Ljava/util/Set;Ljava/lang/String;)V
+}
+
+public final class app/revanced/lib/Options$Patch {
+	public final fun getOptions ()Ljava/util/List;
+	public final fun getPatchName ()Ljava/lang/String;
+}
+
+public final class app/revanced/lib/Options$Patch$Option {
+	public final fun getKey ()Ljava/lang/String;
+	public final fun getValue ()Ljava/lang/Object;
+}
+
+public abstract class app/revanced/lib/adb/AdbManager {
+	public static final field Companion Lapp/revanced/lib/adb/AdbManager$Companion;
+	public synthetic fun <init> (Ljava/lang/String;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	protected final fun getDevice ()Lse/vidstige/jadb/JadbDevice;
+	protected final fun getLogger ()Ljava/util/logging/Logger;
+	public fun install (Lapp/revanced/lib/adb/AdbManager$Apk;)V
+	public fun uninstall (Ljava/lang/String;)V
+}
+
+public final class app/revanced/lib/adb/AdbManager$Apk {
+	public fun <init> (Ljava/io/File;Ljava/lang/String;)V
+	public synthetic fun <init> (Ljava/io/File;Ljava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun getFile ()Ljava/io/File;
+	public final fun getPackageName ()Ljava/lang/String;
+}
+
+public final class app/revanced/lib/adb/AdbManager$Companion {
+	public final fun getAdbManager (Ljava/lang/String;Z)Lapp/revanced/lib/adb/AdbManager;
+	public static synthetic fun getAdbManager$default (Lapp/revanced/lib/adb/AdbManager$Companion;Ljava/lang/String;ZILjava/lang/Object;)Lapp/revanced/lib/adb/AdbManager;
+}
+
+public final class app/revanced/lib/adb/AdbManager$DeviceNotFoundException : java/lang/Exception {
+}
+
+public final class app/revanced/lib/adb/AdbManager$RootAdbManager : app/revanced/lib/adb/AdbManager {
+	public static final field Utils Lapp/revanced/lib/adb/AdbManager$RootAdbManager$Utils;
+	public fun install (Lapp/revanced/lib/adb/AdbManager$Apk;)V
+	public fun uninstall (Ljava/lang/String;)V
+}
+
+public final class app/revanced/lib/adb/AdbManager$RootAdbManager$Utils {
+}
+
+public final class app/revanced/lib/adb/AdbManager$UserAdbManager : app/revanced/lib/adb/AdbManager {
+	public fun install (Lapp/revanced/lib/adb/AdbManager$Apk;)V
+	public fun uninstall (Ljava/lang/String;)V
+}
+
+public final class app/revanced/lib/logging/Logger {
+	public static final field INSTANCE Lapp/revanced/lib/logging/Logger;
+	public final fun addHandler (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function0;)V
+	public final fun removeAllHandlers ()V
+	public final fun setDefault ()V
+	public final fun setFormat (Ljava/lang/String;)V
+	public static synthetic fun setFormat$default (Lapp/revanced/lib/logging/Logger;Ljava/lang/String;ILjava/lang/Object;)V
+}
+
+public final class app/revanced/lib/signing/ApkSigner {
+	public fun <init> (Lapp/revanced/lib/signing/SigningOptions;)V
+	public final fun signApk (Ljava/io/File;Ljava/io/File;)V
+}
+
+public final class app/revanced/lib/signing/SigningOptions {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/io/File;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3 ()Ljava/io/File;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;Ljava/io/File;)Lapp/revanced/lib/signing/SigningOptions;
+	public static synthetic fun copy$default (Lapp/revanced/lib/signing/SigningOptions;Ljava/lang/String;Ljava/lang/String;Ljava/io/File;ILjava/lang/Object;)Lapp/revanced/lib/signing/SigningOptions;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getCommonName ()Ljava/lang/String;
+	public final fun getKeyStoreOutputFilePath ()Ljava/io/File;
+	public final fun getPassword ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class app/revanced/lib/zip/ZipAligner {
+	public static final field INSTANCE Lapp/revanced/lib/zip/ZipAligner;
+	public final fun getEntryAlignment (Lapp/revanced/lib/zip/structures/ZipEntry;)Ljava/lang/Integer;
+}
+
+public final class app/revanced/lib/zip/ZipFile : java/io/Closeable {
+	public fun <init> (Ljava/io/File;)V
+	public final fun addEntryCompressData (Lapp/revanced/lib/zip/structures/ZipEntry;[B)V
+	public fun close ()V
+	public final fun copyEntriesFromFileAligned (Lapp/revanced/lib/zip/ZipFile;Lkotlin/jvm/functions/Function1;)V
+}
+
+public final class app/revanced/lib/zip/structures/ZipEntry {
+	public static final field Companion Lapp/revanced/lib/zip/structures/ZipEntry$Companion;
+	public fun <init> (Ljava/lang/String;)V
+}
+
+public final class app/revanced/lib/zip/structures/ZipEntry$Companion {
+}
+
