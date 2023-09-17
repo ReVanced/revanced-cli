@@ -1,6 +1,7 @@
 public final class app/revanced/lib/ApkUtils {
 	public static final field INSTANCE Lapp/revanced/lib/ApkUtils;
-	public final fun alignAndSign (Ljava/io/File;Ljava/io/File;Lapp/revanced/lib/signing/SigningOptions;Lapp/revanced/patcher/PatcherResult;)V
+	public final fun align (Ljava/io/File;Ljava/io/File;Lapp/revanced/patcher/PatcherResult;)V
+	public final fun sign (Ljava/io/File;Ljava/io/File;Lapp/revanced/lib/signing/SigningOptions;)V
 }
 
 public final class app/revanced/lib/Options {

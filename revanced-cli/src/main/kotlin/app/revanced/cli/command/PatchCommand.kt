@@ -208,16 +208,17 @@ internal object PatchCommand : Runnable {
 
             // region Save
 
-            ApkUtils.alignAndSign(
-                apk,
+            val aligned = resourceCachePath.resolve(apk.name)
+            ApkUtils.align(apk, aligned, patcherResult)
+            if (!mount) ApkUtils.sign(
+                aligned,
                 outputFilePath,
                 SigningOptions(
                     commonName,
                     password,
-                    keystoreFilePath ?: outputFilePath.parentFile
+                    keystoreFilePath ?: outputFilePath.absoluteFile.parentFile
                         .resolve("${outputFilePath.nameWithoutExtension}.keystore"),
-                ),
-                patcherResult
+                )
             )
 
             // endregion
