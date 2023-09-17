@@ -139,6 +139,7 @@ internal object PatchCommand : Runnable {
     @CommandLine.Option(
         names = ["-b", "--patch-bundle"], description = ["One or more bundles of patches"], required = true
     )
+    @Suppress("unused")
     private fun setPatchBundles(patchBundles: Array<File>) {
         patchBundles.firstOrNull { !it.exists() }?.let {
             throw CommandLine.ParameterException(spec.commandLine(), "Patch bundle ${it.name} does not exist")
@@ -149,6 +150,7 @@ internal object PatchCommand : Runnable {
     @CommandLine.Option(
         names = ["--custom-aapt2-binary"], description = ["Path to a custom AAPT binary to compile resources with"]
     )
+    @Suppress("unused")
     private fun setAaptBinaryPath(aaptBinaryPath: File) {
         if (!aaptBinaryPath.exists()) throw CommandLine.ParameterException(
             spec.commandLine(),
