@@ -38,11 +38,15 @@ object Logger {
      * @param closeHandler The handler for closing the log.
      */
     fun addHandler(
-        publishHandler: (log: String, level: Level) -> Unit,
+        publishHandler: (log: String, level: Level, loggerName: String?) -> Unit,
         flushHandler: () -> Unit,
         closeHandler: () -> Unit
     ) = object : Handler() {
-        override fun publish(record: LogRecord) = publishHandler(formatter.format(record), record.level)
+        override fun publish(record: LogRecord) = publishHandler(
+            formatter.format(record),
+            record.level,
+            record.loggerName
+        )
 
         override fun flush() = flushHandler()
 
@@ -59,7 +63,9 @@ object Logger {
         setFormat()
         removeAllHandlers()
 
-        val publishHandler = { log: String, level: Level ->
+        val publishHandler = handler@{ log: String, level: Level, loggerName: String? ->
+            if (loggerName?.startsWith("app.revanced") != true) return@handler
+
             log.toByteArray().let {
                 if (level.intValue() > Level.INFO.intValue())
                     System.err.write(it)

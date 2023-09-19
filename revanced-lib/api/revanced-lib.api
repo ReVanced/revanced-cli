@@ -69,7 +69,7 @@ public final class app/revanced/lib/adb/AdbManager$UserAdbManager : app/revanced
 
 public final class app/revanced/lib/logging/Logger {
 	public static final field INSTANCE Lapp/revanced/lib/logging/Logger;
-	public final fun addHandler (Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function0;)V
+	public final fun addHandler (Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function0;)V
 	public final fun removeAllHandlers ()V
 	public final fun setDefault ()V
 	public final fun setFormat (Ljava/lang/String;)V
