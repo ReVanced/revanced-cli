@@ -32,7 +32,7 @@ object ApkUtils {
 
             patchedEntriesSource.resourceFile?.let {
                 file.copyEntriesFromFileAligned(
-                    ZipFile(it), ZipAligner::getEntryAlignment
+                    ZipFile(it), ZipAligner.apkZipEntryAlignment
                 )
             }
 
@@ -40,7 +40,7 @@ object ApkUtils {
 
             // TODO: Fix copying resources that are not needed anymore.
             file.copyEntriesFromFileAligned(
-                ZipFile(apkFile), ZipAligner::getEntryAlignment
+                ZipFile(apkFile), ZipAligner.apkZipEntryAlignment
             )
         }
     }
