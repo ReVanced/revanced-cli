@@ -15,6 +15,7 @@ import app.revanced.lib.adb.Constants.RESTART
 import app.revanced.lib.adb.Constants.TMP_PATH
 import app.revanced.lib.adb.Constants.UMOUNT
 import se.vidstige.jadb.JadbConnection
+import se.vidstige.jadb.JadbDevice
 import se.vidstige.jadb.managers.Package
 import se.vidstige.jadb.managers.PackageManager
 import java.io.File
@@ -74,27 +75,25 @@ sealed class AdbManager private constructor(deviceSerial: String? = null) {
         override fun install(apk: Apk) {
             logger.info("Installing by mounting")
 
-            val applyReplacement = getPlaceholderReplacement(
-                apk.packageName ?: throw PackageNameRequiredException()
-            )
+            val packageName = apk.packageName ?: throw PackageNameRequiredException()
 
-            device.run(RESOLVE_ACTIVITY.applyReplacement()).inputStream.bufferedReader().readLine().let { line ->
+            device.run(RESOLVE_ACTIVITY, packageName).inputStream.bufferedReader().readLine().let { line ->
                 if (line != "No activity found") return@let
-                throw throw FailedToFindInstalledPackageException(apk.packageName)
+                throw throw FailedToFindInstalledPackageException(packageName)
             }
 
             device.push(apk.file, TMP_PATH)
 
             device.run("$CREATE_DIR $INSTALLATION_PATH")
-            device.run(INSTALL_PATCHED_APK.applyReplacement())
+            device.run(INSTALL_PATCHED_APK, packageName)
 
-            device.createFile(TMP_PATH, MOUNT_SCRIPT.applyReplacement())
+            device.createFile(TMP_PATH, MOUNT_SCRIPT.applyReplacement(packageName))
 
-            device.run(INSTALL_MOUNT.applyReplacement())
-            device.run(UMOUNT.applyReplacement()) // Sanity check.
-            device.run(MOUNT_PATH.applyReplacement())
-            device.run(RESTART.applyReplacement())
-            device.run(DELETE.applyReplacement(TMP_PATH).applyReplacement())
+            device.run(INSTALL_MOUNT, packageName)
+            device.run(UMOUNT, packageName) // Sanity check.
+            device.run(MOUNT_PATH, packageName)
+            device.run(RESTART, packageName)
+            device.run(DELETE, TMP_PATH)
 
             super.install(apk)
         }
@@ -102,18 +101,16 @@ sealed class AdbManager private constructor(deviceSerial: String? = null) {
         override fun uninstall(packageName: String) {
             logger.info("Uninstalling $packageName by unmounting")
 
-            val applyReplacement = getPlaceholderReplacement(packageName)
-
-            device.run(UMOUNT.applyReplacement(packageName))
-            device.run(DELETE.applyReplacement(PATCHED_APK_PATH).applyReplacement())
-            device.run(DELETE.applyReplacement(MOUNT_PATH).applyReplacement())
-            device.run(DELETE.applyReplacement(TMP_PATH).applyReplacement())
+            device.run(UMOUNT, packageName)
+            device.run(DELETE.applyReplacement(PATCHED_APK_PATH), packageName)
+            device.run(DELETE, MOUNT_PATH)
+            device.run(DELETE, TMP_PATH)
 
             super.uninstall(packageName)
         }
 
         companion object Utils {
-            private fun getPlaceholderReplacement(with: String): String.() -> String = { replace(PLACEHOLDER, with) }
+            private fun JadbDevice.run(command: String, with: String) = run(command.applyReplacement(with))
             private fun String.applyReplacement(with: String) = replace(PLACEHOLDER, with)
         }
     }
