@@ -2,6 +2,7 @@ package app.revanced.lib.adb
 
 import se.vidstige.jadb.JadbDevice
 import se.vidstige.jadb.RemoteFile
+import se.vidstige.jadb.ShellProcess
 import se.vidstige.jadb.ShellProcessBuilder
 import java.io.File
 
@@ -15,8 +16,8 @@ internal fun JadbDevice.buildCommand(command: String, su: Boolean = true): Shell
     return shellProcessBuilder(cmd, *args.toTypedArray())
 }
 
-internal fun JadbDevice.run(command: String, su: Boolean = true): Int {
-    return this.buildCommand(command, su).start().waitFor()
+internal fun JadbDevice.run(command: String, su: Boolean = true): ShellProcess {
+    return this.buildCommand(command, su).start()!!
 }
 
 internal fun JadbDevice.hasSu() =

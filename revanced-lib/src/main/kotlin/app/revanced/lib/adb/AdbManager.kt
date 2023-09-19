@@ -10,6 +10,7 @@ import app.revanced.lib.adb.Constants.MOUNT_PATH
 import app.revanced.lib.adb.Constants.MOUNT_SCRIPT
 import app.revanced.lib.adb.Constants.PATCHED_APK_PATH
 import app.revanced.lib.adb.Constants.PLACEHOLDER
+import app.revanced.lib.adb.Constants.RESOLVE_ACTIVITY
 import app.revanced.lib.adb.Constants.RESTART
 import app.revanced.lib.adb.Constants.TMP_PATH
 import app.revanced.lib.adb.Constants.UMOUNT
@@ -74,8 +75,13 @@ sealed class AdbManager private constructor(deviceSerial: String? = null) {
             logger.info("Installing by mounting")
 
             val applyReplacement = getPlaceholderReplacement(
-                apk.packageName ?: throw IllegalArgumentException("Package name is required")
+                apk.packageName ?: throw PackageNameRequiredException()
             )
+
+            device.run(RESOLVE_ACTIVITY.applyReplacement()).inputStream.bufferedReader().readLine().let { line ->
+                if (line != "No activity found") return@let
+                throw throw FailedToFindInstalledPackageException(apk.packageName)
+            }
 
             device.push(apk.file, TMP_PATH)
 
@@ -142,4 +148,10 @@ sealed class AdbManager private constructor(deviceSerial: String? = null) {
         Exception(deviceSerial?.let {
             "The device with the ADB device serial \"$deviceSerial\" can not be found"
         } ?: "No ADB device found")
+
+    class FailedToFindInstalledPackageException internal constructor(packageName: String) :
+        Exception("Failed to find installed package \"$packageName\" because no activity was found")
+
+    class PackageNameRequiredException internal constructor() :
+        Exception("Package name is required")
 }

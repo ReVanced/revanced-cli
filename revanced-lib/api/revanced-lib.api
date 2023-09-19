@@ -47,6 +47,12 @@ public final class app/revanced/lib/adb/AdbManager$Companion {
 public final class app/revanced/lib/adb/AdbManager$DeviceNotFoundException : java/lang/Exception {
 }
 
+public final class app/revanced/lib/adb/AdbManager$FailedToFindInstalledPackageException : java/lang/Exception {
+}
+
+public final class app/revanced/lib/adb/AdbManager$PackageNameRequiredException : java/lang/Exception {
+}
+
 public final class app/revanced/lib/adb/AdbManager$RootAdbManager : app/revanced/lib/adb/AdbManager {
 	public static final field Utils Lapp/revanced/lib/adb/AdbManager$RootAdbManager$Utils;
 	public fun install (Lapp/revanced/lib/adb/AdbManager$Apk;)V

@@ -10,7 +10,8 @@ internal object Constants {
 
     internal const val DELETE = "rm -rf $PLACEHOLDER"
     internal const val CREATE_DIR = "mkdir -p"
-    internal const val RESTART = "pm resolve-activity --brief $PLACEHOLDER | tail -n 1 | " +
+    internal const val RESOLVE_ACTIVITY = "pm resolve-activity --brief $PLACEHOLDER"
+    internal const val RESTART = "$RESOLVE_ACTIVITY | tail -n 1 | " +
             "xargs am start -n && kill ${'$'}(pidof -s $PLACEHOLDER)"
 
     internal const val INSTALL_PATCHED_APK = "base_path=\"$PATCHED_APK_PATH\" && " +
