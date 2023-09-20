@@ -96,16 +96,16 @@ public final class app/revanced/lib/signing/SigningOptions {
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class app/revanced/lib/zip/ZipAligner {
-	public static final field INSTANCE Lapp/revanced/lib/zip/ZipAligner;
-	public final fun getApkZipEntryAlignment ()Lkotlin/jvm/functions/Function1;
-}
-
 public final class app/revanced/lib/zip/ZipFile : java/io/Closeable {
+	public static final field ApkZipFile Lapp/revanced/lib/zip/ZipFile$ApkZipFile;
 	public fun <init> (Ljava/io/File;)V
 	public final fun addEntryCompressData (Lapp/revanced/lib/zip/structures/ZipEntry;[B)V
 	public fun close ()V
 	public final fun copyEntriesFromFileAligned (Lapp/revanced/lib/zip/ZipFile;Lkotlin/jvm/functions/Function1;)V
+}
+
+public final class app/revanced/lib/zip/ZipFile$ApkZipFile {
+	public final fun getApkZipEntryAlignment ()Lkotlin/jvm/functions/Function1;
 }
 
 public final class app/revanced/lib/zip/structures/ZipEntry {

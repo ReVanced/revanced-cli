@@ -2,7 +2,6 @@ package app.revanced.lib
 
 import app.revanced.lib.signing.ApkSigner
 import app.revanced.lib.signing.SigningOptions
-import app.revanced.lib.zip.ZipAligner
 import app.revanced.lib.zip.ZipFile
 import app.revanced.lib.zip.structures.ZipEntry
 import app.revanced.patcher.PatcherResult
@@ -35,7 +34,7 @@ object ApkUtils {
 
             patchedEntriesSource.resourceFile?.let {
                 file.copyEntriesFromFileAligned(
-                    ZipFile(it), ZipAligner.apkZipEntryAlignment
+                    ZipFile(it), ZipFile.apkZipEntryAlignment
                 )
             }
 
@@ -43,7 +42,7 @@ object ApkUtils {
 
             // TODO: Fix copying resources that are not needed anymore.
             file.copyEntriesFromFileAligned(
-                ZipFile(apkFile), ZipAligner.apkZipEntryAlignment
+                ZipFile(apkFile), ZipFile.apkZipEntryAlignment
             )
         }
     }
