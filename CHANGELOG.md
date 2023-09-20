@@ -1,3 +1,10 @@
+# [3.2.0-dev.1](https://github.com/ReVanced/revanced-cli/compare/v3.1.2-dev.1...v3.2.0-dev.1) (2023-09-20)
+
+
+### Features
+
+* Log stacktrace in new line ([c67e3c7](https://github.com/ReVanced/revanced-cli/commit/c67e3c70c7eaa514cde1bebe775a2216bc4a6074))
+
 ## [3.1.2-dev.1](https://github.com/ReVanced/revanced-cli/compare/v3.1.1...v3.1.2-dev.1) (2023-09-12)
 
 
