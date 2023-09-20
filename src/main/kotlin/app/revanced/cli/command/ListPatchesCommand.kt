@@ -1,13 +1,8 @@
 package app.revanced.cli.command
 
 import app.revanced.patcher.PatchBundleLoader
-import app.revanced.patcher.annotation.Package
-import app.revanced.patcher.extensions.PatchExtensions.compatiblePackages
-import app.revanced.patcher.extensions.PatchExtensions.description
-import app.revanced.patcher.extensions.PatchExtensions.options
-import app.revanced.patcher.extensions.PatchExtensions.patchName
-import app.revanced.patcher.patch.PatchClass
-import app.revanced.patcher.patch.PatchOption
+import app.revanced.patcher.patch.Patch
+import app.revanced.patcher.patch.options.PatchOption
 import picocli.CommandLine.*
 import picocli.CommandLine.Help.Visibility.ALWAYS
 import java.io.File
@@ -48,11 +43,11 @@ internal object ListPatchesCommand : Runnable {
     private var withOptions: Boolean = false
 
     override fun run() {
-        fun Package.buildString() = buildString {
-            if (withVersions && versions.isNotEmpty()) {
+        fun Patch.CompatiblePackage.buildString() = buildString {
+            if (withVersions && versions != null) {
                 appendLine("Package name: $name")
                 appendLine("Compatible versions:")
-                append(versions.joinToString("\n") { version -> version }.prependIndent("\t"))
+                append(versions!!.joinToString("\n") { version -> version }.prependIndent("\t"))
             } else append("Package name: $name")
         }
 
@@ -66,15 +61,17 @@ internal object ListPatchesCommand : Runnable {
             } ?: append("Key: $key")
         }
 
-        fun PatchClass.buildString() = buildString {
-            append("Name: $patchName")
+        fun Patch<*>.buildString() = buildString {
+            append("Name: $name")
 
             if (withDescriptions) append("\nDescription: $description")
 
-            if (withOptions && options != null) {
+            if (withOptions && options.isNotEmpty()) {
                 appendLine("\nOptions:")
                 append(
-                    options!!.joinToString("\n\n") { option -> option.buildString() }.prependIndent("\t")
+                    options.values.joinToString("\n\n") { option ->
+                        option.buildString()
+                    }.prependIndent("\t")
                 )
             }
 

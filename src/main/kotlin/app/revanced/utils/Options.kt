@@ -1,9 +1,8 @@
 package app.revanced.utils
 
-import app.revanced.cli.command.PatchList
-import app.revanced.patcher.extensions.PatchExtensions.options
-import app.revanced.patcher.extensions.PatchExtensions.patchName
-import app.revanced.patcher.patch.NoSuchOptionException
+
+import app.revanced.patcher.PatchSet
+import app.revanced.patcher.patch.options.PatchOptionException
 import app.revanced.utils.Options.PatchOption.Option
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import java.io.File
@@ -21,14 +20,13 @@ internal object Options {
      * @param patches The list of patches to serialize.
      * @param prettyPrint Whether to pretty print the JSON.
      * @return The JSON string containing the options.
-     * @see PatchList
      */
-    fun serialize(patches: PatchList, prettyPrint: Boolean = false): String = patches
-        .filter { it.options?.any() == true }
+    fun serialize(patches: PatchSet, prettyPrint: Boolean = false): String = patches
+        .filter { it.options.any() }
         .map { patch ->
             PatchOption(
-                patch.patchName,
-                patch.options!!.map { option -> Option(option.key, option.value) }
+                patch.name!!,
+                patch.options.values.map { option -> Option(option.key, option.value) }
             )
         }
         // See https://github.com/revanced/revanced-patches/pull/2434/commits/60e550550b7641705e81aa72acfc4faaebb225e7.
@@ -56,23 +54,19 @@ internal object Options {
      *
      * @param json The JSON string containing the options.
      */
-    fun PatchList.setOptions(json: String) {
-        filter { it.options?.any() == true }.let { patches ->
+    fun PatchSet.setOptions(json: String) {
+        filter { it.options.any() }.let { patches ->
             if (patches.isEmpty()) return
 
             val patchOptions = deserialize(json)
 
             patches.forEach patch@{ patch ->
-                patchOptions.find { option -> option.patchName == patch.patchName }?.let {
+                patchOptions.find { option -> option.patchName == patch.name!! }?.let {
                     it.options.forEach { option ->
                         try {
-                            patch.options?.set(option.key, option.value)
-                                ?: run{
-                                    logger.warning("${patch.patchName} has no options")
-                                    return@patch
-                                }
-                        } catch (e: NoSuchOptionException) {
-                            logger.info(e.toString())
+                            patch.options[option.key] = option.value
+                        } catch (e: PatchOptionException) {
+                            logger.severe(e.toString())
                         }
                     }
                 }
@@ -86,7 +80,7 @@ internal object Options {
      * @param file The file containing the JSON string containing the options.
      * @see setOptions
      */
-    fun PatchList.setOptions(file: File) = setOptions(file.readText())
+    fun PatchSet.setOptions(file: File) = setOptions(file.readText())
 
     /**
      * Data class for a patch and its [Option]s.

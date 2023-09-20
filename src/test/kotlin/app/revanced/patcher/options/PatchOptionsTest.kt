@@ -1,11 +1,9 @@
 package app.revanced.patcher.options
 
 import app.revanced.patcher.data.BytecodeContext
-import app.revanced.patcher.data.Context
 import app.revanced.patcher.patch.BytecodePatch
-import app.revanced.patcher.patch.OptionsContainer
-import app.revanced.patcher.patch.Patch
-import app.revanced.patcher.patch.PatchOption
+import app.revanced.patcher.patch.options.types.BooleanPatchOption.Companion.booleanPatchOption
+import app.revanced.patcher.patch.options.types.StringPatchOption.Companion.stringPatchOption
 import app.revanced.utils.Options
 import app.revanced.utils.Options.setOptions
 import org.junit.jupiter.api.MethodOrderer
@@ -13,29 +11,19 @@ import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestMethodOrder
 
-class PatchOptionsTestPatch : BytecodePatch() {
+
+object PatchOptionsTestPatch : BytecodePatch(name = "PatchOptionsTestPatch") {
+    var key1 by stringPatchOption("key1", null, "title1", "description1")
+    var key2 by booleanPatchOption("key2", true, "title2", "description2")
+
     override fun execute(context: BytecodeContext) {
         // Do nothing
-    }
-
-    companion object : OptionsContainer() {
-        var key1 by option(
-            PatchOption.StringOption(
-                "key1", null, "title1", "description1"
-            )
-        )
-
-        var key2 by option(
-            PatchOption.BooleanOption(
-                "key2", true, "title2", "description2"
-            )
-        )
     }
 }
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 internal object PatchOptionOptionsTest {
-    private var patches = listOf(PatchOptionsTestPatch::class.java as Class<out Patch<Context<*>>>)
+    private var patches = setOf(PatchOptionsTestPatch)
 
     @Test
     @Order(1)

@@ -1,12 +1,6 @@
 package app.revanced.cli.command
 
-import app.revanced.patcher.PatchBundleLoader
-import app.revanced.patcher.Patcher
-import app.revanced.patcher.PatcherOptions
-import app.revanced.patcher.PatcherResult
-import app.revanced.patcher.extensions.PatchExtensions.compatiblePackages
-import app.revanced.patcher.extensions.PatchExtensions.include
-import app.revanced.patcher.extensions.PatchExtensions.patchName
+import app.revanced.patcher.*
 import app.revanced.utils.Options
 import app.revanced.utils.Options.setOptions
 import app.revanced.utils.adb.AdbManager
@@ -187,9 +181,9 @@ internal object PatchCommand : Runnable {
                     patchResult.exception?.let {
                         StringWriter().use { writer ->
                             it.printStackTrace(PrintWriter(writer))
-                            logger.severe("${patchResult.patchName} failed: $writer")
+                            logger.severe("${patchResult.patch.name} failed:\n$writer")
                         }
-                    } ?: logger.info("${patchResult.patchName} succeeded")
+                    } ?: logger.info("${patchResult.patch.name} succeeded")
                 }
             }
         }.get()
@@ -231,7 +225,7 @@ internal object PatchCommand : Runnable {
      * @param patches The patches to filter.
      * @return The filtered patches.
      */
-    private fun Patcher.filterPatchSelection(patches: PatchList) = buildList {
+    private fun Patcher.filterPatchSelection(patches: PatchSet) = buildList {
         // TODO: Remove this eventually because
         //  patches named "patch-name" and "patch name" will conflict.
         fun String.format() = lowercase().replace(" ", "-")
@@ -243,39 +237,41 @@ internal object PatchCommand : Runnable {
         val packageVersion = context.packageMetadata.packageVersion
 
         patches.forEach patch@{ patch ->
-            val formattedPatchName = patch.patchName.format()
+            val patchName = patch.name!!
+            val formattedPatchName = patchName.format()
 
             val explicitlyExcluded = formattedExcludedPatches.contains(formattedPatchName)
-            if (explicitlyExcluded) return@patch logger.info("Excluding ${patch.patchName}")
+            if (explicitlyExcluded) return@patch logger.info("Excluding $patchName")
 
             // Make sure the patch is compatible with the supplied APK files package name and version.
             patch.compatiblePackages?.let { packages ->
                 packages.singleOrNull { it.name == packageName }?.let { `package` ->
-                    val matchesVersion = force || `package`.versions.let {
-                        it.isEmpty() || it.any { version -> version == packageVersion }
-                    }
+                    val matchesVersion = force || `package`.versions?.let {
+                        it.any { version -> version == packageVersion }
+                    } ?: true
 
                     if (!matchesVersion) return@patch logger.warning(
-                        "${patch.patchName} is incompatible with version $packageVersion. "
+                        "$patchName is incompatible with version $packageVersion. "
                                 + "This patch is only compatible with version "
                                 + packages.joinToString(";") { pkg ->
-                            "${pkg.name}: ${pkg.versions.joinToString(", ")}"
+                            "${pkg.name}: ${pkg.versions!!.joinToString(", ")}"
                         }
                     )
-                } ?: return@patch logger.fine("${patch.patchName} is incompatible with $packageName. "
+                } ?: return@patch logger.fine(
+                    "$patchName is incompatible with $packageName. "
                         + "This patch is only compatible with "
                         + packages.joinToString(", ") { `package` -> `package`.name })
 
                 return@let
             } ?: logger.fine("$formattedPatchName: No constraint on packages.")
 
-            // If the patch is implicitly included, it will be only included if [exclusive] is false.
-            val implicitlyIncluded = !exclusive && patch.include
-            // If the patch is explicitly included, it will be included even if [exclusive] is false.
+            // If the patch is implicitly used, it will be only included if [exclusive] is false.
+            val implicitlyIncluded = !exclusive && patch.use
+            // If the patch is explicitly used, it will be included even if [exclusive] is false.
             val explicitlyIncluded = formattedIncludedPatches.contains(formattedPatchName)
 
             val included = implicitlyIncluded || explicitlyIncluded
-            if (!included) return@patch logger.info("${patch.patchName} excluded by default") // Case 1.
+            if (!included) return@patch logger.info("$patchName excluded by default") // Case 1.
 
             logger.fine("Adding $formattedPatchName")
 

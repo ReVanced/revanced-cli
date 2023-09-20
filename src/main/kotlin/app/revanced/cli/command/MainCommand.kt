@@ -1,7 +1,6 @@
 package app.revanced.cli.command
 
 import app.revanced.cli.command.utility.UtilityCommand
-import app.revanced.patcher.patch.PatchClass
 import picocli.CommandLine
 import picocli.CommandLine.Command
 import picocli.CommandLine.IVersionProvider
@@ -39,8 +38,6 @@ fun main(args: Array<String>) {
 
     CommandLine(MainCommand).execute(*args)
 }
-
-internal typealias PatchList = List<PatchClass>
 
 private object CLIVersionProvider : IVersionProvider {
     override fun getVersion(): Array<String> {
