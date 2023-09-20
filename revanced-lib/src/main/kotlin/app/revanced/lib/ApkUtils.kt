@@ -8,6 +8,7 @@ import app.revanced.lib.zip.structures.ZipEntry
 import app.revanced.patcher.PatcherResult
 import java.io.File
 import java.util.logging.Logger
+import kotlin.io.path.deleteIfExists
 
 @Suppress("MemberVisibilityCanBePrivate", "unused")
 object ApkUtils {
@@ -20,8 +21,10 @@ object ApkUtils {
      * @param outputFile The apk to write the new entries to.
      * @param patchedEntriesSource The result of the patcher to add the patched dex files and resources.
      */
-    fun align(apkFile: File, outputFile: File, patchedEntriesSource: PatcherResult) {
+    fun copyAligned(apkFile: File, outputFile: File, patchedEntriesSource: PatcherResult) {
         logger.info("Aligning ${apkFile.name}")
+
+        outputFile.toPath().deleteIfExists()
 
         ZipFile(outputFile).use { file ->
             patchedEntriesSource.dexFiles.forEach {

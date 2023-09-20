@@ -208,10 +208,10 @@ internal object PatchCommand : Runnable {
 
             // region Save
 
-            val aligned = resourceCachePath.resolve(apk.name)
-            ApkUtils.align(apk, aligned, patcherResult)
+            val tempFile = resourceCachePath.resolve(apk.name)
+            ApkUtils.copyAligned(apk, tempFile, patcherResult)
             if (!mount) ApkUtils.sign(
-                aligned,
+                tempFile,
                 outputFilePath,
                 SigningOptions(
                     commonName,
