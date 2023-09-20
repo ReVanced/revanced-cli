@@ -67,7 +67,7 @@ object Logger {
             if (loggerName?.startsWith("app.revanced") != true) return@handler
 
             log.toByteArray().let {
-                if (level.intValue() > Level.INFO.intValue())
+                if (level.intValue() > Level.WARNING.intValue())
                     System.err.write(it)
                 else
                     System.out.write(it)
