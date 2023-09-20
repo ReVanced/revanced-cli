@@ -35,7 +35,7 @@ class ApkSigner(
                     logger.info("Creating keystore at ${it.absolutePath}")
                     newKeystore(it)
                 } else {
-                    logger.info("Using keystore at ${it.absolutePath}")
+                    logger.info("Using keystore ${it.absolutePath}")
                 }
             }).use { fis -> store.load(fis, null) }
             store.aliases().nextElement()
