@@ -9,7 +9,7 @@ dependencies {
     implementation(libs.kotlin.reflect)
     implementation(libs.jadb) // Updated fork
     implementation(libs.apksig)
-    implementation(libs.bcpkix.jdk15on)
+    implementation(libs.bcpkix.jdk18on)
     implementation(libs.jackson.module.kotlin)
 
     testImplementation(libs.revanced.patcher)

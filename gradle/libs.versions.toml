@@ -1,7 +1,7 @@
 [versions]
 shadow = "8.1.1"
 apksig = "8.1.1"
-bcpkix-jdk15on = "1.70"
+bcpkix-jdk18on = "1.76"
 jackson-module-kotlin = "2.14.3"
 jadb = "2531a28109"
 kotlin-reflect = "1.9.0"
@@ -13,7 +13,7 @@ binary-compatibility-validator = "0.13.2"
 
 [libraries]
 apksig = { module = "com.android.tools.build:apksig", version.ref = "apksig" }
-bcpkix-jdk15on = { module = "org.bouncycastle:bcpkix-jdk15on", version.ref = "bcpkix-jdk15on" }
+bcpkix-jdk18on = { module = "org.bouncycastle:bcpkix-jdk18on", version.ref = "bcpkix-jdk18on" }
 jackson-module-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin", version.ref = "jackson-module-kotlin" }
 jadb = { module = "com.github.revanced:jadb", version.ref = "jadb" }
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin-reflect" }
