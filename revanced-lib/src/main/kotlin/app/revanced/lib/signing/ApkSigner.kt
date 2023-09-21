@@ -6,85 +6,256 @@ import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo
 import org.bouncycastle.cert.X509v3CertificateBuilder
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter
 import org.bouncycastle.jce.provider.BouncyCastleProvider
-import org.bouncycastle.operator.ContentSigner
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder
 import java.io.File
-import java.io.FileInputStream
-import java.io.FileOutputStream
+import java.io.IOException
+import java.io.InputStream
+import java.io.OutputStream
 import java.math.BigInteger
 import java.security.*
 import java.security.cert.X509Certificate
 import java.util.*
 import java.util.logging.Logger
+import kotlin.time.Duration.Companion.days
 
-class ApkSigner(
-    private val signingOptions: SigningOptions
-) {
+@Suppress("unused", "MemberVisibilityCanBePrivate")
+object ApkSigner {
     private val logger = Logger.getLogger(app.revanced.lib.signing.ApkSigner::class.java.name)
 
-    private val signer: ApkSigner.Builder
-    private val passwordCharArray = signingOptions.password.toCharArray()
-
     init {
-        Security.addProvider(BouncyCastleProvider())
-
-        val keyStore = KeyStore.getInstance("BKS", "BC")
-        val alias = keyStore.let { store ->
-            FileInputStream(signingOptions.keyStoreOutputFilePath.also {
-                if (!it.exists()) {
-                    logger.info("Creating keystore at ${it.absolutePath}")
-                    newKeystore(it)
-                } else {
-                    logger.info("Using keystore ${it.absolutePath}")
-                }
-            }).use { fis -> store.load(fis, null) }
-            store.aliases().nextElement()
-        }
-
-        with(
-            ApkSigner.SignerConfig.Builder(
-                signingOptions.commonName,
-                keyStore.getKey(alias, passwordCharArray) as PrivateKey,
-                listOf(keyStore.getCertificate(alias) as X509Certificate)
-            ).build()
-        ) {
-            this@ApkSigner.signer = ApkSigner.Builder(listOf(this))
-            signer.setCreatedBy(signingOptions.commonName)
-        }
+        if (Security.getProvider(BouncyCastleProvider.PROVIDER_NAME) == null)
+            Security.addProvider(BouncyCastleProvider())
     }
 
-    private fun newKeystore(out: File) {
-        val (publicKey, privateKey) = createKey()
-        val privateKS = KeyStore.getInstance("BKS", "BC")
-        privateKS.load(null, passwordCharArray)
-        privateKS.setKeyEntry("alias", privateKey, passwordCharArray, arrayOf(publicKey))
-        privateKS.store(FileOutputStream(out), passwordCharArray)
-    }
+    /**
+     * Create a new [PrivateKeyCertificatePair].
+     *
+     * @param commonName The common name of the certificate.
+     * @param validUntil The date until the certificate is valid.
+     * @return The created [PrivateKeyCertificatePair].
+     */
+    fun newPrivateKeyCertificatePair(
+        commonName: String = "ReVanced",
+        validUntil: Date = Date(System.currentTimeMillis() + 356.days.inWholeMilliseconds * 24)
+    ): PrivateKeyCertificatePair {
+        logger.fine("Creating certificate for $commonName")
 
-    private fun createKey(): Pair<X509Certificate, PrivateKey> {
-        val gen = KeyPairGenerator.getInstance("RSA")
-        gen.initialize(2048)
-        val pair = gen.generateKeyPair()
+        // Generate a new key pair.
+        val keyPair = KeyPairGenerator.getInstance("RSA").apply {
+            initialize(2048)
+        }.generateKeyPair()
+
         var serialNumber: BigInteger
-        do serialNumber = BigInteger.valueOf(SecureRandom().nextLong()) while (serialNumber < BigInteger.ZERO)
-        val x500Name = X500Name("CN=${signingOptions.commonName}")
-        val builder = X509v3CertificateBuilder(
-            x500Name,
-            serialNumber,
-            Date(System.currentTimeMillis() - 1000L * 60L * 60L * 24L * 30L),
-            Date(System.currentTimeMillis() + 1000L * 60L * 60L * 24L * 366L * 30L),
-            Locale.ENGLISH,
-            x500Name,
-            SubjectPublicKeyInfo.getInstance(pair.public.encoded)
+        do serialNumber = BigInteger.valueOf(SecureRandom().nextLong())
+        while (serialNumber < BigInteger.ZERO)
+
+        val name = X500Name("CN=$commonName")
+
+        // Create a new certificate.
+        val certificate = JcaX509CertificateConverter().getCertificate(
+            X509v3CertificateBuilder(
+                name,
+                serialNumber,
+                Date(System.currentTimeMillis()),
+                validUntil,
+                Locale.ENGLISH,
+                name,
+                SubjectPublicKeyInfo.getInstance(keyPair.public.encoded)
+            ).build(JcaContentSignerBuilder("SHA256withRSA").build(keyPair.private))
         )
-        val signer: ContentSigner = JcaContentSignerBuilder("SHA256withRSA").build(pair.private)
-        return JcaX509CertificateConverter().getCertificate(builder.build(signer)) to pair.private
+
+        return PrivateKeyCertificatePair(keyPair.private, certificate)
     }
 
-    fun signApk(input: File, output: File) {
-        signer.setInputApk(input)
-        signer.setOutputApk(output)
+    /**
+     * Create a new keystore with a new keypair.
+     *
+     * @param entries The entries to add to the keystore.
+     * @return The created keystore.
+     * @see KeyStoreEntry
+     */
+    fun newKeyStore(
+        entries: List<KeyStoreEntry>
+    ): KeyStore {
+        logger.fine("Creating keystore")
 
-        signer.build().sign()
+        return KeyStore.getInstance("BKS", BouncyCastleProvider.PROVIDER_NAME).apply {
+            entries.forEach { entry ->
+                load(null)
+                // Add all entries to the keystore.
+                setKeyEntry(
+                    entry.alias,
+                    entry.privateKeyCertificatePair.privateKey,
+                    entry.password.toCharArray(),
+                    arrayOf(entry.privateKeyCertificatePair.certificate)
+                )
+            }
+        }
     }
+
+    /**
+     * Create a new keystore with a new keypair and saves it to the given [keyStoreOutputStream].
+     *
+     * @param keyStoreOutputStream The stream to write the keystore to.
+     * @param keyStorePassword The password for the keystore.
+     * @param entries The entries to add to the keystore.
+     */
+    fun newKeystore(
+        keyStoreOutputStream: OutputStream,
+        keyStorePassword: String,
+        entries: List<KeyStoreEntry>
+    ) = newKeyStore(entries).store(
+        keyStoreOutputStream,
+        keyStorePassword.toCharArray()
+    ) // Save the keystore.
+
+    /**
+     * Read a keystore from the given [keyStoreInputStream].
+     *
+     * @param keyStoreInputStream The stream to read the keystore from.
+     * @param keyStorePassword The password for the keystore.
+     * @return The keystore.
+     * @throws IllegalArgumentException If the keystore password is invalid.
+     */
+    fun readKeyStore(
+        keyStoreInputStream: InputStream,
+        keyStorePassword: String?
+    ): KeyStore {
+        logger.fine("Reading keystore")
+
+        return KeyStore.getInstance("BKS", BouncyCastleProvider.PROVIDER_NAME).apply {
+            try {
+                load(keyStoreInputStream, keyStorePassword?.toCharArray())
+            } catch (exception: IOException) {
+                if (exception.cause is UnrecoverableKeyException)
+                    throw IllegalArgumentException("Invalid keystore password")
+                else
+                    throw exception
+            }
+        }
+    }
+
+    /**
+     * Create a new [ApkSigner.Builder].
+     *
+     * @param privateKeyCertificatePair The private key and certificate pair to use for signing.
+     * @param signer The name of the signer.
+     * @param createdBy The value for the `Created-By` attribute in the APK's manifest.
+     * @return The created [ApkSigner.Builder] instance.
+     */
+    fun newApkSignerBuilder(
+        privateKeyCertificatePair: PrivateKeyCertificatePair,
+        signer: String,
+        createdBy: String
+    ): ApkSigner.Builder {
+        logger.fine(
+            "Creating new ApkSigner " +
+                    "with $signer as signer and " +
+                    "$createdBy as Created-By attribute in the APK's manifest"
+        )
+
+        // Create the signer config.
+        val signerConfig = ApkSigner.SignerConfig.Builder(
+            signer,
+            privateKeyCertificatePair.privateKey,
+            listOf(privateKeyCertificatePair.certificate)
+        ).build()
+
+        // Create the signer.
+        return ApkSigner.Builder(listOf(signerConfig)).apply {
+            setCreatedBy(createdBy)
+        }
+    }
+
+    /**
+     * Read a [PrivateKeyCertificatePair] from a keystore entry.
+     *
+     * @param keyStore The keystore to read the entry from.
+     * @param keyStoreEntryAlias The alias of the key store entry to read.
+     * @param keyStoreEntryPassword The password for recovering the signing key.
+     * @return The read [PrivateKeyCertificatePair].
+     * @throws IllegalArgumentException If the keystore does not contain the given alias or the password is invalid.
+     */
+    fun readKeyCertificatePair(
+        keyStore: KeyStore,
+        keyStoreEntryAlias: String,
+        keyStoreEntryPassword: String,
+    ): PrivateKeyCertificatePair {
+        logger.fine("Reading key and certificate pair from keystore entry $keyStoreEntryAlias")
+
+        if (!keyStore.containsAlias(keyStoreEntryAlias))
+            throw IllegalArgumentException("Keystore does not contain alias $keyStoreEntryAlias")
+
+        // Read the private key and certificate from the keystore.
+
+        val privateKey = try {
+            keyStore.getKey(keyStoreEntryAlias, keyStoreEntryPassword.toCharArray()) as PrivateKey
+        } catch (exception: UnrecoverableKeyException) {
+            throw IllegalArgumentException("Invalid password for keystore entry $keyStoreEntryAlias")
+        }
+
+        val certificate = keyStore.getCertificate(keyStoreEntryAlias) as X509Certificate
+
+        return PrivateKeyCertificatePair(privateKey, certificate)
+    }
+
+    /**
+     * Create a new [ApkSigner.Builder].
+     *
+     * @param keyStore The keystore to use for signing.
+     * @param keyStoreEntryAlias The alias of the key store entry to use for signing.
+     * @param keyStoreEntryPassword The password for recovering the signing key.
+     * @param signer The name of the signer.
+     * @param createdBy The value for the `Created-By` attribute in the APK's manifest.
+     * @return The created [ApkSigner.Builder] instance.
+     * @see KeyStoreEntry
+     * @see PrivateKeyCertificatePair
+     * @see ApkSigner.Builder.setCreatedBy
+     * @see ApkSigner.Builder.signApk
+     */
+    fun newApkSignerBuilder(
+        keyStore: KeyStore,
+        keyStoreEntryAlias: String,
+        keyStoreEntryPassword: String,
+        signer: String,
+        createdBy: String,
+    ) = newApkSignerBuilder(
+        readKeyCertificatePair(keyStore, keyStoreEntryAlias, keyStoreEntryPassword),
+        signer,
+        createdBy
+    )
+
+    fun ApkSigner.Builder.signApk(input: File, output: File) {
+        logger.info("Signing ${input.name}")
+
+        setInputApk(input)
+        setOutputApk(output)
+
+        build().sign()
+    }
+
+    /**
+     * An entry in a keystore.
+     *
+     * @param alias The alias of the entry.
+     * @param password The password for recovering the signing key.
+     * @param privateKeyCertificatePair The private key and certificate pair.
+     * @see PrivateKeyCertificatePair
+     */
+    class KeyStoreEntry(
+        val alias: String,
+        val password: String,
+        val privateKeyCertificatePair: PrivateKeyCertificatePair = newPrivateKeyCertificatePair()
+    )
+
+    /**
+     * A private key and certificate pair.
+     *
+     * @param privateKey The private key.
+     * @param certificate The certificate.
+     */
+    class PrivateKeyCertificatePair(
+        val privateKey: PrivateKey,
+        val certificate: X509Certificate,
+    )
 }

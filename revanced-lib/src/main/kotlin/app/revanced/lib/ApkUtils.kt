@@ -1,7 +1,7 @@
 package app.revanced.lib
 
 import app.revanced.lib.signing.ApkSigner
-import app.revanced.lib.signing.SigningOptions
+import app.revanced.lib.signing.ApkSigner.signApk
 import app.revanced.lib.zip.ZipFile
 import app.revanced.lib.zip.structures.ZipEntry
 import app.revanced.patcher.PatcherResult
@@ -47,9 +47,8 @@ object ApkUtils {
         }
     }
 
-
     /**
-     * Signs the apk at [apk] and writes it to [output].
+     * Signs the [apk] file and writes it to [output].
      *
      * @param apk The apk to sign.
      * @param output The apk to write the signed apk to.
@@ -60,8 +59,44 @@ object ApkUtils {
         output: File,
         signingOptions: SigningOptions,
     ) {
-        logger.info("Signing ${apk.name}")
+        // Get the keystore from the file or create a new one.
+        val keyStore = if (signingOptions.keyStore.exists()) {
+            ApkSigner.readKeyStore(signingOptions.keyStore.inputStream(), signingOptions.keyStorePassword)
+        } else {
+            val entry = ApkSigner.KeyStoreEntry(signingOptions.alias, signingOptions.password)
 
-        ApkSigner(signingOptions).signApk(apk, output)
+            // Create a new keystore with a new keypair and saves it.
+            ApkSigner.newKeyStore(listOf(entry)).also { keyStore ->
+                keyStore.store(
+                    signingOptions.keyStore.outputStream(),
+                    signingOptions.keyStorePassword?.toCharArray()
+                )
+            }
+        }
+
+        ApkSigner.newApkSignerBuilder(
+            keyStore,
+            signingOptions.alias,
+            signingOptions.password,
+            signingOptions.signer,
+            signingOptions.signer
+        ).signApk(apk, output)
     }
+
+    /**
+     * Options for signing an apk.
+     *
+     * @param keyStore The keystore to use for signing.
+     * @param keyStorePassword The password for the keystore.
+     * @param alias The alias of the key store entry to use for signing.
+     * @param password The password for recovering the signing key.
+     * @param signer The name of the signer.
+     */
+    class SigningOptions(
+        val keyStore: File,
+        val keyStorePassword: String?,
+        val alias: String = "ReVanced Key",
+        val password: String = "",
+        val signer: String = "ReVanced",
+    )
 }

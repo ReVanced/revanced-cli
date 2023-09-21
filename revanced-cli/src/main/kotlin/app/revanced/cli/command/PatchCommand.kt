@@ -4,7 +4,6 @@ import app.revanced.lib.ApkUtils
 import app.revanced.lib.Options
 import app.revanced.lib.Options.setOptions
 import app.revanced.lib.adb.AdbManager
-import app.revanced.lib.signing.SigningOptions
 import app.revanced.patcher.PatchBundleLoader
 import app.revanced.patcher.PatchSet
 import app.revanced.patcher.Patcher
@@ -80,22 +79,34 @@ internal object PatchCommand : Runnable {
     private var mount: Boolean = false
 
     @CommandLine.Option(
-        names = ["--common-name"],
-        description = ["The common name of the signer of the patched APK file"],
-        showDefaultValue = ALWAYS
-
-    )
-    private var commonName = "ReVanced"
-
-    @CommandLine.Option(
-        names = ["--keystore"], description = ["Path to the keystore to sign the patched APK file with"]
+        names = ["--keystore"], description = ["Path to the keystore to sign the patched APK file with"],
     )
     private var keystoreFilePath: File? = null
 
+    // key store password
     @CommandLine.Option(
-        names = ["--password"], description = ["The password of the keystore to sign the patched APK file with"]
+        names = ["--keystore-password"],
+        description = ["The password of the keystore to sign the patched APK file with"],
     )
-    private var password = "ReVanced"
+    private var keyStorePassword: String? = null // Empty password by default
+
+    @CommandLine.Option(
+        names = ["--alias"], description = ["The alias of the key from the keystore to sign the patched APK file with"],
+        showDefaultValue = ALWAYS
+    )
+    private var alias = "ReVanced Key"
+
+    @CommandLine.Option(
+        names = ["--keystore-entry-password"],
+        description = ["The password of the entry from the keystore for the key to sign the patched APK file with"]
+    )
+    private var password = "" // Empty password by default
+
+    @CommandLine.Option(
+        names = ["--signer"], description = ["The name of the signer to sign the patched APK file with"],
+        showDefaultValue = ALWAYS
+    )
+    private var signer = "ReVanced"
 
     @CommandLine.Option(
         names = ["-r", "--resource-cache"],
@@ -208,16 +219,22 @@ internal object PatchCommand : Runnable {
 
             // region Save
 
-            val tempFile = resourceCachePath.resolve(apk.name)
-            ApkUtils.copyAligned(apk, tempFile, patcherResult)
+            val tempFile = resourceCachePath.resolve(apk.name).apply {
+                ApkUtils.copyAligned(apk, this, patcherResult)
+            }
+
+            val keystoreFilePath = keystoreFilePath ?: outputFilePath.absoluteFile.parentFile
+                .resolve("${outputFilePath.nameWithoutExtension}.keystore")
+
             if (!mount) ApkUtils.sign(
                 tempFile,
                 outputFilePath,
-                SigningOptions(
-                    commonName,
+                ApkUtils.SigningOptions(
+                    keystoreFilePath,
+                    keyStorePassword,
+                    alias,
                     password,
-                    keystoreFilePath ?: outputFilePath.absoluteFile.parentFile
-                        .resolve("${outputFilePath.nameWithoutExtension}.keystore"),
+                    signer
                 )
             )
 
