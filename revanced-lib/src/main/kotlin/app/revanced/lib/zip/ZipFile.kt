@@ -13,7 +13,7 @@ import java.util.zip.Deflater
 class ZipFile(file: File) : Closeable {
     private var entries: MutableList<ZipEntry> = mutableListOf()
 
-    private val filePointer: RandomAccessFile = RandomAccessFile(file, "rw")
+    private val filePointer: RandomAccessFile = RandomAccessFile(file, if (file.canWrite()) "rw" else "r")
     private var centralDirectoryNeedsRewrite = false
 
     private val compressionLevel = 5
