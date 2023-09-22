@@ -23,7 +23,7 @@ internal object PatchUtilsTest {
 
     @Test
     fun `return null because no patch is compatible with the supplied package name`() {
-        val patches = setOf(newPatch("other.package", "a"))
+        val patches = setOf(newPatch("some.package", "a"))
 
         assertEqualsVersion(null, patches, "other.package")
     }

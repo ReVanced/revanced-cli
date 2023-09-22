@@ -42,6 +42,11 @@ internal object ListPatchesCommand : Runnable {
     )
     private var withOptions: Boolean = false
 
+    @Option(
+        names = ["-f", "--filter-package-name"], description = ["Filter patches by package name"]
+    )
+    private var packageName: String? = null
+
     override fun run() {
         fun Patch.CompatiblePackage.buildString() = buildString {
             if (withVersions && versions != null) {
@@ -83,6 +88,12 @@ internal object ListPatchesCommand : Runnable {
             }
         }
 
-        logger.info(PatchBundleLoader.Jar(*patchBundles).joinToString("\n\n") { it.buildString() })
+        fun Patch<*>.anyPackageName(name: String) = compatiblePackages?.any { it.name == name } == true
+
+        val patches = PatchBundleLoader.Jar(*patchBundles)
+
+        val filtered = packageName?.let {  patches.filter { patch -> patch.anyPackageName(it) } } ?: patches
+
+        if (filtered.isNotEmpty()) logger.info(filtered.joinToString("\n\n") { it.buildString() })
     }
 }
