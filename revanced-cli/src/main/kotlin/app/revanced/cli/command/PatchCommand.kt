@@ -124,6 +124,13 @@ internal object PatchCommand : Runnable {
     )
     private var purge: Boolean = false
 
+    @CommandLine.Option(
+        names = ["-w", "--warn"],
+        description = ["Warn if a patch can not be found in the supplied patch bundles"],
+        showDefaultValue = ALWAYS
+    )
+    private var warn: Boolean = false
+
     @CommandLine.Parameters(
         description = ["APK file to be patched"], arity = "1..1"
     )
@@ -178,6 +185,16 @@ internal object PatchCommand : Runnable {
         logger.info("Loading patches")
 
         val patches = PatchBundleLoader.Jar(*patchBundles.toTypedArray())
+
+        // Warn if a patch can not be found in the supplied patch bundles.
+        if (warn) patches.map { it.name }.toHashSet().let { availableNames ->
+            arrayOf(*includedPatches, *excludedPatches).filter { name ->
+                !availableNames.contains(name)
+            }
+        }.let { unknownPatches ->
+            if (unknownPatches.isEmpty()) return@let
+            logger.warning("Unknown input of patches:\n${unknownPatches.joinToString("\n")}")
+        }
 
         logger.info("Setting patch options")
 
