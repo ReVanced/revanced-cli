@@ -1,4 +1,4 @@
-package app.revanced.lib.signing
+package app.revanced.lib
 
 import com.android.apksig.ApkSigner
 import org.bouncycastle.asn1.x500.X500Name
@@ -18,9 +18,12 @@ import java.util.*
 import java.util.logging.Logger
 import kotlin.time.Duration.Companion.days
 
-@Suppress("unused", "MemberVisibilityCanBePrivate")
+/**
+ * Utility class for writing or reading keystore files and entries as well as signing APK files.
+ */
+@Suppress("MemberVisibilityCanBePrivate", "unused")
 object ApkSigner {
-    private val logger = Logger.getLogger(app.revanced.lib.signing.ApkSigner::class.java.name)
+    private val logger = Logger.getLogger(app.revanced.lib.ApkSigner::class.java.name)
 
     init {
         if (Security.getProvider(BouncyCastleProvider.PROVIDER_NAME) == null)
@@ -65,6 +68,39 @@ object ApkSigner {
         )
 
         return PrivateKeyCertificatePair(keyPair.private, certificate)
+    }
+
+
+    /**
+     * Read a [PrivateKeyCertificatePair] from a keystore entry.
+     *
+     * @param keyStore The keystore to read the entry from.
+     * @param keyStoreEntryAlias The alias of the key store entry to read.
+     * @param keyStoreEntryPassword The password for recovering the signing key.
+     * @return The read [PrivateKeyCertificatePair].
+     * @throws IllegalArgumentException If the keystore does not contain the given alias or the password is invalid.
+     */
+    fun readKeyCertificatePair(
+        keyStore: KeyStore,
+        keyStoreEntryAlias: String,
+        keyStoreEntryPassword: String,
+    ): PrivateKeyCertificatePair {
+        logger.fine("Reading key and certificate pair from keystore entry $keyStoreEntryAlias")
+
+        if (!keyStore.containsAlias(keyStoreEntryAlias))
+            throw IllegalArgumentException("Keystore does not contain alias $keyStoreEntryAlias")
+
+        // Read the private key and certificate from the keystore.
+
+        val privateKey = try {
+            keyStore.getKey(keyStoreEntryAlias, keyStoreEntryPassword.toCharArray()) as PrivateKey
+        } catch (exception: UnrecoverableKeyException) {
+            throw IllegalArgumentException("Invalid password for keystore entry $keyStoreEntryAlias")
+        }
+
+        val certificate = keyStore.getCertificate(keyStoreEntryAlias) as X509Certificate
+
+        return PrivateKeyCertificatePair(privateKey, certificate)
     }
 
     /**
@@ -165,38 +201,6 @@ object ApkSigner {
         return ApkSigner.Builder(listOf(signerConfig)).apply {
             setCreatedBy(createdBy)
         }
-    }
-
-    /**
-     * Read a [PrivateKeyCertificatePair] from a keystore entry.
-     *
-     * @param keyStore The keystore to read the entry from.
-     * @param keyStoreEntryAlias The alias of the key store entry to read.
-     * @param keyStoreEntryPassword The password for recovering the signing key.
-     * @return The read [PrivateKeyCertificatePair].
-     * @throws IllegalArgumentException If the keystore does not contain the given alias or the password is invalid.
-     */
-    fun readKeyCertificatePair(
-        keyStore: KeyStore,
-        keyStoreEntryAlias: String,
-        keyStoreEntryPassword: String,
-    ): PrivateKeyCertificatePair {
-        logger.fine("Reading key and certificate pair from keystore entry $keyStoreEntryAlias")
-
-        if (!keyStore.containsAlias(keyStoreEntryAlias))
-            throw IllegalArgumentException("Keystore does not contain alias $keyStoreEntryAlias")
-
-        // Read the private key and certificate from the keystore.
-
-        val privateKey = try {
-            keyStore.getKey(keyStoreEntryAlias, keyStoreEntryPassword.toCharArray()) as PrivateKey
-        } catch (exception: UnrecoverableKeyException) {
-            throw IllegalArgumentException("Invalid password for keystore entry $keyStoreEntryAlias")
-        }
-
-        val certificate = keyStore.getCertificate(keyStoreEntryAlias) as X509Certificate
-
-        return PrivateKeyCertificatePair(privateKey, certificate)
     }
 
     /**

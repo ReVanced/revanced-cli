@@ -1,7 +1,6 @@
 package app.revanced.lib
 
-import app.revanced.lib.signing.ApkSigner
-import app.revanced.lib.signing.ApkSigner.signApk
+import app.revanced.lib.ApkSigner.signApk
 import app.revanced.lib.zip.ZipFile
 import app.revanced.lib.zip.structures.ZipEntry
 import app.revanced.patcher.PatcherResult
@@ -9,6 +8,9 @@ import java.io.File
 import java.util.logging.Logger
 import kotlin.io.path.deleteIfExists
 
+/**
+ * Utility functions for working with apks.
+ */
 @Suppress("MemberVisibilityCanBePrivate", "unused")
 object ApkUtils {
     private val logger = Logger.getLogger(ApkUtils::class.java.name)
