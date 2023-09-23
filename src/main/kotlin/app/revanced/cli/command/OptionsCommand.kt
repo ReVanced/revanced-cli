@@ -1,7 +1,7 @@
 package app.revanced.cli.command
 
-import app.revanced.lib.Options
-import app.revanced.lib.Options.setOptions
+import app.revanced.library.Options
+import app.revanced.library.Options.setOptions
 import app.revanced.patcher.PatchBundleLoader
 import picocli.CommandLine
 import picocli.CommandLine.Help.Visibility.ALWAYS

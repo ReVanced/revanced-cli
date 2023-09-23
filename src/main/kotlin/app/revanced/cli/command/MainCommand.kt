@@ -1,7 +1,7 @@
 package app.revanced.cli.command
 
 import app.revanced.cli.command.utility.UtilityCommand
-import app.revanced.lib.logging.Logger
+import app.revanced.library.logging.Logger
 import picocli.CommandLine
 import picocli.CommandLine.Command
 import picocli.CommandLine.IVersionProvider

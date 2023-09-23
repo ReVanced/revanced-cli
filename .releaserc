@@ -31,7 +31,7 @@
       {
         "assets": [
           {
-            "path": "revanced-cli/build/libs/*all.jar"
+            "path": "build/libs/*all.jar"
           }
         ],
         successComment: false

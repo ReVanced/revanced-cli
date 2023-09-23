@@ -1,9 +1,9 @@
 package app.revanced.cli.command
 
-import app.revanced.lib.ApkUtils
-import app.revanced.lib.Options
-import app.revanced.lib.Options.setOptions
-import app.revanced.lib.adb.AdbManager
+import app.revanced.library.ApkUtils
+import app.revanced.library.Options
+import app.revanced.library.Options.setOptions
+import app.revanced.library.adb.AdbManager
 import app.revanced.patcher.PatchBundleLoader
 import app.revanced.patcher.PatchSet
 import app.revanced.patcher.Patcher

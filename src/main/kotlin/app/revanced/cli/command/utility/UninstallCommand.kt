@@ -1,6 +1,6 @@
 package app.revanced.cli.command.utility
 
-import app.revanced.lib.adb.AdbManager
+import app.revanced.library.adb.AdbManager
 import picocli.CommandLine.*
 import picocli.CommandLine.Help.Visibility.ALWAYS
 import java.util.logging.Logger
