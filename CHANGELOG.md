@@ -1,3 +1,10 @@
+# [4.0.0-dev.2](https://github.com/ReVanced/revanced-cli/compare/v4.0.0-dev.1...v4.0.0-dev.2) (2023-09-24)
+
+
+### Features
+
+* Improve option descriptions ([d5ea5a0](https://github.com/ReVanced/revanced-cli/commit/d5ea5a0ab1cc015730063e5be94ee18bd88cc906))
+
 # [4.0.0-dev.1](https://github.com/ReVanced/revanced-cli/compare/v3.1.2-dev.1...v4.0.0-dev.1) (2023-09-23)
 
 
