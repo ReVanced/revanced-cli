@@ -58,7 +58,7 @@ internal object PatchCommand : Runnable {
 
     @CommandLine.Option(
         names = ["-f","--force"],
-        description = ["Force inclusion of patches that are incompatible with the supplied APK file's version"],
+        description = ["Bypass compatibility checks for the supplied APK's version"],
         showDefaultValue = ALWAYS
     )
     private var force: Boolean = false
