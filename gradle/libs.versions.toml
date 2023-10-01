@@ -3,8 +3,8 @@ shadow = "8.1.1"
 kotlin-test = "1.8.20-RC"
 kotlinx-coroutines-core = "1.7.3"
 picocli = "4.7.3"
-revanced-patcher = "15.0.2"
-revanced-library = "1.0.1"
+revanced-patcher = "15.0.3"
+revanced-library = "1.1.0"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin-test" }
