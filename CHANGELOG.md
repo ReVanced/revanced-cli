@@ -1,3 +1,71 @@
+# [4.0.0-dev.5](https://github.com/ReVanced/revanced-cli/compare/v4.0.0-dev.4...v4.0.0-dev.5) (2023-10-04)
+
+
+### Bug Fixes
+
+* Only set options for filtered patches ([64d9127](https://github.com/ReVanced/revanced-cli/commit/64d9127291ea9a8abe21a0e82721721495094472))
+
+
+### Performance Improvements
+
+* Do not check, if the options file exists twice ([e3c5550](https://github.com/ReVanced/revanced-cli/commit/e3c55507cf52e697b9ce9d59decc1cbe4cfe5b43))
+
+# [4.0.0-dev.4](https://github.com/ReVanced/revanced-cli/compare/v4.0.0-dev.3...v4.0.0-dev.4) (2023-10-01)
+
+# [4.0.0-dev.3](https://github.com/ReVanced/revanced-cli/compare/v4.0.0-dev.2...v4.0.0-dev.3) (2023-09-27)
+
+# [4.0.0-dev.2](https://github.com/ReVanced/revanced-cli/compare/v4.0.0-dev.1...v4.0.0-dev.2) (2023-09-24)
+
+
+### Features
+
+* Improve option descriptions ([d5ea5a0](https://github.com/ReVanced/revanced-cli/commit/d5ea5a0ab1cc015730063e5be94ee18bd88cc906))
+
+# [4.0.0-dev.1](https://github.com/ReVanced/revanced-cli/compare/v3.1.2-dev.1...v4.0.0-dev.1) (2023-09-23)
+
+
+### Bug Fixes
+
+* Check, if mounting is possible ([3e13fb5](https://github.com/ReVanced/revanced-cli/commit/3e13fb5d56eb2a90c2a4a1ddfc05852b1f70add5))
+* Delete temporal files if it exists ([a022feb](https://github.com/ReVanced/revanced-cli/commit/a022febd0c70807ddc3fa9948207a2a70d5191da))
+* Do not sign if mounting ([578e16b](https://github.com/ReVanced/revanced-cli/commit/578e16b099fddfd2bb56accb225d04dfcd409b0c))
+* Filter logs correctly ([43fc20d](https://github.com/ReVanced/revanced-cli/commit/43fc20d90e0a694b231b17bb7d9ecfa22bb5d9a0))
+* Log logs with levels over warning to error output stream ([075f6ad](https://github.com/ReVanced/revanced-cli/commit/075f6ad56528a667dca1f0bed704cf7e5381026f))
+* Only open files for reading and writing if writeable ([3846f72](https://github.com/ReVanced/revanced-cli/commit/3846f721ca015ab39a7e4b8d3f3d61163a6f1650))
+
+
+### Features
+
+* Add function to get the most common compatible version ([77d9173](https://github.com/ReVanced/revanced-cli/commit/77d91735ffbbd6e733f08176f535bfd39ece0c29))
+* Add option to filter patches to be listed by package name ([50c0f98](https://github.com/ReVanced/revanced-cli/commit/50c0f98ce5927e07839437a2e550aa85f5a7e62d))
+* Add option to warn about patches not being found in supplied patch bundles ([e46d855](https://github.com/ReVanced/revanced-cli/commit/e46d85564320f46c6faa54b2d3fa7fca3fa60019))
+* Add ReVanced Library subproject ([#265](https://github.com/ReVanced/revanced-cli/issues/265)) ([157278c](https://github.com/ReVanced/revanced-cli/commit/157278c9ba25f0f786c5fe58e3e23f6890107118))
+* Do not format patch names ([80a8d88](https://github.com/ReVanced/revanced-cli/commit/80a8d88406b2b04d13dca4fb0d7d7d62e1910317))
+* Extend signing API ([592dc1c](https://github.com/ReVanced/revanced-cli/commit/592dc1c64ae4078e73bb71eba11380b301c79dea))
+* Log stacktrace in new line ([c67e3c7](https://github.com/ReVanced/revanced-cli/commit/c67e3c70c7eaa514cde1bebe775a2216bc4a6074))
+* Use ReVanced Library in ReVanced CLI ([7794327](https://github.com/ReVanced/revanced-cli/commit/7794327a11e8a0e0f28176cd45fad797b924c45f))
+* Word log message better ([6942b22](https://github.com/ReVanced/revanced-cli/commit/6942b22a68de5e991987ea89882915917aec93a3))
+
+
+### BREAKING CHANGES
+
+* This changes many signatures of existing APIs and adds new functions for signing
+* This changes the log handler signature
+
+# [3.2.0-dev.1](https://github.com/ReVanced/revanced-cli/compare/v3.1.2-dev.1...v3.2.0-dev.1) (2023-09-20)
+
+
+### Features
+
+* Log stacktrace in new line ([c67e3c7](https://github.com/ReVanced/revanced-cli/commit/c67e3c70c7eaa514cde1bebe775a2216bc4a6074))
+
+## [3.1.2-dev.1](https://github.com/ReVanced/revanced-cli/compare/v3.1.1...v3.1.2-dev.1) (2023-09-12)
+
+
+### Bug Fixes
+
+* Log correct options command ([#262](https://github.com/ReVanced/revanced-cli/issues/262)) ([96c196d](https://github.com/ReVanced/revanced-cli/commit/96c196dcb14e37ad91b751af61ee8382547c1ca3))
+
 ## [3.1.1](https://github.com/ReVanced/revanced-cli/compare/v3.1.0...v3.1.1) (2023-09-09)
 
 

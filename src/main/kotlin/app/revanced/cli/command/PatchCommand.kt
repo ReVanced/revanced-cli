@@ -1,23 +1,18 @@
 package app.revanced.cli.command
 
+import app.revanced.library.ApkUtils
+import app.revanced.library.Options
+import app.revanced.library.Options.setOptions
+import app.revanced.library.adb.AdbManager
 import app.revanced.patcher.PatchBundleLoader
+import app.revanced.patcher.PatchSet
 import app.revanced.patcher.Patcher
 import app.revanced.patcher.PatcherOptions
-import app.revanced.patcher.PatcherResult
-import app.revanced.patcher.extensions.PatchExtensions.compatiblePackages
-import app.revanced.patcher.extensions.PatchExtensions.include
-import app.revanced.patcher.extensions.PatchExtensions.patchName
-import app.revanced.utils.Options
-import app.revanced.utils.Options.setOptions
-import app.revanced.utils.adb.AdbManager
-import app.revanced.utils.align.ZipAligner
-import app.revanced.utils.align.zip.ZipFile
-import app.revanced.utils.align.zip.structures.ZipEntry
-import app.revanced.utils.signing.ApkSigner
-import app.revanced.utils.signing.SigningOptions
 import kotlinx.coroutines.runBlocking
 import picocli.CommandLine
 import picocli.CommandLine.Help.Visibility.ALWAYS
+import picocli.CommandLine.Model.CommandSpec
+import picocli.CommandLine.Spec
 import java.io.File
 import java.io.PrintWriter
 import java.io.StringWriter
@@ -30,20 +25,14 @@ import java.util.logging.Logger
 internal object PatchCommand : Runnable {
     private val logger = Logger.getLogger(PatchCommand::class.java.name)
 
-    @CommandLine.Parameters(
-        description = ["APK file to be patched"], arity = "1..1"
-    )
+    @Spec
+    lateinit var spec: CommandSpec // injected by picocli
+
     private lateinit var apk: File
 
-    @CommandLine.Option(
-        names = ["-b", "--patch-bundle"], description = ["One or more bundles of patches"], required = true
-    )
-    private var patchBundles = emptyList<File>()
-
-    @CommandLine.Option(
-        names = ["-m", "--merge"], description = ["One or more DEX files or containers to merge into the APK"]
-    )
     private var integrations = listOf<File>()
+
+    private var patchBundles = emptyList<File>()
 
     @CommandLine.Option(
         names = ["-i", "--include"], description = ["List of patches to include"]
@@ -69,7 +58,7 @@ internal object PatchCommand : Runnable {
 
     @CommandLine.Option(
         names = ["-f","--force"],
-        description = ["Force inclusion of patches that are incompatible with the supplied APK file's version"],
+        description = ["Bypass compatibility checks for the supplied APK's version"],
         showDefaultValue = ALWAYS
     )
     private var force: Boolean = false
@@ -90,22 +79,34 @@ internal object PatchCommand : Runnable {
     private var mount: Boolean = false
 
     @CommandLine.Option(
-        names = ["--common-name"],
-        description = ["The common name of the signer of the patched APK file"],
+        names = ["--keystore"], description = ["Path to the keystore to sign the patched APK file with"],
+    )
+    private var keystoreFilePath: File? = null
+
+    // key store password
+    @CommandLine.Option(
+        names = ["--keystore-password"],
+        description = ["The password of the keystore to sign the patched APK file with"],
+    )
+    private var keyStorePassword: String? = null // Empty password by default
+
+    @CommandLine.Option(
+        names = ["--alias"], description = ["The alias of the key from the keystore to sign the patched APK file with"],
         showDefaultValue = ALWAYS
-
     )
-    private var commonName = "ReVanced"
-
-    @CommandLine.Option(
-        names = ["--keystore"], description = ["Path to the keystore to sign the patched APK file with"]
-    )
-    private var keystorePath: String? = null
+    private var alias = "ReVanced Key"
 
     @CommandLine.Option(
-        names = ["--password"], description = ["The password of the keystore to sign the patched APK file with"]
+        names = ["--keystore-entry-password"],
+        description = ["The password of the entry from the keystore for the key to sign the patched APK file with"]
     )
-    private var password = "ReVanced"
+    private var password = "" // Empty password by default
+
+    @CommandLine.Option(
+        names = ["--signer"], description = ["The name of the signer to sign the patched APK file with"],
+        showDefaultValue = ALWAYS
+    )
+    private var signer = "ReVanced"
 
     @CommandLine.Option(
         names = ["-r", "--resource-cache"],
@@ -114,10 +115,7 @@ internal object PatchCommand : Runnable {
     )
     private var resourceCachePath = File("revanced-resource-cache")
 
-    @CommandLine.Option(
-        names = ["--custom-aapt2-binary"], description = ["Path to a custom AAPT binary to compile resources with"]
-    )
-    private var aaptBinaryPath = File("")
+    private var aaptBinaryPath: File? = null
 
     @CommandLine.Option(
         names = ["-p", "--purge"],
@@ -126,219 +124,203 @@ internal object PatchCommand : Runnable {
     )
     private var purge: Boolean = false
 
+    @CommandLine.Option(
+        names = ["-w", "--warn"],
+        description = ["Warn if a patch can not be found in the supplied patch bundles"],
+        showDefaultValue = ALWAYS
+    )
+    private var warn: Boolean = false
+
+    @CommandLine.Parameters(
+        description = ["APK file to be patched"], arity = "1..1"
+    )
+    @Suppress("unused")
+    private fun setApk(apk: File) {
+        if (!apk.exists()) throw CommandLine.ParameterException(
+            spec.commandLine(),
+            "APK file ${apk.name} does not exist"
+        )
+        this.apk = apk
+    }
+
+    @CommandLine.Option(
+        names = ["-m", "--merge"], description = ["One or more DEX files or containers to merge into the APK"]
+    )
+    @Suppress("unused")
+    private fun setIntegrations(integrations: Array<File>) {
+        integrations.firstOrNull { !it.exists() }?.let {
+            throw CommandLine.ParameterException(spec.commandLine(), "Integrations file ${it.name} does not exist")
+        }
+        this.integrations += integrations
+    }
+
+    @CommandLine.Option(
+        names = ["-b", "--patch-bundle"], description = ["One or more bundles of patches"], required = true
+    )
+    @Suppress("unused")
+    private fun setPatchBundles(patchBundles: Array<File>) {
+        patchBundles.firstOrNull { !it.exists() }?.let {
+            throw CommandLine.ParameterException(spec.commandLine(), "Patch bundle ${it.name} does not exist")
+        }
+        this.patchBundles = patchBundles.toList()
+    }
+
+    @CommandLine.Option(
+        names = ["--custom-aapt2-binary"], description = ["Path to a custom AAPT binary to compile resources with"]
+    )
+    @Suppress("unused")
+    private fun setAaptBinaryPath(aaptBinaryPath: File) {
+        if (!aaptBinaryPath.exists()) throw CommandLine.ParameterException(
+            spec.commandLine(),
+            "AAPT binary ${aaptBinaryPath.name} does not exist"
+        )
+        this.aaptBinaryPath = aaptBinaryPath
+    }
+
     override fun run() {
-        // region Prepare
-
-        if (!apk.exists()) {
-            logger.severe("APK file ${apk.name} does not exist")
-            return
-        }
-
-        integrations.filter { !it.exists() }.let {
-            if (it.isEmpty()) return@let
-
-            it.forEach { integration ->
-                logger.severe("Integration file ${integration.name} does not exist")
-            }
-            return
-        }
-
-        val adbManager = deviceSerial?.let { serial ->
-            if (mount) AdbManager.RootAdbManager(serial)
-            else AdbManager.UserAdbManager(serial)
-        }
-
-        // endregion
+        val adbManager = deviceSerial?.let { serial -> AdbManager.getAdbManager(serial, mount) }
 
         // region Load patches
 
         logger.info("Loading patches")
 
         val patches = PatchBundleLoader.Jar(*patchBundles.toTypedArray())
-        val integrations = integrations
 
-        logger.info("Setting patch options")
-
-        optionsFile.let {
-            if (it.exists()) patches.setOptions(it)
-            else Options.serialize(patches, prettyPrint = true).let(it::writeText)
+        // Warn if a patch can not be found in the supplied patch bundles.
+        if (warn) patches.map { it.name }.toHashSet().let { availableNames ->
+            arrayOf(*includedPatches, *excludedPatches).filter { name ->
+                !availableNames.contains(name)
+            }
+        }.let { unknownPatches ->
+            if (unknownPatches.isEmpty()) return@let
+            logger.warning("Unknown input of patches:\n${unknownPatches.joinToString("\n")}")
         }
 
         // endregion
 
-        // region Patch
-
-        val patcher = Patcher(
+        Patcher(
             PatcherOptions(
                 apk,
                 resourceCachePath,
-                aaptBinaryPath.path,
+                aaptBinaryPath?.path,
                 resourceCachePath.absolutePath,
             )
-        )
+        ).use { patcher ->
+            val filteredPatches = patcher.filterPatchSelection(patches).also { patches ->
+                logger.info("Setting patch options")
 
-        val result = patcher.apply {
-            acceptIntegrations(integrations)
-            acceptPatches(filterPatchSelection(patches))
-
-            // Execute patches.
-            runBlocking {
-                apply(false).collect { patchResult ->
-                    patchResult.exception?.let {
-                        StringWriter().use { writer ->
-                            it.printStackTrace(PrintWriter(writer))
-                            logger.severe("${patchResult.patchName} failed: $writer")
-                        }
-                    } ?: logger.info("${patchResult.patchName} succeeded")
-                }
+                if (optionsFile.exists()) patches.setOptions(optionsFile)
+                else Options.serialize(patches, prettyPrint = true).let(optionsFile::writeText)
             }
-        }.get()
 
-        patcher.close()
+            // region Patch
 
-        // endregion
+            val patcherResult = patcher.apply {
+                acceptIntegrations(integrations)
+                acceptPatches(filteredPatches.toList())
 
-        // region Finish
+                // Execute patches.
+                runBlocking {
+                    apply(false).collect { patchResult ->
+                        patchResult.exception?.let {
+                            StringWriter().use { writer ->
+                                it.printStackTrace(PrintWriter(writer))
+                                logger.severe("${patchResult.patch.name} failed:\n$writer")
+                            }
+                        } ?: logger.info("${patchResult.patch.name} succeeded")
+                    }
+                }
+            }.get()
 
-        val alignAndSignedFile = sign(
-            apk.newAlignedFile(
-                result, resourceCachePath.resolve("${outputFilePath.nameWithoutExtension}_aligned.apk")
+            // endregion
+
+            // region Save
+
+            val tempFile = resourceCachePath.resolve(apk.name).apply {
+                ApkUtils.copyAligned(apk, this, patcherResult)
+            }
+
+            val keystoreFilePath = keystoreFilePath ?: outputFilePath.absoluteFile.parentFile
+                .resolve("${outputFilePath.nameWithoutExtension}.keystore")
+
+            if (!mount) ApkUtils.sign(
+                tempFile,
+                outputFilePath,
+                ApkUtils.SigningOptions(
+                    keystoreFilePath,
+                    keyStorePassword,
+                    alias,
+                    password,
+                    signer
+                )
             )
-        )
 
-        logger.info("Copying to ${outputFilePath.name}")
-        alignAndSignedFile.copyTo(outputFilePath, overwrite = true)
+            // endregion
 
-        adbManager?.install(AdbManager.Apk(outputFilePath, patcher.context.packageMetadata.packageName))
+            // region Install
+
+            adbManager?.install(AdbManager.Apk(outputFilePath, patcher.context.packageMetadata.packageName))
+
+            // endregion
+        }
 
         if (purge) {
             logger.info("Purging temporary files")
             purge(resourceCachePath)
         }
-
-        // endregion
     }
 
 
     /**
      * Filter the patches to be added to the patcher. The filter is based on the following:
-     * - [includedPatches] (explicitly included)
-     * - [excludedPatches] (explicitly excluded)
-     * - [exclusive] (only include patches that are explicitly included)
-     * - [force] (ignore patches incompatibility to versions)
-     * - Package name and version of the input APK file (if [force] is false)
      *
      * @param patches The patches to filter.
      * @return The filtered patches.
      */
-    private fun Patcher.filterPatchSelection(patches: PatchList) = buildList {
-        // TODO: Remove this eventually because
-        //  patches named "patch-name" and "patch name" will conflict.
-        fun String.format() = lowercase().replace(" ", "-")
-
-        val formattedExcludedPatches = excludedPatches.map { it.format() }
-        val formattedIncludedPatches = includedPatches.map { it.format() }
-
+    private fun Patcher.filterPatchSelection(patches: PatchSet): PatchSet = buildSet {
         val packageName = context.packageMetadata.packageName
         val packageVersion = context.packageMetadata.packageVersion
 
         patches.forEach patch@{ patch ->
-            val formattedPatchName = patch.patchName.format()
+            val patchName = patch.name!!
 
-            val explicitlyExcluded = formattedExcludedPatches.contains(formattedPatchName)
-            if (explicitlyExcluded) return@patch logger.info("Excluding ${patch.patchName}")
+            val explicitlyExcluded = excludedPatches.contains(patchName)
+            if (explicitlyExcluded) return@patch logger.info("Excluding $patchName")
 
             // Make sure the patch is compatible with the supplied APK files package name and version.
             patch.compatiblePackages?.let { packages ->
                 packages.singleOrNull { it.name == packageName }?.let { `package` ->
-                    val matchesVersion = force || `package`.versions.let {
-                        it.isEmpty() || it.any { version -> version == packageVersion }
-                    }
+                    val matchesVersion = force || `package`.versions?.let {
+                        it.any { version -> version == packageVersion }
+                    } ?: true
 
                     if (!matchesVersion) return@patch logger.warning(
-                        "${patch.patchName} is incompatible with version $packageVersion. "
+                        "$patchName is incompatible with version $packageVersion. "
                                 + "This patch is only compatible with version "
                                 + packages.joinToString(";") { pkg ->
-                            "${pkg.name}: ${pkg.versions.joinToString(", ")}"
+                            "${pkg.name}: ${pkg.versions!!.joinToString(", ")}"
                         }
                     )
-                } ?: return@patch logger.fine("${patch.patchName} is incompatible with $packageName. "
+                } ?: return@patch logger.fine(
+                    "$patchName is incompatible with $packageName. "
                         + "This patch is only compatible with "
                         + packages.joinToString(", ") { `package` -> `package`.name })
 
                 return@let
-            } ?: logger.fine("$formattedPatchName: No constraint on packages.")
+            } ?: logger.fine("$patchName has no constraint on packages.")
 
-            // If the patch is implicitly included, it will be only included if [exclusive] is false.
-            val implicitlyIncluded = !exclusive && patch.include
-            // If the patch is explicitly included, it will be included even if [exclusive] is false.
-            val explicitlyIncluded = formattedIncludedPatches.contains(formattedPatchName)
+            // If the patch is implicitly used, it will be only included if [exclusive] is false.
+            val implicitlyIncluded = !exclusive && patch.use
+            // If the patch is explicitly used, it will be included even if [exclusive] is false.
+            val explicitlyIncluded = includedPatches.contains(patchName)
 
             val included = implicitlyIncluded || explicitlyIncluded
-            if (!included) return@patch logger.info("${patch.patchName} excluded by default") // Case 1.
+            if (!included) return@patch logger.info("$patchName excluded") // Case 1.
 
-            logger.fine("Adding $formattedPatchName")
+            logger.fine("Adding $patchName")
 
             add(patch)
         }
-    }
-
-    /**
-     * Create a new aligned APK file.
-     *
-     * @param result The result of the patching process.
-     * @param outputFile The file to save the aligned APK to.
-     */
-    private fun File.newAlignedFile(
-        result: PatcherResult, outputFile: File
-    ): File {
-        logger.info("Aligning $name")
-
-        if (outputFile.exists()) outputFile.delete()
-
-        ZipFile(outputFile).use { file ->
-            result.dexFiles.forEach {
-                file.addEntryCompressData(
-                    ZipEntry.createWithName(it.name), it.stream.readBytes()
-                )
-            }
-
-            result.resourceFile?.let {
-                file.copyEntriesFromFileAligned(
-                    ZipFile(it), ZipAligner::getEntryAlignment
-                )
-            }
-
-            // TODO: Do not compress result.doNotCompress
-
-            file.copyEntriesFromFileAligned(
-                ZipFile(this), ZipAligner::getEntryAlignment
-            )
-        }
-
-        return outputFile
-    }
-
-    /**
-     * Sign the APK file.
-     *
-     * @param inputFile The APK file to sign.
-     * @return The signed APK file. If [mount] is true, the input file will be returned.
-     */
-    private fun sign(inputFile: File) = if (mount) inputFile
-    else {
-        logger.info("Signing ${inputFile.name}")
-
-        val keyStoreFilePath = keystorePath
-            ?: outputFilePath.absoluteFile.parentFile.resolve("${outputFilePath.nameWithoutExtension}.keystore").canonicalPath
-
-        val options = SigningOptions(
-            commonName, password, keyStoreFilePath
-        )
-
-        ApkSigner(options).signApk(
-                inputFile, resourceCachePath.resolve("${outputFilePath.nameWithoutExtension}_signed.apk")
-            )
     }
 
     private fun purge(resourceCachePath: File) {

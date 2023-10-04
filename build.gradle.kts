@@ -1,5 +1,5 @@
 plugins {
-    kotlin("jvm") version "1.8.20"
+    kotlin("jvm") version "1.9.0"
     alias(libs.plugins.shadow)
 }
 
@@ -7,13 +7,10 @@ group = "app.revanced"
 
 dependencies {
     implementation(libs.revanced.patcher)
-    implementation(libs.kotlin.reflect)
+    implementation(libs.revanced.library)
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.picocli)
-    implementation(libs.jadb) // Updated fork
-    implementation(libs.apksig)
-    implementation(libs.bcpkix.jdk15on)
-    implementation(libs.jackson.module.kotlin)
+
     testImplementation(libs.kotlin.test)
 }
 
@@ -46,12 +43,21 @@ tasks {
         dependsOn(shadowJar)
     }
 
-    // Dummy task to fix the Gradle semantic-release plugin.
-    // Remove this if you forked it to support building only.
-    // Tracking issue: https://github.com/KengoTODA/gradle-semantic-release-plugin/issues/435
+    /*
+    Dummy task to hack gradle-semantic-release-plugin to release this project.
+
+    Explanation:
+    SemVer is a standard for versioning libraries.
+    For that reason the semantic-release plugin uses the "publish" task to publish libraries.
+    However, this subproject is not a library, and the "publish" task is not available for this subproject.
+    Because semantic-release is not designed to handle this case, we need to hack it.
+
+    RE: https://github.com/KengoTODA/gradle-semantic-release-plugin/issues/435
+     */
+
     register<DefaultTask>("publish") {
-        group = "publish"
-        description = "Dummy task"
+        group = "publishing"
+        description = "Dummy task to hack gradle-semantic-release-plugin to release ReVanced CLI"
         dependsOn(build)
     }
 }
