@@ -196,13 +196,6 @@ internal object PatchCommand : Runnable {
             logger.warning("Unknown input of patches:\n${unknownPatches.joinToString("\n")}")
         }
 
-        logger.info("Setting patch options")
-
-        optionsFile.let {
-            if (it.exists()) patches.setOptions(it)
-            else Options.serialize(patches, prettyPrint = true).let(it::writeText)
-        }
-
         // endregion
 
         Patcher(
@@ -213,11 +206,18 @@ internal object PatchCommand : Runnable {
                 resourceCachePath.absolutePath,
             )
         ).use { patcher ->
+            val filteredPatches = patcher.filterPatchSelection(patches).also { patches ->
+                logger.info("Setting patch options")
+
+                if (optionsFile.exists()) patches.setOptions(optionsFile)
+                else Options.serialize(patches, prettyPrint = true).let(optionsFile::writeText)
+            }
+
             // region Patch
 
             val patcherResult = patcher.apply {
                 acceptIntegrations(integrations)
-                acceptPatches(filterPatchSelection(patches))
+                acceptPatches(filteredPatches.toList())
 
                 // Execute patches.
                 runBlocking {
@@ -277,7 +277,7 @@ internal object PatchCommand : Runnable {
      * @param patches The patches to filter.
      * @return The filtered patches.
      */
-    private fun Patcher.filterPatchSelection(patches: PatchSet) = buildList {
+    private fun Patcher.filterPatchSelection(patches: PatchSet): PatchSet = buildSet {
         val packageName = context.packageMetadata.packageName
         val packageVersion = context.packageMetadata.packageVersion
 
