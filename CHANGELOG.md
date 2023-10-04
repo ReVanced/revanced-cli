@@ -1,3 +1,15 @@
+# [4.0.0-dev.5](https://github.com/ReVanced/revanced-cli/compare/v4.0.0-dev.4...v4.0.0-dev.5) (2023-10-04)
+
+
+### Bug Fixes
+
+* Only set options for filtered patches ([64d9127](https://github.com/ReVanced/revanced-cli/commit/64d9127291ea9a8abe21a0e82721721495094472))
+
+
+### Performance Improvements
+
+* Do not check, if the options file exists twice ([e3c5550](https://github.com/ReVanced/revanced-cli/commit/e3c55507cf52e697b9ce9d59decc1cbe4cfe5b43))
+
 # [4.0.0-dev.4](https://github.com/ReVanced/revanced-cli/compare/v4.0.0-dev.3...v4.0.0-dev.4) (2023-10-01)
 
 # [4.0.0-dev.3](https://github.com/ReVanced/revanced-cli/compare/v4.0.0-dev.2...v4.0.0-dev.3) (2023-09-27)
