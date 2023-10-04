@@ -39,8 +39,9 @@ internal object OptionsCommand : Runnable {
 
     override fun run() = try {
         PatchBundleLoader.Jar(*patchBundles).let { patches ->
-            if (!filePath.exists() || overwrite) {
-                if (update && filePath.exists()) patches.setOptions(filePath)
+            val exists = filePath.exists()
+            if (!exists || overwrite) {
+                if (exists && update) patches.setOptions(filePath)
 
                 Options.serialize(patches, prettyPrint = true).let(filePath::writeText)
             } else throw OptionsFileAlreadyExistsException()
