@@ -8,6 +8,7 @@ import app.revanced.patcher.PatchBundleLoader
 import app.revanced.patcher.PatchSet
 import app.revanced.patcher.Patcher
 import app.revanced.patcher.PatcherOptions
+import app.revanced.patcher.data.ResourceContext
 import kotlinx.coroutines.runBlocking
 import picocli.CommandLine
 import picocli.CommandLine.Help.Visibility.ALWAYS
@@ -33,6 +34,8 @@ internal object PatchCommand : Runnable {
     private var integrations = listOf<File>()
 
     private var patchBundles = emptyList<File>()
+
+    private var sigLevels = setOf(1, 2, 3)
 
     @CommandLine.Option(
         names = ["-i", "--include"],
@@ -216,6 +219,24 @@ internal object PatchCommand : Runnable {
         this.aaptBinaryPath = aaptBinaryPath
     }
 
+    @CommandLine.Option(
+        names = ["--sig-level"],
+        description = ["Output apk signing level"],
+        split = ",",
+        defaultValue = "1,2,3",
+        showDefaultValue = ALWAYS
+    )
+    @Suppress("unused")
+    private fun setSigLevels(sigLevelsArray: Array<Int>) {
+        val sigLevels = sigLevelsArray.toSet()
+        if (sigLevels.isEmpty() || !listOf(1, 2, 3).containsAll(sigLevels))
+            throw CommandLine.ParameterException(
+                spec.commandLine(),
+                "Signing levels ${sigLevelsArray.joinToString(",")} invalid"
+            )
+        this.sigLevels = sigLevels
+    }
+
     override fun run() {
         // region Setup
 
@@ -260,15 +281,15 @@ internal object PatchCommand : Runnable {
 
         // endregion
 
-        Patcher(
-            PatcherOptions(
-                apk,
-                resourceCachePath,
-                aaptBinaryPath?.path,
-                resourceCachePath.absolutePath,
-                true,
-            ),
-        ).use { patcher ->
+        val patcherOptions = PatcherOptions(
+            apk,
+            resourceCachePath,
+            aaptBinaryPath?.path,
+            resourceCachePath.absolutePath,
+            true,
+            shortenResourcePaths = true,
+        )
+        Patcher(patcherOptions).use { patcher ->
             val filteredPatches =
                 patcher.filterPatchSelection(patches).also { patches ->
                     logger.info("Setting patch options")
@@ -306,7 +327,7 @@ internal object PatchCommand : Runnable {
 
             val alignedFile =
                 resourceCachePath.resolve(apk.name).apply {
-                    ApkUtils.copyAligned(apk, this, patcherResult)
+                    ApkUtils.copyAligned(apk, this, patcherResult, ignoreRes = patcherOptions.resourceDecodingMode == ResourceContext.ResourceDecodingMode.FULL,)
                 }
 
             if (!mount) {
@@ -319,6 +340,7 @@ internal object PatchCommand : Runnable {
                         alias,
                         password,
                         signer,
+                        sigLevels,
                     ),
                 )
             } else {
