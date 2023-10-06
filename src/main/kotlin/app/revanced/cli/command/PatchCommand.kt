@@ -17,6 +17,7 @@ import java.io.File
 import java.io.PrintWriter
 import java.io.StringWriter
 import java.util.logging.Logger
+import kotlin.io.path.deleteIfExists
 
 
 @CommandLine.Command(
@@ -254,6 +255,10 @@ internal object PatchCommand : Runnable {
                     signer
                 )
             )
+            else {
+                outputFilePath.toPath().deleteIfExists()
+                tempFile.copyTo(outputFilePath)
+            }
 
             // endregion
 
