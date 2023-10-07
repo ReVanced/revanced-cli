@@ -1,3 +1,10 @@
+## [4.0.1-dev.1](https://github.com/ReVanced/revanced-cli/compare/v4.0.0...v4.0.1-dev.1) (2023-10-07)
+
+
+### Bug Fixes
+
+* Correct warning message ([e4e339d](https://github.com/ReVanced/revanced-cli/commit/e4e339dff40542d6265de59496545c859312cf11))
+
 # [4.0.0](https://github.com/ReVanced/revanced-cli/compare/v3.1.1...v4.0.0) (2023-10-04)
 
 
