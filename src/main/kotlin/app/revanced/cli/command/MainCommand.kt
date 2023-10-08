@@ -26,7 +26,7 @@ private object CLIVersionProvider : IVersionProvider {
 
 @Command(
     name = "revanced-cli",
-    description = ["Command line application to use ReVanced"],
+    description = ["Command line application to use ReVanced."],
     mixinStandardHelpOptions = true,
     versionProvider = CLIVersionProvider::class,
     subcommands = [
