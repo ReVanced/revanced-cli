@@ -46,7 +46,7 @@ Learn how to ReVanced CLI.
   This will generate an `options.json` file for the patches from a list of supplied patch bundles.
   The file can be supplied to ReVanced CLI later on.
  
-- ```bash
+  ```bash
   java -jar revanced-cli.jar options \
    --path options.json \
    --overwrite \

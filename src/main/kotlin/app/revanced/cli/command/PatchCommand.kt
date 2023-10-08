@@ -298,7 +298,7 @@ internal object PatchCommand : Runnable {
                         "$patchName is incompatible with version $packageVersion. "
                                 + "This patch is only compatible with version "
                                 + packages.joinToString(";") { pkg ->
-                            "${pkg.name}: ${pkg.versions!!.joinToString(", ")}"
+                            pkg.versions!!.joinToString(", ")
                         }
                     )
                 } ?: return@patch logger.fine(
