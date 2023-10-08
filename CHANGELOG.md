@@ -1,3 +1,10 @@
+## [4.0.2-dev.1](https://github.com/ReVanced/revanced-cli/compare/v4.0.1...v4.0.2-dev.1) (2023-10-08)
+
+
+### Bug Fixes
+
+* Use punctuation in option descriptions ([da4469f](https://github.com/ReVanced/revanced-cli/commit/da4469f402c26ad95898404236b0acf0202907e2))
+
 ## [4.0.1](https://github.com/ReVanced/revanced-cli/compare/v4.0.0...v4.0.1) (2023-10-08)
 
 
