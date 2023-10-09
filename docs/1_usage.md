@@ -38,9 +38,9 @@ ReVanced CLI is divided into the following fundamental commands:
   > A default `options.json` file will be automatically created, if it does not exist 
   without any need for intervention when using the `patch` command.
 
-- ### 💉 Patch apps
+- ### 💉 Patch an app
 
-  You can patch apps by supplying patch bundles and the APK file to patch.
+  You can patch apps by supplying patch bundles and the app to patch.
   After patching, ReVanced CLI can install the patched app on your device using two methods:
 
   > [!NOTE]  
