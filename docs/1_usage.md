@@ -6,7 +6,7 @@ Learn how to ReVanced CLI.
 
 ReVanced CLI is divided into the following fundamental commands:
 
-- ### ⚙️ Show all available options for ReVanced CLI
+- ### 🚀 Show all available options for ReVanced CLI
 
   ```bash
   java -jar revanced-cli.jar -h
@@ -112,7 +112,7 @@ ReVanced CLI is divided into the following fundamental commands:
   > You can unmount an APK file
   by adding the option `--unmount`.
 
-- ### ️ ⚙️ Install an app
+- ### ️ 📦 Install an app
 
   ```bash
   java -jar revanced-cli.jar utility install \
