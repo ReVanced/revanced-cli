@@ -63,6 +63,11 @@ ReVanced CLI is divided into the following fundamental commands:
   > ```
   >
 
+  > [!WARNING]  
+  > Some patches may require integrations
+  > such as [ReVanced Integrations](https://github.com/revanced/revanced-integrations).
+  > Supply them with the option `--merge`. ReVanced Patcher will automatically determine if they are necessary.
+
   - #### 👾 Patch an app and install it on your device regularly
 
     ```bash
@@ -94,11 +99,6 @@ ReVanced CLI is divided into the following fundamental commands:
      --mount \
      app.apk
     ```
-
-  > [!WARNING]  
-  > Some patches may require integrations
-  > such as [ReVanced Integrations](https://github.com/revanced/revanced-integrations). 
-  > Supply them with the option `--merge`. ReVanced Patcher will automatically determine if they are necessary.
 
 - ### 🗑️ Uninstall an app
 
