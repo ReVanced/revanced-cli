@@ -204,6 +204,7 @@ internal object PatchCommand : Runnable {
                 resourceCachePath,
                 aaptBinaryPath?.path,
                 resourceCachePath.absolutePath,
+                true
             )
         ).use { patcher ->
             val filteredPatches = patcher.filterPatchSelection(patches).also { patches ->
