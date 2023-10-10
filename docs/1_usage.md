@@ -87,8 +87,6 @@ ReVanced CLI is divided into the following fundamental commands:
     > adb install app.apk
     > ```
 
-    Patch and install the app on your device by mounting it on top of the un-patched app with root permissions:
-
     ```bash
     java -jar revanced-cli.jar patch \
      --patch-bundle revanced-patches.jar \
