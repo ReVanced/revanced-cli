@@ -237,7 +237,7 @@ internal object PatchCommand : Runnable {
 
             // region Save
 
-            val tempFile = resourceCachePath.resolve(apk.name).apply {
+            val alignedFile = resourceCachePath.resolve(apk.name).apply {
                 ApkUtils.copyAligned(apk, this, patcherResult)
             }
 
@@ -245,7 +245,7 @@ internal object PatchCommand : Runnable {
                 .resolve("${outputFilePath.nameWithoutExtension}.keystore")
 
             if (!mount) ApkUtils.sign(
-                tempFile,
+                alignedFile,
                 outputFilePath,
                 ApkUtils.SigningOptions(
                     keystoreFilePath,
@@ -255,6 +255,7 @@ internal object PatchCommand : Runnable {
                     signer
                 )
             )
+            else alignedFile.renameTo(outputFilePath)
 
             // endregion
 
