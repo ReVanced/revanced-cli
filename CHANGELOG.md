@@ -1,3 +1,10 @@
+## [4.0.2-dev.2](https://github.com/ReVanced/revanced-cli/compare/v4.0.2-dev.1...v4.0.2-dev.2) (2023-10-10)
+
+
+### Performance Improvements
+
+* Use multiple threads for writing dex files ([28648a1](https://github.com/ReVanced/revanced-cli/commit/28648a1c53520eef8c799504ff61a35947f878b8))
+
 ## [4.0.2-dev.1](https://github.com/ReVanced/revanced-cli/compare/v4.0.1...v4.0.2-dev.1) (2023-10-08)
 
 
