@@ -1,3 +1,10 @@
+## [4.0.2-dev.3](https://github.com/ReVanced/revanced-cli/compare/v4.0.2-dev.2...v4.0.2-dev.3) (2023-10-10)
+
+
+### Bug Fixes
+
+* Move file to output even when mounting ([59dfc98](https://github.com/ReVanced/revanced-cli/commit/59dfc988e351374eb718923d19bd9bdd94e8d3c0))
+
 ## [4.0.2-dev.2](https://github.com/ReVanced/revanced-cli/compare/v4.0.2-dev.1...v4.0.2-dev.2) (2023-10-10)
 
 
