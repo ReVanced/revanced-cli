@@ -81,7 +81,7 @@ ReVanced CLI is divided into the following fundamental commands:
   - #### 👾 Patch an app and mount it on top of the un-patched app with root permissions
   
     > [!IMPORTANT]  
-    > Ensure sure the same app you are patching is installed on your device:
+    > Ensure sure the same app you are patching and mounting over is installed on your device:
     > 
     > ```bash
     > adb install app.apk
