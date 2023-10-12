@@ -5,6 +5,13 @@ plugins {
 
 group = "app.revanced"
 
+repositories {
+    mavenCentral()
+    mavenLocal()
+    google()
+    maven { url = uri("https://jitpack.io") }
+}
+
 dependencies {
     implementation(libs.revanced.patcher)
     implementation(libs.revanced.library)

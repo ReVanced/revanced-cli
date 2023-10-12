@@ -1,3 +1,24 @@
+## [4.0.2-dev.3](https://github.com/ReVanced/revanced-cli/compare/v4.0.2-dev.2...v4.0.2-dev.3) (2023-10-10)
+
+
+### Bug Fixes
+
+* Move file to output even when mounting ([59dfc98](https://github.com/ReVanced/revanced-cli/commit/59dfc988e351374eb718923d19bd9bdd94e8d3c0))
+
+## [4.0.2-dev.2](https://github.com/ReVanced/revanced-cli/compare/v4.0.2-dev.1...v4.0.2-dev.2) (2023-10-10)
+
+
+### Performance Improvements
+
+* Use multiple threads for writing dex files ([28648a1](https://github.com/ReVanced/revanced-cli/commit/28648a1c53520eef8c799504ff61a35947f878b8))
+
+## [4.0.2-dev.1](https://github.com/ReVanced/revanced-cli/compare/v4.0.1...v4.0.2-dev.1) (2023-10-08)
+
+
+### Bug Fixes
+
+* Use punctuation in option descriptions ([da4469f](https://github.com/ReVanced/revanced-cli/commit/da4469f402c26ad95898404236b0acf0202907e2))
+
 ## [4.0.1](https://github.com/ReVanced/revanced-cli/compare/v4.0.0...v4.0.1) (2023-10-08)
 
 

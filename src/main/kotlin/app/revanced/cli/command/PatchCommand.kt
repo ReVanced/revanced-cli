@@ -20,7 +20,7 @@ import java.util.logging.Logger
 
 
 @CommandLine.Command(
-    name = "patch", description = ["Patch an APK file"]
+    name = "patch", description = ["Patch an APK file."]
 )
 internal object PatchCommand : Runnable {
     private val logger = Logger.getLogger(PatchCommand::class.java.name)
@@ -35,104 +35,104 @@ internal object PatchCommand : Runnable {
     private var patchBundles = emptyList<File>()
 
     @CommandLine.Option(
-        names = ["-i", "--include"], description = ["List of patches to include"]
+        names = ["-i", "--include"], description = ["List of patches to include."]
     )
     private var includedPatches = arrayOf<String>()
 
     @CommandLine.Option(
-        names = ["-e", "--exclude"], description = ["List of patches to exclude"]
+        names = ["-e", "--exclude"], description = ["List of patches to exclude."]
     )
     private var excludedPatches = arrayOf<String>()
 
     @CommandLine.Option(
-        names = ["--options"], description = ["Path to patch options JSON file"], showDefaultValue = ALWAYS
+        names = ["--options"], description = ["Path to patch options JSON file."], showDefaultValue = ALWAYS
     )
     private var optionsFile: File = File("options.json")
 
     @CommandLine.Option(
         names = ["--exclusive"],
-        description = ["Only include patches that are explicitly specified to be included"],
+        description = ["Only include patches that are explicitly specified to be included."],
         showDefaultValue = ALWAYS
     )
     private var exclusive = false
 
     @CommandLine.Option(
         names = ["-f","--force"],
-        description = ["Bypass compatibility checks for the supplied APK's version"],
+        description = ["Bypass compatibility checks for the supplied APK's version."],
         showDefaultValue = ALWAYS
     )
     private var force: Boolean = false
 
     @CommandLine.Option(
-        names = ["-o", "--out"], description = ["Path to save the patched APK file to"], required = true
+        names = ["-o", "--out"], description = ["Path to save the patched APK file to."], required = true
     )
     private lateinit var outputFilePath: File
 
     @CommandLine.Option(
-        names = ["-d", "--device-serial"], description = ["ADB device serial to install to"], showDefaultValue = ALWAYS
+        names = ["-d", "--device-serial"], description = ["ADB device serial to install to."], showDefaultValue = ALWAYS
     )
     private var deviceSerial: String? = null
 
     @CommandLine.Option(
-        names = ["--mount"], description = ["Install by mounting the patched APK file"], showDefaultValue = ALWAYS
+        names = ["--mount"], description = ["Install by mounting the patched APK file."], showDefaultValue = ALWAYS
     )
     private var mount: Boolean = false
 
     @CommandLine.Option(
-        names = ["--keystore"], description = ["Path to the keystore to sign the patched APK file with"],
+        names = ["--keystore"], description = ["Path to the keystore to sign the patched APK file with."],
     )
     private var keystoreFilePath: File? = null
 
     // key store password
     @CommandLine.Option(
         names = ["--keystore-password"],
-        description = ["The password of the keystore to sign the patched APK file with"],
+        description = ["The password of the keystore to sign the patched APK file with."],
     )
     private var keyStorePassword: String? = null // Empty password by default
 
     @CommandLine.Option(
-        names = ["--alias"], description = ["The alias of the key from the keystore to sign the patched APK file with"],
+        names = ["--alias"], description = ["The alias of the key from the keystore to sign the patched APK file with."],
         showDefaultValue = ALWAYS
     )
     private var alias = "ReVanced Key"
 
     @CommandLine.Option(
         names = ["--keystore-entry-password"],
-        description = ["The password of the entry from the keystore for the key to sign the patched APK file with"]
+        description = ["The password of the entry from the keystore for the key to sign the patched APK file with."]
     )
     private var password = "" // Empty password by default
 
     @CommandLine.Option(
-        names = ["--signer"], description = ["The name of the signer to sign the patched APK file with"],
+        names = ["--signer"], description = ["The name of the signer to sign the patched APK file with."],
         showDefaultValue = ALWAYS
     )
     private var signer = "ReVanced"
 
     @CommandLine.Option(
         names = ["-r", "--resource-cache"],
-        description = ["Path to temporary resource cache directory"],
+        description = ["Path to temporary resource cache directory."],
         showDefaultValue = ALWAYS
     )
-    private var resourceCachePath = File("revanced-resource-cache")
+    private var resourceCachePath = File("revanced-resource-cache.")
 
     private var aaptBinaryPath: File? = null
 
     @CommandLine.Option(
         names = ["-p", "--purge"],
-        description = ["Purge the temporary resource cache directory after patching"],
+        description = ["Purge the temporary resource cache directory after patching."],
         showDefaultValue = ALWAYS
     )
     private var purge: Boolean = false
 
     @CommandLine.Option(
         names = ["-w", "--warn"],
-        description = ["Warn if a patch can not be found in the supplied patch bundles"],
+        description = ["Warn if a patch can not be found in the supplied patch bundles."],
         showDefaultValue = ALWAYS
     )
     private var warn: Boolean = false
 
     @CommandLine.Parameters(
-        description = ["APK file to be patched"], arity = "1..1"
+        description = ["APK file to be patched."], arity = "1..1"
     )
     @Suppress("unused")
     private fun setApk(apk: File) {
@@ -144,18 +144,18 @@ internal object PatchCommand : Runnable {
     }
 
     @CommandLine.Option(
-        names = ["-m", "--merge"], description = ["One or more DEX files or containers to merge into the APK"]
+        names = ["-m", "--merge"], description = ["One or more DEX files or containers to merge into the APK."]
     )
     @Suppress("unused")
     private fun setIntegrations(integrations: Array<File>) {
         integrations.firstOrNull { !it.exists() }?.let {
-            throw CommandLine.ParameterException(spec.commandLine(), "Integrations file ${it.name} does not exist")
+            throw CommandLine.ParameterException(spec.commandLine(), "Integrations file ${it.name} does not exist.")
         }
         this.integrations += integrations
     }
 
     @CommandLine.Option(
-        names = ["-b", "--patch-bundle"], description = ["One or more bundles of patches"], required = true
+        names = ["-b", "--patch-bundle"], description = ["One or more bundles of patches."], required = true
     )
     @Suppress("unused")
     private fun setPatchBundles(patchBundles: Array<File>) {
@@ -166,7 +166,7 @@ internal object PatchCommand : Runnable {
     }
 
     @CommandLine.Option(
-        names = ["--custom-aapt2-binary"], description = ["Path to a custom AAPT binary to compile resources with"]
+        names = ["--custom-aapt2-binary"], description = ["Path to a custom AAPT binary to compile resources with."]
     )
     @Suppress("unused")
     private fun setAaptBinaryPath(aaptBinaryPath: File) {
@@ -204,6 +204,7 @@ internal object PatchCommand : Runnable {
                 resourceCachePath,
                 aaptBinaryPath?.path,
                 resourceCachePath.absolutePath,
+                true
             )
         ).use { patcher ->
             val filteredPatches = patcher.filterPatchSelection(patches).also { patches ->
@@ -236,7 +237,7 @@ internal object PatchCommand : Runnable {
 
             // region Save
 
-            val tempFile = resourceCachePath.resolve(apk.name).apply {
+            val alignedFile = resourceCachePath.resolve(apk.name).apply {
                 ApkUtils.copyAligned(apk, this, patcherResult)
             }
 
@@ -244,7 +245,7 @@ internal object PatchCommand : Runnable {
                 .resolve("${outputFilePath.nameWithoutExtension}.keystore")
 
             if (!mount) ApkUtils.sign(
-                tempFile,
+                alignedFile,
                 outputFilePath,
                 ApkUtils.SigningOptions(
                     keystoreFilePath,
@@ -254,6 +255,7 @@ internal object PatchCommand : Runnable {
                     signer
                 )
             )
+            else alignedFile.renameTo(outputFilePath)
 
             // endregion
 
