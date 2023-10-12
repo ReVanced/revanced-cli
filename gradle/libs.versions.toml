@@ -4,7 +4,7 @@ kotlin-test = "1.8.20-RC"
 kotlinx-coroutines-core = "1.7.3"
 picocli = "4.7.3"
 revanced-patcher = "17.0.0"
-revanced-library = "1.1.3"
+revanced-library = "1.1.4"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin-test" }
