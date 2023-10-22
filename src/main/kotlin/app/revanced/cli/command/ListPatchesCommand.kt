@@ -58,12 +58,16 @@ internal object ListPatchesCommand : Runnable {
 
         fun PatchOption<*>.buildString() = buildString {
             appendLine("Title: $title")
-            appendLine("Description: $description")
-
-            value?.let {
+            description?.let { appendLine("Description: $it") }
+            default?.let {
                 appendLine("Key: $key")
-                append("Value: $it")
+                append("Default: $it")
             } ?: append("Key: $key")
+
+            values?.let { values ->
+                appendLine("\nValid values:")
+                append(values.map { "${it.value} (${it.key})" }.joinToString("\n").prependIndent("\t"))
+            }
         }
 
         fun Patch<*>.buildString() = buildString {
