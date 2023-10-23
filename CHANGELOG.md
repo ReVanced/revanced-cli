@@ -1,3 +1,5 @@
+## [4.0.3-dev.1](https://github.com/ReVanced/revanced-cli/compare/v4.0.2...v4.0.3-dev.1) (2023-10-23)
+
 ## [4.0.2](https://github.com/ReVanced/revanced-cli/compare/v4.0.1...v4.0.2) (2023-10-12)
 
 
