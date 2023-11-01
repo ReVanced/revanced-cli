@@ -47,6 +47,13 @@ internal object ListPatchesCommand : Runnable {
     )
     private var packageName: String? = null
 
+    @Option(
+        names = ["--filter-include-packageless"],
+        description = ["Include patches with no compatible packages listed when filtering by package name."],
+        showDefaultValue = ALWAYS
+    )
+    private var patchesWithNoPackage: Boolean = false
+
     override fun run() {
         fun Patch.CompatiblePackage.buildString() = buildString {
             if (withVersions && versions != null) {
@@ -92,7 +99,7 @@ internal object ListPatchesCommand : Runnable {
             }
         }
 
-        fun Patch<*>.anyPackageName(name: String) = compatiblePackages?.any { it.name == name } == true
+        fun Patch<*>.anyPackageName(name: String) = compatiblePackages?.any { it.name == name } ?: patchesWithNoPackage
 
         val patches = PatchBundleLoader.Jar(*patchBundles)
 
