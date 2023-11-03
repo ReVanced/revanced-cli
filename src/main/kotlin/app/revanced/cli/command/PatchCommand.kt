@@ -37,7 +37,7 @@ internal object PatchCommand : Runnable {
     @CommandLine.Option(
         names = ["-i", "--include"], description = ["List of patches to include."]
     )
-    private var includedPatches = arrayOf<String>()
+    private var includedPatches = hashSetOf<String>()
 
     @CommandLine.Option(
         names = ["--ii"],
@@ -48,7 +48,7 @@ internal object PatchCommand : Runnable {
     @CommandLine.Option(
         names = ["-e", "--exclude"], description = ["List of patches to exclude."]
     )
-    private var excludedPatches = arrayOf<String>()
+    private var excludedPatches = hashSetOf<String>()
 
     @CommandLine.Option(
         names = ["--ei"],
@@ -200,7 +200,7 @@ internal object PatchCommand : Runnable {
 
         // Warn if a patch can not be found in the supplied patch bundles.
         if (warn) patches.map { it.name }.toHashSet().let { availableNames ->
-            arrayOf(*includedPatches, *excludedPatches).filter { name ->
+            (includedPatches + excludedPatches).filter { name ->
                 !availableNames.contains(name)
             }
         }.let { unknownPatches ->
