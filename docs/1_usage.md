@@ -87,10 +87,25 @@ ReVanced CLI is divided into the following fundamental commands:
     > adb install app.apk
     > ```
 
+    > [!NOTE]  
+    > You can use the option `--ii` to include or `--ie` to exclude
+    > patches by their index in relation to supplied patch bundles,
+    > similarly to the option `--include` and `--exclude`.
+    > 
+    > This is useful in case two patches have the same name, and you need to include or exclude one of them.  
+    > The index of a patch is calculated by the position of the patch in the list of patches
+    > from patch bundles supplied using the option `--patch-bundle`.
+    > 
+    > You can list all patches with their indices using the command `list-patches`.
+    > 
+    > Keep in mind, that the indices can change based on the order of the patch bundles supplied,
+    > as well if the patch bundles are updated, because patches can be added or removed.
+
     ```bash
     java -jar revanced-cli.jar patch \
      --patch-bundle revanced-patches.jar \
      --include "Some patch" \
+     --ii 123 \
      --exclude "Some other patch" \
      --out patched-app.apk \
      --device-serial <device-serial> \
