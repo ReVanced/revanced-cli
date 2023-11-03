@@ -1,3 +1,10 @@
+# [4.1.0-dev.1](https://github.com/ReVanced/revanced-cli/compare/v4.0.3-dev.2...v4.1.0-dev.1) (2023-11-03)
+
+
+### Features
+
+* List patches which are compatible with any app ([#297](https://github.com/ReVanced/revanced-cli/issues/297)) ([0139dfe](https://github.com/ReVanced/revanced-cli/commit/0139dfe0bfa06a13f56dc03e7718aaf644029614))
+
 ## [4.0.3-dev.2](https://github.com/ReVanced/revanced-cli/compare/v4.0.3-dev.1...v4.0.3-dev.2) (2023-10-30)
 
 ## [4.0.3-dev.1](https://github.com/ReVanced/revanced-cli/compare/v4.0.2...v4.0.3-dev.1) (2023-10-23)
