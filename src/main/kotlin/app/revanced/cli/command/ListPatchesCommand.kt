@@ -43,6 +43,13 @@ internal object ListPatchesCommand : Runnable {
     private var withOptions: Boolean = false
 
     @Option(
+        names = ["-u", "--with-universal-patches"],
+        description = ["List patches which are compatible with any app."],
+        showDefaultValue = ALWAYS
+    )
+    private var withUniversalPatches: Boolean = true
+
+    @Option(
         names = ["-f", "--filter-package-name"], description = ["Filter patches by package name."]
     )
     private var packageName: String? = null
@@ -92,11 +99,12 @@ internal object ListPatchesCommand : Runnable {
             }
         }
 
-        fun Patch<*>.anyPackageName(name: String) = compatiblePackages?.any { it.name == name } == true
+        fun Patch<*>.filterCompatiblePackages(name: String) = compatiblePackages?.any { it.name == name }
+            ?: withUniversalPatches
 
         val patches = PatchBundleLoader.Jar(*patchBundles)
 
-        val filtered = packageName?.let {  patches.filter { patch -> patch.anyPackageName(it) } } ?: patches
+        val filtered = packageName?.let { patches.filter { patch -> patch.filterCompatiblePackages(it) } } ?: patches
 
         if (filtered.isNotEmpty()) logger.info(filtered.joinToString("\n\n") { it.buildString() })
     }
