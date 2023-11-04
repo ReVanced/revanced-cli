@@ -3,14 +3,14 @@ shadow = "8.1.1"
 kotlin-test = "1.8.20-RC"
 kotlinx-coroutines-core = "1.7.3"
 picocli = "4.7.3"
-revanced-patcher = "17.0.0"
-revanced-library = "1.1.3"
+revanced-patcher = "19.0.0"
+revanced-library = "1.2.0"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin-test" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines-core" }
 picocli = { module = "info.picocli:picocli", version.ref = "picocli" }
-revanced-patcher = { module = "app.revanced.revanced-patcher:revanced-patcher", version.ref = "revanced-patcher" }
+revanced-patcher = { module = "app.revanced:revanced-patcher", version.ref = "revanced-patcher" }
 revanced-library = { module = "app.revanced:revanced-library", version.ref = "revanced-library" }
 
 [plugins]

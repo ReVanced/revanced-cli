@@ -43,6 +43,20 @@ internal object ListPatchesCommand : Runnable {
     private var withOptions: Boolean = false
 
     @Option(
+        names = ["-u", "--with-universal-patches"],
+        description = ["List patches which are compatible with any app."],
+        showDefaultValue = ALWAYS
+    )
+    private var withUniversalPatches: Boolean = true
+
+    @Option(
+        names = ["-i", "--index"],
+        description = ["List the index of of each patch in relation to the supplied patch bundles."],
+        showDefaultValue = ALWAYS
+    )
+    private var withIndex: Boolean = true
+
+    @Option(
         names = ["-f", "--filter-package-name"], description = ["Filter patches by package name."]
     )
     private var packageName: String? = null
@@ -58,41 +72,51 @@ internal object ListPatchesCommand : Runnable {
 
         fun PatchOption<*>.buildString() = buildString {
             appendLine("Title: $title")
-            appendLine("Description: $description")
-
-            value?.let {
+            description?.let { appendLine("Description: $it") }
+            default?.let {
                 appendLine("Key: $key")
-                append("Value: $it")
+                append("Default: $it")
             } ?: append("Key: $key")
-        }
 
-        fun Patch<*>.buildString() = buildString {
-            append("Name: $name")
-
-            if (withDescriptions) append("\nDescription: $description")
-
-            if (withOptions && options.isNotEmpty()) {
-                appendLine("\nOptions:")
-                append(
-                    options.values.joinToString("\n\n") { option ->
-                        option.buildString()
-                    }.prependIndent("\t")
-                )
-            }
-
-            if (withPackages && compatiblePackages != null) {
-                appendLine("\nCompatible packages:")
-                append(
-                    compatiblePackages!!.joinToString("\n") { it.buildString() }.prependIndent("\t")
-                )
+            values?.let { values ->
+                appendLine("\nValid values:")
+                append(values.map { "${it.value} (${it.key})" }.joinToString("\n").prependIndent("\t"))
             }
         }
 
-        fun Patch<*>.anyPackageName(name: String) = compatiblePackages?.any { it.name == name } == true
+        fun IndexedValue<Patch<*>>.buildString() = let { (index, patch) ->
+            buildString {
+                if (withIndex) appendLine("Index: $index")
 
-        val patches = PatchBundleLoader.Jar(*patchBundles)
+                append("Name: ${patch.name}")
 
-        val filtered = packageName?.let {  patches.filter { patch -> patch.anyPackageName(it) } } ?: patches
+                if (withDescriptions) append("\nDescription: ${patch.description}")
+
+                if (withOptions && patch.options.isNotEmpty()) {
+                    appendLine("\nOptions:")
+                    append(
+                        patch.options.values.joinToString("\n\n") { option ->
+                            option.buildString()
+                        }.prependIndent("\t")
+                    )
+                }
+
+                if (withPackages && patch.compatiblePackages != null) {
+                    appendLine("\nCompatible packages:")
+                    append(patch.compatiblePackages!!.joinToString("\n") {
+                        it.buildString()
+                    }.prependIndent("\t"))
+                }
+            }
+        }
+
+        fun Patch<*>.filterCompatiblePackages(name: String) = compatiblePackages?.any { it.name == name }
+            ?: withUniversalPatches
+
+        val patches = PatchBundleLoader.Jar(*patchBundles).withIndex().toList()
+
+        val filtered =
+            packageName?.let { patches.filter { (_, patch) -> patch.filterCompatiblePackages(it) } } ?: patches
 
         if (filtered.isNotEmpty()) logger.info(filtered.joinToString("\n\n") { it.buildString() })
     }

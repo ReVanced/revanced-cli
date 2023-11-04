@@ -37,12 +37,24 @@ internal object PatchCommand : Runnable {
     @CommandLine.Option(
         names = ["-i", "--include"], description = ["List of patches to include."]
     )
-    private var includedPatches = arrayOf<String>()
+    private var includedPatches = hashSetOf<String>()
+
+    @CommandLine.Option(
+        names = ["--ii"],
+        description = ["List of patches to include by their index in relation to the supplied patch bundles."]
+    )
+    private var includedPatchesByIndex = arrayOf<Int>()
 
     @CommandLine.Option(
         names = ["-e", "--exclude"], description = ["List of patches to exclude."]
     )
-    private var excludedPatches = arrayOf<String>()
+    private var excludedPatches = hashSetOf<String>()
+
+    @CommandLine.Option(
+        names = ["--ei"],
+        description = ["List of patches to exclude by their index in relation to the supplied patch bundles."]
+    )
+    private var excludedPatchesByIndex = arrayOf<Int>()
 
     @CommandLine.Option(
         names = ["--options"], description = ["Path to patch options JSON file."], showDefaultValue = ALWAYS
@@ -188,7 +200,7 @@ internal object PatchCommand : Runnable {
 
         // Warn if a patch can not be found in the supplied patch bundles.
         if (warn) patches.map { it.name }.toHashSet().let { availableNames ->
-            arrayOf(*includedPatches, *excludedPatches).filter { name ->
+            (includedPatches + excludedPatches).filter { name ->
                 !availableNames.contains(name)
             }
         }.let { unknownPatches ->
@@ -283,10 +295,10 @@ internal object PatchCommand : Runnable {
         val packageName = context.packageMetadata.packageName
         val packageVersion = context.packageMetadata.packageVersion
 
-        patches.forEach patch@{ patch ->
+        patches.withIndex().forEach patch@{ (i, patch) ->
             val patchName = patch.name!!
 
-            val explicitlyExcluded = excludedPatches.contains(patchName)
+            val explicitlyExcluded = excludedPatches.contains(patchName) || excludedPatchesByIndex.contains(i)
             if (explicitlyExcluded) return@patch logger.info("Excluding $patchName")
 
             // Make sure the patch is compatible with the supplied APK files package name and version.
@@ -314,7 +326,7 @@ internal object PatchCommand : Runnable {
             // If the patch is implicitly used, it will be only included if [exclusive] is false.
             val implicitlyIncluded = !exclusive && patch.use
             // If the patch is explicitly used, it will be included even if [exclusive] is false.
-            val explicitlyIncluded = includedPatches.contains(patchName)
+            val explicitlyIncluded = includedPatches.contains(patchName) || includedPatchesByIndex.contains(i)
 
             val included = implicitlyIncluded || explicitlyIncluded
             if (!included) return@patch logger.info("$patchName excluded") // Case 1.
