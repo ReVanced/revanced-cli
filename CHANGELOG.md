@@ -1,3 +1,16 @@
+# [4.1.0](https://github.com/ReVanced/revanced-cli/compare/v4.0.2...v4.1.0) (2023-11-04)
+
+
+### Features
+
+* Include or exclude patches by their index in relation to supplied patch bundles ([b2055ce](https://github.com/ReVanced/revanced-cli/commit/b2055ce07df3ab9a9f3f73ab17d8c2cf02f2ae62))
+* List patches which are compatible with any app ([#297](https://github.com/ReVanced/revanced-cli/issues/297)) ([0139dfe](https://github.com/ReVanced/revanced-cli/commit/0139dfe0bfa06a13f56dc03e7718aaf644029614))
+
+
+### Performance Improvements
+
+* Use a `HashSet` to check for included and excluded patches ([616d14f](https://github.com/ReVanced/revanced-cli/commit/616d14f0097c1ee7ba6dc07be417590f6418e8e5))
+
 # [4.1.0-dev.3](https://github.com/ReVanced/revanced-cli/compare/v4.1.0-dev.2...v4.1.0-dev.3) (2023-11-03)
 
 # [4.1.0-dev.2](https://github.com/ReVanced/revanced-cli/compare/v4.1.0-dev.1...v4.1.0-dev.2) (2023-11-03)
