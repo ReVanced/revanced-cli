@@ -1,6 +1,6 @@
 [versions]
 shadow = "8.1.1"
-kotlin-test = "1.8.20-RC"
+kotlin-test = "1.9.10"
 kotlinx-coroutines-core = "1.7.3"
 picocli = "4.7.3"
 revanced-patcher = "19.0.0"
