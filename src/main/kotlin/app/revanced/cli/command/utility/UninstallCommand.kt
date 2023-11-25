@@ -13,10 +13,17 @@ import java.util.logging.Logger
 internal object UninstallCommand : Runnable {
     private val logger = Logger.getLogger(UninstallCommand::class.java.name)
 
-    @Parameters(description = ["ADB device serials"], arity = "1..*")
+    @Parameters(
+        description = ["ADB device serials"],
+        arity = "1..*"
+    )
     private lateinit var deviceSerials: Array<String>
 
-    @Option(names = ["-p", "--package-name"], description = ["Package name of the app to uninstall"], required = true)
+    @Option(
+        names = ["-p", "--package-name"],
+        description = ["Package name of the app to uninstall"],
+        required = true
+    )
     private lateinit var packageName: String
 
     @Option(

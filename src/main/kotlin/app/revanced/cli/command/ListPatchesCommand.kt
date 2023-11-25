@@ -9,17 +9,23 @@ import java.io.File
 import java.util.logging.Logger
 
 
-@Command(name = "list-patches", description = ["List patches from supplied patch bundles."])
+@Command(
+    name = "list-patches",
+    description = ["List patches from supplied patch bundles."]
+)
 internal object ListPatchesCommand : Runnable {
     private val logger = Logger.getLogger(ListPatchesCommand::class.java.name)
 
     @Parameters(
-        description = ["Paths to patch bundles."], arity = "1..*"
+        description = ["Paths to patch bundles."],
+        arity = "1..*"
     )
     private lateinit var patchBundles: Array<File>
 
     @Option(
-        names = ["-d", "--with-descriptions"], description = ["List their descriptions."], showDefaultValue = ALWAYS
+        names = ["-d", "--with-descriptions"],
+        description = ["List their descriptions."],
+        showDefaultValue = ALWAYS
     )
     private var withDescriptions: Boolean = true
 
@@ -38,7 +44,9 @@ internal object ListPatchesCommand : Runnable {
     private var withVersions: Boolean = false
 
     @Option(
-        names = ["-o", "--with-options"], description = ["List the options of the patches."], showDefaultValue = ALWAYS
+        names = ["-o", "--with-options"],
+        description = ["List the options of the patches."],
+        showDefaultValue = ALWAYS
     )
     private var withOptions: Boolean = false
 
@@ -57,7 +65,8 @@ internal object ListPatchesCommand : Runnable {
     private var withIndex: Boolean = true
 
     @Option(
-        names = ["-f", "--filter-package-name"], description = ["Filter patches by package name."]
+        names = ["-f", "--filter-package-name"],
+        description = ["Filter patches by package name."]
     )
     private var packageName: String? = null
 

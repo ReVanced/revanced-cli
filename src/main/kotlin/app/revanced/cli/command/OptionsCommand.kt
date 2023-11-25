@@ -16,17 +16,22 @@ internal object OptionsCommand : Runnable {
     private val logger = Logger.getLogger(OptionsCommand::class.java.name)
 
     @CommandLine.Parameters(
-        description = ["Paths to patch bundles."], arity = "1..*"
+        description = ["Paths to patch bundles."],
+        arity = "1..*"
     )
     private lateinit var patchBundles: Array<File>
 
     @CommandLine.Option(
-        names = ["-p", "--path"], description = ["Path to patch options JSON file."], showDefaultValue = ALWAYS
+        names = ["-p", "--path"],
+        description = ["Path to patch options JSON file."],
+        showDefaultValue = ALWAYS
     )
     private var filePath: File = File("options.json")
 
     @CommandLine.Option(
-        names = ["-o", "--overwrite"], description = ["Overwrite existing options file."], showDefaultValue = ALWAYS
+        names = ["-o", "--overwrite"],
+        description = ["Overwrite existing options file."],
+        showDefaultValue = ALWAYS
     )
     private var overwrite: Boolean = false
 

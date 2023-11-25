@@ -20,7 +20,8 @@ import java.util.logging.Logger
 
 
 @CommandLine.Command(
-    name = "patch", description = ["Patch an APK file."]
+    name = "patch",
+    description = ["Patch an APK file."]
 )
 internal object PatchCommand : Runnable {
     private val logger = Logger.getLogger(PatchCommand::class.java.name)
@@ -35,7 +36,8 @@ internal object PatchCommand : Runnable {
     private var patchBundles = emptyList<File>()
 
     @CommandLine.Option(
-        names = ["-i", "--include"], description = ["List of patches to include."]
+        names = ["-i", "--include"],
+        description = ["List of patches to include."]
     )
     private var includedPatches = hashSetOf<String>()
 
@@ -46,7 +48,8 @@ internal object PatchCommand : Runnable {
     private var includedPatchesByIndex = arrayOf<Int>()
 
     @CommandLine.Option(
-        names = ["-e", "--exclude"], description = ["List of patches to exclude."]
+        names = ["-e", "--exclude"],
+        description = ["List of patches to exclude."]
     )
     private var excludedPatches = hashSetOf<String>()
 
@@ -57,7 +60,9 @@ internal object PatchCommand : Runnable {
     private var excludedPatchesByIndex = arrayOf<Int>()
 
     @CommandLine.Option(
-        names = ["--options"], description = ["Path to patch options JSON file."], showDefaultValue = ALWAYS
+        names = ["--options"],
+        description = ["Path to patch options JSON file."],
+        showDefaultValue = ALWAYS
     )
     private var optionsFile: File = File("options.json")
 
@@ -76,22 +81,29 @@ internal object PatchCommand : Runnable {
     private var force: Boolean = false
 
     @CommandLine.Option(
-        names = ["-o", "--out"], description = ["Path to save the patched APK file to."], required = true
+        names = ["-o", "--out"],
+        description = ["Path to save the patched APK file to."],
+        required = true
     )
     private lateinit var outputFilePath: File
 
     @CommandLine.Option(
-        names = ["-d", "--device-serial"], description = ["ADB device serial to install to."], showDefaultValue = ALWAYS
+        names = ["-d", "--device-serial"],
+        description = ["ADB device serial to install to."],
+        showDefaultValue = ALWAYS
     )
     private var deviceSerial: String? = null
 
     @CommandLine.Option(
-        names = ["--mount"], description = ["Install by mounting the patched APK file."], showDefaultValue = ALWAYS
+        names = ["--mount"],
+        description = ["Install by mounting the patched APK file."],
+        showDefaultValue = ALWAYS
     )
     private var mount: Boolean = false
 
     @CommandLine.Option(
-        names = ["--keystore"], description = ["Path to the keystore to sign the patched APK file with."],
+        names = ["--keystore"],
+        description = ["Path to the keystore to sign the patched APK file with."],
     )
     private var keystoreFilePath: File? = null
 
@@ -103,7 +115,8 @@ internal object PatchCommand : Runnable {
     private var keyStorePassword: String? = null // Empty password by default
 
     @CommandLine.Option(
-        names = ["--alias"], description = ["The alias of the key from the keystore to sign the patched APK file with."],
+        names = ["--alias"],
+        description = ["The alias of the key from the keystore to sign the patched APK file with."],
         showDefaultValue = ALWAYS
     )
     private var alias = "ReVanced Key"
@@ -115,7 +128,8 @@ internal object PatchCommand : Runnable {
     private var password = "" // Empty password by default
 
     @CommandLine.Option(
-        names = ["--signer"], description = ["The name of the signer to sign the patched APK file with."],
+        names = ["--signer"],
+        description = ["The name of the signer to sign the patched APK file with."],
         showDefaultValue = ALWAYS
     )
     private var signer = "ReVanced"
@@ -144,7 +158,8 @@ internal object PatchCommand : Runnable {
     private var warn: Boolean = false
 
     @CommandLine.Parameters(
-        description = ["APK file to be patched."], arity = "1..1"
+        description = ["APK file to be patched."],
+        arity = "1..1"
     )
     @Suppress("unused")
     private fun setApk(apk: File) {
@@ -156,7 +171,8 @@ internal object PatchCommand : Runnable {
     }
 
     @CommandLine.Option(
-        names = ["-m", "--merge"], description = ["One or more DEX files or containers to merge into the APK."]
+        names = ["-m", "--merge"],
+        description = ["One or more DEX files or containers to merge into the APK."]
     )
     @Suppress("unused")
     private fun setIntegrations(integrations: Array<File>) {
@@ -167,7 +183,9 @@ internal object PatchCommand : Runnable {
     }
 
     @CommandLine.Option(
-        names = ["-b", "--patch-bundle"], description = ["One or more bundles of patches."], required = true
+        names = ["-b", "--patch-bundle"],
+        description = ["One or more bundles of patches."],
+        required = true
     )
     @Suppress("unused")
     private fun setPatchBundles(patchBundles: Array<File>) {
@@ -178,7 +196,8 @@ internal object PatchCommand : Runnable {
     }
 
     @CommandLine.Option(
-        names = ["--custom-aapt2-binary"], description = ["Path to a custom AAPT binary to compile resources with."]
+        names = ["--custom-aapt2-binary"],
+        description = ["Path to a custom AAPT binary to compile resources with."]
     )
     @Suppress("unused")
     private fun setAaptBinaryPath(aaptBinaryPath: File) {
