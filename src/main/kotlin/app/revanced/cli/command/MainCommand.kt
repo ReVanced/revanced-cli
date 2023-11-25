@@ -10,7 +10,7 @@ import java.util.*
 
 fun main(args: Array<String>) {
     Logger.setDefault()
-    CommandLine(MainCommand).execute(*args)
+    CommandLine(MainCommand).execute(*args).let(System::exit)
 }
 
 private object CLIVersionProvider : IVersionProvider {
