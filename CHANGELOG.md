@@ -1,3 +1,10 @@
+## [4.1.1-dev.1](https://github.com/ReVanced/revanced-cli/compare/v4.1.0...v4.1.1-dev.1) (2023-11-25)
+
+
+### Bug Fixes
+
+* Fix typo ([#300](https://github.com/ReVanced/revanced-cli/issues/300)) ([9d96bb7](https://github.com/ReVanced/revanced-cli/commit/9d96bb7b4cc4538da416db50bd689af1a632fc45))
+
 # [4.1.0](https://github.com/ReVanced/revanced-cli/compare/v4.0.2...v4.1.0) (2023-11-04)
 
 
