@@ -3,6 +3,7 @@ package app.revanced.cli.command
 import app.revanced.patcher.PatchBundleLoader
 import app.revanced.patcher.patch.Patch
 import app.revanced.patcher.patch.options.PatchOption
+import kotlinx.serialization.json.*
 import picocli.CommandLine.*
 import picocli.CommandLine.Help.Visibility.ALWAYS
 import java.io.File
@@ -69,7 +70,14 @@ internal object ListPatchesCommand : Runnable {
     )
     private var packageName: String? = null
 
-    override fun run() {
+    @Option(
+        names = ["-j", "--json"],
+        description = ["Output in machine-readable format."],
+        showDefaultValue = ALWAYS
+    )
+    private var asJson: Boolean = false
+
+    private fun formatHuman(patches: List<IndexedValue<Patch<*>>>): String {
         fun Patch.CompatiblePackage.buildString() =
             buildString {
                 if (withVersions && versions != null) {
@@ -124,7 +132,48 @@ internal object ListPatchesCommand : Runnable {
                     }
                 }
             }
+        return patches.joinToString("\n\n") { it.buildString() }
+    }
 
+    private fun formatJson(patches: List<IndexedValue<Patch<*>>>): String {
+        fun Patch.CompatiblePackage.asJson(): JsonObject = buildJsonObject {
+            put("name", name)
+            if (withVersions) versions?.let {
+                put("compatible_versions", JsonArray(it.map(::JsonPrimitive)))
+            }
+        }
+
+        fun PatchOption<*>.asJson(): JsonObject = buildJsonObject {
+            put("title", title)
+            description?.let { put("description", it) }
+            put("key", key)
+            default?.let { put("default", it.toString()) }
+            values?.let { values ->
+                put("valid", JsonObject(values.mapValues { entry -> JsonPrimitive(entry.value.toString()) }))
+            }
+        }
+
+        fun IndexedValue<Patch<*>>.asJson(): JsonObject = let { (index, patch) ->
+            buildJsonObject {
+                if (withIndex) put("index", index)
+                put("name", patch.name)
+                if (withDescriptions) patch.description?.let { put("description", it) }
+                if (withOptions && patch.options.isNotEmpty()) {
+                    put("options", JsonArray(patch.options.values.map(PatchOption<*>::asJson)))
+                }
+                if (withPackages) {
+                    patch.compatiblePackages?.let {
+                        put("compatible_packages", JsonArray(it.map(Patch.CompatiblePackage::asJson)))
+                    }
+                }
+            }
+        }
+
+        val json = JsonArray(patches.map(IndexedValue<Patch<*>>::asJson))
+        return json.toString()
+    }
+
+    override fun run() {
         fun Patch<*>.filterCompatiblePackages(name: String) =
             compatiblePackages?.any { it.name == name }
                 ?: withUniversalPatches
@@ -134,6 +183,6 @@ internal object ListPatchesCommand : Runnable {
         val filtered =
             packageName?.let { patches.filter { (_, patch) -> patch.filterCompatiblePackages(it) } } ?: patches
 
-        if (filtered.isNotEmpty()) logger.info(filtered.joinToString("\n\n") { it.buildString() })
+        if (filtered.isNotEmpty()) logger.info((if (asJson) formatJson(filtered) else formatHuman(filtered)))
     }
 }

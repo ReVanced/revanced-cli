@@ -16,6 +16,7 @@ dependencies {
     implementation(libs.revanced.patcher)
     implementation(libs.revanced.library)
     implementation(libs.kotlinx.coroutines.core)
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
     implementation(libs.picocli)
 
     testImplementation(libs.kotlin.test)
