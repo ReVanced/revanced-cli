@@ -51,7 +51,7 @@ internal object ListPatchesCommand : Runnable {
 
     @Option(
         names = ["-i", "--index"],
-        description = ["List the index of of each patch in relation to the supplied patch bundles."],
+        description = ["List the index of each patch in relation to the supplied patch bundles."],
         showDefaultValue = ALWAYS
     )
     private var withIndex: Boolean = true
