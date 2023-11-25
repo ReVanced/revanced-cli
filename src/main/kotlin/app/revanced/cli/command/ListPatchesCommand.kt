@@ -6,13 +6,10 @@ import app.revanced.patcher.patch.options.PatchOption
 import picocli.CommandLine.*
 import picocli.CommandLine.Help.Visibility.ALWAYS
 import java.io.File
-import java.util.logging.Logger
 
 
 @Command(name = "list-patches", description = ["List patches from supplied patch bundles."])
 internal object ListPatchesCommand : Runnable {
-    private val logger = Logger.getLogger(ListPatchesCommand::class.java.name)
-
     @Parameters(
         description = ["Paths to patch bundles."], arity = "1..*"
     )
@@ -118,6 +115,6 @@ internal object ListPatchesCommand : Runnable {
         val filtered =
             packageName?.let { patches.filter { (_, patch) -> patch.filterCompatiblePackages(it) } } ?: patches
 
-        if (filtered.isNotEmpty()) logger.info(filtered.joinToString("\n\n") { it.buildString() })
+        if (filtered.isNotEmpty()) println(filtered.joinToString("\n\n") { it.buildString() })
     }
 }
