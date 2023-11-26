@@ -62,9 +62,8 @@ internal object PatchCommand : Runnable {
     @CommandLine.Option(
         names = ["--options"],
         description = ["Path to patch options JSON file."],
-        showDefaultValue = ALWAYS
     )
-    private var optionsFile: File = File("options.json")
+    private var optionsFile: File? = null
 
     @CommandLine.Option(
         names = ["--exclusive"],
@@ -80,17 +79,19 @@ internal object PatchCommand : Runnable {
     )
     private var force: Boolean = false
 
+    private var outputFilePath: File? = null
+
     @CommandLine.Option(
         names = ["-o", "--out"],
-        description = ["Path to save the patched APK file to."],
-        required = true
+        description = ["Path to save the patched APK file to. Defaults to the same directory as the supplied APK file."],
     )
-    private lateinit var outputFilePath: File
+    private fun setOutputFilePath(outputFilePath: File?) {
+        this.outputFilePath = outputFilePath?.absoluteFile
+    }
 
     @CommandLine.Option(
         names = ["-d", "--device-serial"],
         description = ["ADB device serial to install to."],
-        showDefaultValue = ALWAYS
     )
     private var deviceSerial: String? = null
 
@@ -103,14 +104,15 @@ internal object PatchCommand : Runnable {
 
     @CommandLine.Option(
         names = ["--keystore"],
-        description = ["Path to the keystore to sign the patched APK file with."],
+        description = ["Path to the keystore to sign the patched APK file with. " +
+                "Defaults to the same directory as the supplied APK file."],
     )
     private var keystoreFilePath: File? = null
 
     // key store password
     @CommandLine.Option(
         names = ["--keystore-password"],
-        description = ["The password of the keystore to sign the patched APK file with."],
+        description = ["The password of the keystore to sign the patched APK file with. Empty password by default."]
     )
     private var keyStorePassword: String? = null // Empty password by default
 
@@ -137,9 +139,8 @@ internal object PatchCommand : Runnable {
     @CommandLine.Option(
         names = ["-r", "--resource-cache"],
         description = ["Path to temporary resource cache directory."],
-        showDefaultValue = ALWAYS
     )
-    private var resourceCachePath = File("revanced-resource-cache.")
+    private var resourceCachePath: File? = null
 
     private var aaptBinaryPath: File? = null
 
@@ -209,7 +210,26 @@ internal object PatchCommand : Runnable {
     }
 
     override fun run() {
+        // region Setup
+
+        val outputFilePath = outputFilePath ?: File("").absoluteFile.resolve(
+            "${apk.nameWithoutExtension}-patched.${apk.extension}"
+        )
+
+        val resourceCachePath = resourceCachePath ?: outputFilePath.parentFile.resolve(
+            "${outputFilePath.nameWithoutExtension}-resource-cache"
+        )
+
+        val optionsFile = optionsFile ?: outputFilePath.parentFile.resolve(
+            "${outputFilePath.nameWithoutExtension}-options.json"
+        )
+
+        val keystoreFilePath = keystoreFilePath ?: outputFilePath.parentFile
+            .resolve("${outputFilePath.nameWithoutExtension}.keystore")
+
         val adbManager = deviceSerial?.let { serial -> AdbManager.getAdbManager(serial, mount) }
+
+        // endregion
 
         // region Load patches
 
@@ -271,9 +291,6 @@ internal object PatchCommand : Runnable {
             val alignedFile = resourceCachePath.resolve(apk.name).apply {
                 ApkUtils.copyAligned(apk, this, patcherResult)
             }
-
-            val keystoreFilePath = keystoreFilePath ?: outputFilePath.absoluteFile.parentFile
-                .resolve("${outputFilePath.nameWithoutExtension}.keystore")
 
             if (!mount) ApkUtils.sign(
                 alignedFile,

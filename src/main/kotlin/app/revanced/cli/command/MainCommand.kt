@@ -18,7 +18,9 @@ private object CLIVersionProvider : IVersionProvider {
         MainCommand::class.java.getResourceAsStream(
             "/app/revanced/cli/version.properties"
         )?.use { stream ->
-            Properties().apply { load(stream) }.let {
+            Properties().apply {
+                load(stream)
+            }.let {
                 "ReVanced CLI v${it.getProperty("version")}"
             }
         } ?: "ReVanced CLI")
