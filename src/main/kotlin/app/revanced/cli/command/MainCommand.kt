@@ -7,21 +7,24 @@ import picocli.CommandLine.Command
 import picocli.CommandLine.IVersionProvider
 import java.util.*
 
-
 fun main(args: Array<String>) {
     Logger.setDefault()
-    CommandLine(MainCommand).execute(*args)
+    CommandLine(MainCommand).execute(*args).let(System::exit)
 }
 
 private object CLIVersionProvider : IVersionProvider {
-    override fun getVersion() = arrayOf(
-        MainCommand::class.java.getResourceAsStream(
-            "/app/revanced/cli/version.properties"
-        )?.use { stream ->
-            Properties().apply { load(stream) }.let {
-                "ReVanced CLI v${it.getProperty("version")}"
-            }
-        } ?: "ReVanced CLI")
+    override fun getVersion() =
+        arrayOf(
+            MainCommand::class.java.getResourceAsStream(
+                "/app/revanced/cli/version.properties",
+            )?.use { stream ->
+                Properties().apply {
+                    load(stream)
+                }.let {
+                    "ReVanced CLI v${it.getProperty("version")}"
+                }
+            } ?: "ReVanced CLI",
+        )
 }
 
 @Command(
@@ -34,6 +37,6 @@ private object CLIVersionProvider : IVersionProvider {
         PatchCommand::class,
         OptionsCommand::class,
         UtilityCommand::class,
-    ]
+    ],
 )
 private object MainCommand
