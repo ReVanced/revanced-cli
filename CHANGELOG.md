@@ -1,3 +1,17 @@
+# [4.2.0](https://github.com/ReVanced/revanced-cli/compare/v4.1.0...v4.2.0) (2023-11-26)
+
+
+### Bug Fixes
+
+* Fix typo ([#300](https://github.com/ReVanced/revanced-cli/issues/300)) ([9d96bb7](https://github.com/ReVanced/revanced-cli/commit/9d96bb7b4cc4538da416db50bd689af1a632fc45))
+
+
+### Features
+
+* Allow selecting first Adb device, if none supplied automatically by updating dependencies ([e7c3d64](https://github.com/ReVanced/revanced-cli/commit/e7c3d64bf15bf84f3853e7ef699511bf72c13767))
+* Exit application with CLI exit code ([36c6a6a](https://github.com/ReVanced/revanced-cli/commit/36c6a6a5f75f2e770a7941b3f83f430f62de13de))
+* Make `--out´ option optional ([3765957](https://github.com/ReVanced/revanced-cli/commit/3765957043989fe7a8932a0c548566a78d04fc41))
+
 # [4.2.0-dev.1](https://github.com/ReVanced/revanced-cli/compare/v4.1.1-dev.1...v4.2.0-dev.1) (2023-11-26)
 
 
