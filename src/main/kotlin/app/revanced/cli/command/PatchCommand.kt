@@ -219,20 +219,24 @@ internal object PatchCommand : Runnable {
     override fun run() {
         // region Setup
 
-        val outputFilePath = outputFilePath ?: File("").absoluteFile.resolve(
-            "${apk.nameWithoutExtension}-patched.${apk.extension}",
-        )
+        val outputFilePath =
+            outputFilePath ?: File("").absoluteFile.resolve(
+                "${apk.nameWithoutExtension}-patched.${apk.extension}",
+            )
 
-        val resourceCachePath = resourceCachePath ?: outputFilePath.parentFile.resolve(
-            "${outputFilePath.nameWithoutExtension}-resource-cache",
-        )
+        val resourceCachePath =
+            resourceCachePath ?: outputFilePath.parentFile.resolve(
+                "${outputFilePath.nameWithoutExtension}-resource-cache",
+            )
 
-        val optionsFile = optionsFile ?: outputFilePath.parentFile.resolve(
-            "${outputFilePath.nameWithoutExtension}-options.json",
-        )
+        val optionsFile =
+            optionsFile ?: outputFilePath.parentFile.resolve(
+                "${outputFilePath.nameWithoutExtension}-options.json",
+            )
 
-        val keystoreFilePath = keystoreFilePath ?: outputFilePath.parentFile
-            .resolve("${outputFilePath.nameWithoutExtension}.keystore")
+        val keystoreFilePath =
+            keystoreFilePath ?: outputFilePath.parentFile
+                .resolve("${outputFilePath.nameWithoutExtension}.keystore")
 
         // endregion
 
@@ -265,42 +269,45 @@ internal object PatchCommand : Runnable {
                 true,
             ),
         ).use { patcher ->
-            val filteredPatches = patcher.filterPatchSelection(patches).also { patches ->
-                logger.info("Setting patch options")
+            val filteredPatches =
+                patcher.filterPatchSelection(patches).also { patches ->
+                    logger.info("Setting patch options")
 
-                if (optionsFile.exists()) {
-                    patches.setOptions(optionsFile)
-                } else {
-                    Options.serialize(patches, prettyPrint = true).let(optionsFile::writeText)
+                    if (optionsFile.exists()) {
+                        patches.setOptions(optionsFile)
+                    } else {
+                        Options.serialize(patches, prettyPrint = true).let(optionsFile::writeText)
+                    }
                 }
-            }
 
             // region Patch
 
-            val patcherResult = patcher.apply {
-                acceptIntegrations(integrations)
-                acceptPatches(filteredPatches.toList())
+            val patcherResult =
+                patcher.apply {
+                    acceptIntegrations(integrations)
+                    acceptPatches(filteredPatches.toList())
 
-                // Execute patches.
-                runBlocking {
-                    apply(false).collect { patchResult ->
-                        patchResult.exception?.let {
-                            StringWriter().use { writer ->
-                                it.printStackTrace(PrintWriter(writer))
-                                logger.severe("${patchResult.patch.name} failed:\n$writer")
-                            }
-                        } ?: logger.info("${patchResult.patch.name} succeeded")
+                    // Execute patches.
+                    runBlocking {
+                        apply(false).collect { patchResult ->
+                            patchResult.exception?.let {
+                                StringWriter().use { writer ->
+                                    it.printStackTrace(PrintWriter(writer))
+                                    logger.severe("${patchResult.patch.name} failed:\n$writer")
+                                }
+                            } ?: logger.info("${patchResult.patch.name} succeeded")
+                        }
                     }
-                }
-            }.get()
+                }.get()
 
             // endregion
 
             // region Save
 
-            val alignedFile = resourceCachePath.resolve(apk.name).apply {
-                ApkUtils.copyAligned(apk, this, patcherResult)
-            }
+            val alignedFile =
+                resourceCachePath.resolve(apk.name).apply {
+                    ApkUtils.copyAligned(apk, this, patcherResult)
+                }
 
             if (!mount) {
                 ApkUtils.sign(
@@ -341,61 +348,64 @@ internal object PatchCommand : Runnable {
      * @param patches The patches to filter.
      * @return The filtered patches.
      */
-    private fun Patcher.filterPatchSelection(patches: PatchSet): PatchSet = buildSet {
-        val packageName = context.packageMetadata.packageName
-        val packageVersion = context.packageMetadata.packageVersion
+    private fun Patcher.filterPatchSelection(patches: PatchSet): PatchSet =
+        buildSet {
+            val packageName = context.packageMetadata.packageName
+            val packageVersion = context.packageMetadata.packageVersion
 
-        patches.withIndex().forEach patch@{ (i, patch) ->
-            val patchName = patch.name!!
+            patches.withIndex().forEach patch@{ (i, patch) ->
+                val patchName = patch.name!!
 
-            val explicitlyExcluded = excludedPatches.contains(patchName) || excludedPatchesByIndex.contains(i)
-            if (explicitlyExcluded) return@patch logger.info("Excluding $patchName")
+                val explicitlyExcluded = excludedPatches.contains(patchName) || excludedPatchesByIndex.contains(i)
+                if (explicitlyExcluded) return@patch logger.info("Excluding $patchName")
 
-            // Make sure the patch is compatible with the supplied APK files package name and version.
-            patch.compatiblePackages?.let { packages ->
-                packages.singleOrNull { it.name == packageName }?.let { `package` ->
-                    val matchesVersion = force || `package`.versions?.let {
-                        it.any { version -> version == packageVersion }
-                    } ?: true
+                // Make sure the patch is compatible with the supplied APK files package name and version.
+                patch.compatiblePackages?.let { packages ->
+                    packages.singleOrNull { it.name == packageName }?.let { `package` ->
+                        val matchesVersion =
+                            force || `package`.versions?.let {
+                                it.any { version -> version == packageVersion }
+                            } ?: true
 
-                    if (!matchesVersion) {
-                        return@patch logger.warning(
-                            "$patchName is incompatible with version $packageVersion. " +
-                                "This patch is only compatible with version " +
-                                packages.joinToString(";") { pkg ->
-                                    pkg.versions!!.joinToString(", ")
-                                },
-                        )
-                    }
-                } ?: return@patch logger.fine(
-                    "$patchName is incompatible with $packageName. " +
-                        "This patch is only compatible with " +
-                        packages.joinToString(", ") { `package` -> `package`.name },
-                )
+                        if (!matchesVersion) {
+                            return@patch logger.warning(
+                                "$patchName is incompatible with version $packageVersion. " +
+                                    "This patch is only compatible with version " +
+                                    packages.joinToString(";") { pkg ->
+                                        pkg.versions!!.joinToString(", ")
+                                    },
+                            )
+                        }
+                    } ?: return@patch logger.fine(
+                        "$patchName is incompatible with $packageName. " +
+                            "This patch is only compatible with " +
+                            packages.joinToString(", ") { `package` -> `package`.name },
+                    )
 
-                return@let
-            } ?: logger.fine("$patchName has no constraint on packages.")
+                    return@let
+                } ?: logger.fine("$patchName has no constraint on packages.")
 
-            // If the patch is implicitly used, it will be only included if [exclusive] is false.
-            val implicitlyIncluded = !exclusive && patch.use
-            // If the patch is explicitly used, it will be included even if [exclusive] is false.
-            val explicitlyIncluded = includedPatches.contains(patchName) || includedPatchesByIndex.contains(i)
+                // If the patch is implicitly used, it will be only included if [exclusive] is false.
+                val implicitlyIncluded = !exclusive && patch.use
+                // If the patch is explicitly used, it will be included even if [exclusive] is false.
+                val explicitlyIncluded = includedPatches.contains(patchName) || includedPatchesByIndex.contains(i)
 
-            val included = implicitlyIncluded || explicitlyIncluded
-            if (!included) return@patch logger.info("$patchName excluded") // Case 1.
+                val included = implicitlyIncluded || explicitlyIncluded
+                if (!included) return@patch logger.info("$patchName excluded") // Case 1.
 
-            logger.fine("Adding $patchName")
+                logger.fine("Adding $patchName")
 
-            add(patch)
+                add(patch)
+            }
         }
-    }
 
     private fun purge(resourceCachePath: File) {
-        val result = if (resourceCachePath.deleteRecursively()) {
-            "Purged resource cache directory"
-        } else {
-            "Failed to purge resource cache directory"
-        }
+        val result =
+            if (resourceCachePath.deleteRecursively()) {
+                "Purged resource cache directory"
+            } else {
+                "Failed to purge resource cache directory"
+            }
         logger.info(result)
     }
 }

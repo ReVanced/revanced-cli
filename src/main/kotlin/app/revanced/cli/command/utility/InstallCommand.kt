@@ -32,11 +32,12 @@ internal object InstallCommand : Runnable {
     private var packageName: String? = null
 
     override fun run() {
-        fun install(deviceSerial: String? = null) = try {
-            AdbManager.getAdbManager(deviceSerial, packageName != null).install(AdbManager.Apk(apk, packageName))
-        } catch (e: AdbManager.DeviceNotFoundException) {
-            logger.severe(e.toString())
-        }
+        fun install(deviceSerial: String? = null) =
+            try {
+                AdbManager.getAdbManager(deviceSerial, packageName != null).install(AdbManager.Apk(apk, packageName))
+            } catch (e: AdbManager.DeviceNotFoundException) {
+                logger.severe(e.toString())
+            }
 
         deviceSerials?.forEach(::install) ?: install()
     }
