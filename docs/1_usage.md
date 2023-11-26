@@ -116,7 +116,7 @@ ReVanced CLI is divided into the following fundamental commands:
   ```bash
   java -jar revanced-cli.jar utility uninstall \
    --package-name <package-name> \
-   <device-serial>
+   [<device-serial>]
   ```
 
   > [!NOTE]  
@@ -128,7 +128,7 @@ ReVanced CLI is divided into the following fundamental commands:
   ```bash
   java -jar revanced-cli.jar utility install \
    -a input.apk \
-   <device-serial>
+   [<device-serial>]
   ```
 
   > [!NOTE]  
