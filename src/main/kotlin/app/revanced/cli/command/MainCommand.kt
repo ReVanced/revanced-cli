@@ -33,9 +33,10 @@ private object CLIVersionProvider : IVersionProvider {
     mixinStandardHelpOptions = true,
     versionProvider = CLIVersionProvider::class,
     subcommands = [
-        ListPatchesCommand::class,
         PatchCommand::class,
         OptionsCommand::class,
+        ListPatchesCommand::class,
+        ListCompatibleVersions::class,
         UtilityCommand::class,
     ],
 )
