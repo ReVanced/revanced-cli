@@ -1,3 +1,10 @@
+# [4.3.0-dev.1](https://github.com/ReVanced/revanced-cli/compare/v4.2.0...v4.3.0-dev.1) (2023-11-27)
+
+
+### Features
+
+* Add `list-versions` command ([a974b8e](https://github.com/ReVanced/revanced-cli/commit/a974b8ea80acd85f8dc472a3f93b8fd7bea08007))
+
 # [4.2.0](https://github.com/ReVanced/revanced-cli/compare/v4.1.0...v4.2.0) (2023-11-26)
 
 
