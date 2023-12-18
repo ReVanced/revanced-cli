@@ -1,3 +1,10 @@
+# [4.4.0-dev.2](https://github.com/ReVanced/revanced-cli/compare/v4.4.0-dev.1...v4.4.0-dev.2) (2023-12-18)
+
+
+### Bug Fixes
+
+* Add missing punctuation in command description ([8210351](https://github.com/ReVanced/revanced-cli/commit/821035107d7264580275f395e9e3fcef91394afd))
+
 # [4.4.0-dev.1](https://github.com/ReVanced/revanced-cli/compare/v4.3.0...v4.4.0-dev.1) (2023-12-01)
 
 
