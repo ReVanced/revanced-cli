@@ -325,6 +325,8 @@ internal object PatchCommand : Runnable {
                 alignedFile.renameTo(outputFilePath)
             }
 
+            logger.info("Saved to $outputFilePath")
+
             // endregion
 
             // region Install

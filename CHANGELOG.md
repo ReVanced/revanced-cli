@@ -1,3 +1,17 @@
+# [4.4.0-dev.2](https://github.com/ReVanced/revanced-cli/compare/v4.4.0-dev.1...v4.4.0-dev.2) (2023-12-18)
+
+
+### Bug Fixes
+
+* Add missing punctuation in command description ([8210351](https://github.com/ReVanced/revanced-cli/commit/821035107d7264580275f395e9e3fcef91394afd))
+
+# [4.4.0-dev.1](https://github.com/ReVanced/revanced-cli/compare/v4.3.0...v4.4.0-dev.1) (2023-12-01)
+
+
+### Features
+
+* Log saved patched APK file path ([16109bd](https://github.com/ReVanced/revanced-cli/commit/16109bd8bc6236debf71cbc8db78fe452b2ed00d))
+
 # [4.3.0](https://github.com/ReVanced/revanced-cli/compare/v4.2.0...v4.3.0) (2023-12-01)
 
 

@@ -35,7 +35,7 @@ ReVanced CLI is divided into the following fundamental commands:
   ```
 
 > [!NOTE]  
-> A default `options.json` file will be automatically created, if it does not exist 
+> A default `options.json` file will be automatically created if it does not exist 
 without any need for intervention when using the `patch` command.
 
 - ### 💉 Patch an app
@@ -80,7 +80,7 @@ without any need for intervention when using the `patch` command.
   - #### 👾 Patch an app and mount it on top of the un-patched app with root permissions
   
   > [!IMPORTANT]  
-  > Ensure sure the same app you are patching and mounting over is installed on your device:
+  > Ensure that the same app you are patching and mounting over is installed on your device:
   > 
   > ```bash
   > adb install app.apk
@@ -91,14 +91,14 @@ without any need for intervention when using the `patch` command.
   > patches by their index in relation to supplied patch bundles,
   > similarly to the option `--include` and `--exclude`.
   > 
-  > This is useful in case two patches have the same name, and you need to include or exclude one of them.  
-  > The index of a patch is calculated by the position of the patch in the list of patches
+  > This is useful in case two patches have the same name, and you must include or exclude one.  
+  > The patch index is calculated by the position of the patch in the list of patches
   > from patch bundles supplied using the option `--patch-bundle`.
   > 
   > You can list all patches with their indices using the command `list-patches`.
   > 
-  > Keep in mind, that the indices can change based on the order of the patch bundles supplied,
-  > as well if the patch bundles are updated, because patches can be added or removed.
+  > Keep in mind that the indices can change based on the order of the patch bundles supplied,
+  > as well if the patch bundles are updated because patches can be added or removed.
 
     ```bash
     java -jar revanced-cli.jar patch \
@@ -133,4 +133,4 @@ by adding the option `--unmount`.
 
 > [!NOTE]  
 > You can mount an APK file 
-> by supplying the package name of the app to mount the supplied APK file to over the option `--mount`.
+> by supplying the package name of the app to mount the supplied APK file over the option `--mount`.
