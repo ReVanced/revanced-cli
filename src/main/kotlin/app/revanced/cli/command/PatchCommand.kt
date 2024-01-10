@@ -285,7 +285,7 @@ internal object PatchCommand : Runnable {
             val patcherResult =
                 patcher.apply {
                     acceptIntegrations(integrations)
-                    acceptPatches(filteredPatches.toList())
+                    acceptPatches(filteredPatches)
 
                     // Execute patches.
                     runBlocking {
