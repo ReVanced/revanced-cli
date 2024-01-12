@@ -50,12 +50,6 @@ without any need for intervention when using the `patch` command.
 > adb shell exit
 > ```
 >
-> To get your device's serial, run the following command:
->
-> ```bash
-> adb devices
-> ```
->
 > If you want to mount the patched app on top of the un-patched app, make sure you have root permissions:
 >
 > ```bash
@@ -73,7 +67,7 @@ without any need for intervention when using the `patch` command.
     ```bash
     java -jar revanced-cli.jar patch \
      --patch-bundle revanced-patches.jar \
-     --device-serial <device-serial> \
+     -d \
      input.apk
     ```
 
@@ -106,7 +100,7 @@ without any need for intervention when using the `patch` command.
      --include "Some patch" \
      --ii 123 \
      --exclude "Some other patch" \
-     --device-serial <device-serial> \
+     -d \
      --mount \
      app.apk
     ```
