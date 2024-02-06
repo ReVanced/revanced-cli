@@ -3,6 +3,8 @@ package app.revanced.cli.command
 import app.revanced.patcher.PatchBundleLoader
 import app.revanced.patcher.patch.Patch
 import app.revanced.patcher.patch.options.PatchOption
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import picocli.CommandLine.*
 import picocli.CommandLine.Help.Visibility.ALWAYS
 import java.io.File
@@ -69,7 +71,14 @@ internal object ListPatchesCommand : Runnable {
     )
     private var packageName: String? = null
 
-    override fun run() {
+    @Option(
+        names = ["-j", "--json"],
+        description = ["Output in machine-readable format. Implies -diopv"],
+        showDefaultValue = ALWAYS
+    )
+    private var asJson: Boolean = false
+
+    private fun formatHuman(patches: List<IndexedValue<Patch<*>>>): String {
         fun Patch.CompatiblePackage.buildString() =
             buildString {
                 if (withVersions && versions != null) {
@@ -124,7 +133,16 @@ internal object ListPatchesCommand : Runnable {
                     }
                 }
             }
+        return patches.joinToString("\n\n") { it.buildString() }
+    }
 
+    private fun formatJson(patches: List<IndexedValue<Patch<*>>>): String {
+        val data = patches.map { app.revanced.cli.serialization.Patch(it) }
+        val format = Json { encodeDefaults = false }
+        return format.encodeToString(data)
+    }
+
+    override fun run() {
         fun Patch<*>.filterCompatiblePackages(name: String) =
             compatiblePackages?.any { it.name == name }
                 ?: withUniversalPatches
@@ -134,6 +152,6 @@ internal object ListPatchesCommand : Runnable {
         val filtered =
             packageName?.let { patches.filter { (_, patch) -> patch.filterCompatiblePackages(it) } } ?: patches
 
-        if (filtered.isNotEmpty()) logger.info(filtered.joinToString("\n\n") { it.buildString() })
+        if (filtered.isNotEmpty()) logger.info((if (asJson) formatJson(filtered) else formatHuman(filtered)))
     }
 }
