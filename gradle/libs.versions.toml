@@ -1,13 +1,13 @@
 [versions]
 shadow = "8.1.1"
-kotlin-test = "1.9.20"
+kotlin = "1.9.22"
 kotlinx-coroutines-core = "1.7.3"
 picocli = "4.7.3"
-revanced-patcher = "19.2.0"
-revanced-library = "1.4.0"
+revanced-patcher = "19.3.0"
+revanced-library = "2.0.0"
 
 [libraries]
-kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin-test" }
+kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines-core" }
 picocli = { module = "info.picocli:picocli", version.ref = "picocli" }
 revanced-patcher = { module = "app.revanced:revanced-patcher", version.ref = "revanced-patcher" }
