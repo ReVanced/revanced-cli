@@ -31,7 +31,7 @@
       {
         "assets": [
           {
-            "path": "build/libs/*all.jar"
+            "path": "build/libs/*-all*"
           }
         ],
         successComment: false
