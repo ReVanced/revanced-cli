@@ -21,6 +21,6 @@ To build ReVanced CLI, follow these steps:
 
    ```bash
     ./gradlew build
-    ```
+   ```
 
 After the build succeeds, the built JAR file will be located at `build/libs/revanced-cli-<version>-all.jar`.
