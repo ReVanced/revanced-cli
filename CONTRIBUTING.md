@@ -64,9 +64,9 @@ This document describes how to contribute to ReVanced CLI.
 
 ## 📖 Resources to help you get started
 
-* The [documentation](/docs) explains how to use ReVanced CLI
-* [Our backlog](https://github.com/orgs/ReVanced/projects/12) is where we keep track of what we're working on
-* [Issues](https://github.com/ReVanced/revanced-cli/issues) are where we keep track of bugs and feature requests
+- The [documentation](/docs) explains how to use ReVanced CLI
+- [Our backlog](https://github.com/orgs/ReVanced/projects/12) is where we keep track of what we're working on
+- [Issues](https://github.com/ReVanced/revanced-cli/issues) are where we keep track of bugs and feature requests
 
 ## 🙏 Submitting a feature request
 
@@ -94,5 +94,5 @@ If you encounter a bug while using ReVanced CLI, open an issue using the
 5. Our team will review your pull request and provide feedback. Once your pull request is approved,
    it will be merged into the `dev` branch and will be included in the next release of ReVanced CLI
 
-❤️ Thank you for considering contributing to ReVanced CLI,
+❤️ Thank you for considering contributing to ReVanced CLI,  
 ReVanced
