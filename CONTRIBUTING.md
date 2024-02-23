@@ -88,7 +88,7 @@ If you encounter a bug while using ReVanced CLI, open an issue using the
    with the maintainers of ReVanced CLI. This will help you determine whether your change is acceptable
    and whether it is worth your time to implement it
 2. Development happens on the `dev` branch. Fork the repository and create your branch from `dev`
-3. Commit your changes.
+3. Commit your changes
 4. Submit a pull request to the `dev` branch of the repository and reference issues
    that your pull request closes in the description of your pull request
 5. Our team will review your pull request and provide feedback. Once your pull request is approved,
