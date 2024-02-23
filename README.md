@@ -67,13 +67,13 @@ Command line application to use ReVanced.
 
 ## ❓ About
 
-ReVanced CLI is a command line application to patch apps using ReVanced.
-ReVanced CLI also comes with commands to uninstall or install patched apps and list patches from supplied patch bundles.
+ReVanced CLI is a command line application that patches apps using ReVanced.  
+ReVanced CLI also has commands to uninstall or install patched apps and list patches from supplied patch bundles.
 
 ## 🚀 Download
 
-You can download the most recent version of ReVanced CLI from 
-[here](https://github.com/ReVanced/revanced-cli/releases/latest). Learn how to use ReVanced CLI by following the [documentation](/docs).
+You can download the most recent version of ReVanced CLI from
+[here](https://github.com/ReVanced/revanced-cli/releases/latest). Use ReVanced CLI by following the [documentation](/docs).
 
 ## 📚 Everything else
 
@@ -84,10 +84,10 @@ You can find the contribution guidelines [here](CONTRIBUTING.md).
 
 ### 🛠️ Building
 
-In order to build ReVanced CLI, you can follow the [documentation](/docs).
+To build a ReVanced CLI, you can follow the [documentation](/docs).
 
 ## 📜 Licence
 
-ReVanced CLI is licensed under the GPLv3 licence. Please see the [licence file](LICENSE) for more information.
+ReVanced CLI is licensed under the GPLv3 license. Please see the [license file](LICENSE) for more information.
 [tl;dr](https://www.tldrlegal.com/license/gnu-general-public-license-v3-gpl-3) you may copy, distribute and modify ReVanced CLI as long as you track changes/dates in source files.
-Any modifications to ReVanced CLI must also be made available under the GPL along with build & install instructions.
+Any modifications to ReVanced CLI must also be made available under the GPL, along with build & install instructions.
