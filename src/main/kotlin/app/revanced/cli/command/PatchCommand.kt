@@ -273,8 +273,7 @@ internal object PatchCommand : Runnable {
         }
 
         // endregion
-
-        Patcher(
+        val (packageName, patcherResult) = Patcher(
             PatcherConfig(
                 apk,
                 temporaryFilesPath,
@@ -296,56 +295,54 @@ internal object PatchCommand : Runnable {
 
             // region Patch
 
-            val patcherResult =
-                patcher.apply {
-                    acceptIntegrations(integrations)
-                    acceptPatches(filteredPatches)
+            patcher.context.packageMetadata.packageName to patcher.apply {
+                acceptIntegrations(integrations)
+                acceptPatches(filteredPatches)
 
-                    // Execute patches.
-                    runBlocking {
-                        apply(false).collect { patchResult ->
-                            patchResult.exception?.let {
-                                StringWriter().use { writer ->
-                                    it.printStackTrace(PrintWriter(writer))
-                                    logger.severe("${patchResult.patch.name} failed:\n$writer")
-                                }
-                            } ?: logger.info("${patchResult.patch.name} succeeded")
-                        }
+                // Execute patches.
+                runBlocking {
+                    apply(false).collect { patchResult ->
+                        patchResult.exception?.let {
+                            StringWriter().use { writer ->
+                                it.printStackTrace(PrintWriter(writer))
+                                logger.severe("${patchResult.patch.name} failed:\n$writer")
+                            }
+                        } ?: logger.info("${patchResult.patch.name} succeeded")
                     }
-                }.get()
-
-            // endregion
-
-            // region Save
-
-            apk.copyTo(outputFilePath, overwrite = true)
-
-            patcherResult.applyTo(outputFilePath)
-
-            if (!mount) {
-                outputFilePath.sign(
-                    ApkUtils.SigningOptions(
-                        keystoreFilePath,
-                        keyStorePassword,
-                        alias,
-                        password,
-                        signer,
-                    ),
-                )
-            }
-
-            logger.info("Saved to $outputFilePath")
-
-            // endregion
-
-            // region Install
-
-            deviceSerial?.let { serial ->
-                AdbManager.getAdbManager(deviceSerial = serial.ifEmpty { null }, mount)
-            }?.install(AdbManager.Apk(outputFilePath, patcher.context.packageMetadata.packageName))
-
+                }
+            }.get()
             // endregion
         }
+
+        // region Save
+
+        apk.copyTo(outputFilePath, overwrite = true)
+
+        patcherResult.applyTo(outputFilePath)
+
+        if (!mount) {
+            outputFilePath.sign(
+                ApkUtils.SigningOptions(
+                    keystoreFilePath,
+                    keyStorePassword,
+                    alias,
+                    password,
+                    signer,
+                ),
+            )
+        }
+
+        logger.info("Saved to $outputFilePath")
+
+        // endregion
+
+        // region Install
+
+        deviceSerial?.let { serial ->
+            AdbManager.getAdbManager(deviceSerial = serial.ifEmpty { null }, mount)
+        }?.install(AdbManager.Apk(outputFilePath, packageName))
+
+        // endregion
 
         if (purge) {
             logger.info("Purging temporary files")
