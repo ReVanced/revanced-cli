@@ -67,13 +67,23 @@ Command line application to use ReVanced.
 
 ## ❓ About
 
-ReVanced CLI is a command line application that patches apps using ReVanced.  
-ReVanced CLI also has commands to uninstall or install patched apps and list patches from supplied patch bundles.
+ReVanced CLI is a command line application that uses [ReVanced Patcher](https://github.com/revanced/revanced-patcher) to patch Android apps.
 
-## 🚀 Download
+## 💪 Features
+
+Some of the features ReVanced CLI provides are:
+
+- 💉 **Patch apps**: Harness ReVanced Patcher to patch Android apps
+- 💾 **Install and uninstall apps**: Install and uninstall Apps via ADB,
+  using the Android package manager, or by mounting using root permissions
+- 📃 **List patches from patch bundles**: List available patches, compatible packages, and versions
+- 💪 **Flexibility and functionality**: Apply any combination of patches to any version of Android apps
+
+## 🔽 Download
 
 You can download the most recent version of ReVanced CLI from
-[here](https://github.com/ReVanced/revanced-cli/releases/latest). Use ReVanced CLI by following the [documentation](/docs).
+[here](https://github.com/ReVanced/revanced-cli/releases/latest).  
+Learn how to use ReVanced CLI by following the [documentation](/docs).
 
 ## 📚 Everything else
 
@@ -85,6 +95,10 @@ You can find the contribution guidelines [here](CONTRIBUTING.md).
 ### 🛠️ Building
 
 To build a ReVanced CLI, you can follow the [documentation](/docs).
+
+### 📃 Documentation
+
+You can find the documentation of ReVanced CLI [here](/docs).
 
 ## 📜 Licence
 
