@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     alias(libs.plugins.kotlin)
     alias(libs.plugins.shadow)
@@ -35,7 +37,15 @@ dependencies {
     testImplementation(libs.kotlin.test)
 }
 
-kotlin { jvmToolchain(11) }
+kotlin {
+    compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_11)
+    }
+}
+
+java {
+    targetCompatibility = JavaVersion.VERSION_11
+}
 
 tasks {
     test {
