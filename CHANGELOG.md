@@ -1,3 +1,10 @@
+## [4.4.1](https://github.com/ReVanced/revanced-cli/compare/v4.4.0...v4.4.1) (2024-03-06)
+
+
+### Bug Fixes
+
+* Bump dependencies to support BCS keystore ([1c10a77](https://github.com/ReVanced/revanced-cli/commit/1c10a7760d76ea850260ca49b448be7ad121de44))
+
 ## [4.4.1-dev.2](https://github.com/ReVanced/revanced-cli/compare/v4.4.1-dev.1...v4.4.1-dev.2) (2024-03-04)
 
 
