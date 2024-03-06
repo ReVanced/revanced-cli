@@ -1,13 +1,15 @@
 package app.revanced.cli.command
 
 import app.revanced.library.ApkUtils
+import app.revanced.library.ApkUtils.applyTo
+import app.revanced.library.ApkUtils.sign
 import app.revanced.library.Options
 import app.revanced.library.Options.setOptions
 import app.revanced.library.adb.AdbManager
 import app.revanced.patcher.PatchBundleLoader
 import app.revanced.patcher.PatchSet
 import app.revanced.patcher.Patcher
-import app.revanced.patcher.PatcherOptions
+import app.revanced.patcher.PatcherConfig
 import kotlinx.coroutines.runBlocking
 import picocli.CommandLine
 import picocli.CommandLine.Help.Visibility.ALWAYS
@@ -30,9 +32,9 @@ internal object PatchCommand : Runnable {
 
     private lateinit var apk: File
 
-    private var integrations = listOf<File>()
+    private var integrations = setOf<File>()
 
-    private var patchBundles = emptyList<File>()
+    private var patchBundles = emptySet<File>()
 
     @CommandLine.Option(
         names = ["-i", "--include"],
@@ -91,7 +93,8 @@ internal object PatchCommand : Runnable {
     @CommandLine.Option(
         names = ["-d", "--device-serial"],
         description = ["ADB device serial to install to. If not supplied, the first connected device will be used."],
-        fallbackValue = "", // Empty string to indicate that the first connected device should be used.
+        // Empty string to indicate that the first connected device should be used.
+        fallbackValue = "",
         arity = "0..1",
     )
     private var deviceSerial: String? = null
@@ -144,6 +147,17 @@ internal object PatchCommand : Runnable {
         description = ["Path to temporary resource cache directory."],
     )
     private var resourceCachePath: File? = null
+        set(value) {
+            logger.warning("The --resource-cache option is deprecated. Use --temporary-files-patch instead.")
+            field = value
+            temporaryFilesPath = value
+        }
+
+    @CommandLine.Option(
+        names = ["-t", "--temporary-files-path"],
+        description = ["Path to temporary files directory."],
+    )
+    private var temporaryFilesPath: File? = null
 
     private var aaptBinaryPath: File? = null
 
@@ -194,11 +208,11 @@ internal object PatchCommand : Runnable {
         required = true,
     )
     @Suppress("unused")
-    private fun setPatchBundles(patchBundles: Array<File>) {
+    private fun setPatchBundles(patchBundles: Set<File>) {
         patchBundles.firstOrNull { !it.exists() }?.let {
             throw CommandLine.ParameterException(spec.commandLine(), "Patch bundle ${it.name} does not exist")
         }
-        this.patchBundles = patchBundles.toList()
+        this.patchBundles = patchBundles
     }
 
     @CommandLine.Option(
@@ -224,9 +238,9 @@ internal object PatchCommand : Runnable {
                 "${apk.nameWithoutExtension}-patched.${apk.extension}",
             )
 
-        val resourceCachePath =
-            resourceCachePath ?: outputFilePath.parentFile.resolve(
-                "${outputFilePath.nameWithoutExtension}-resource-cache",
+        val temporaryFilesPath =
+            temporaryFilesPath ?: outputFilePath.parentFile.resolve(
+                "${outputFilePath.nameWithoutExtension}-temporary-files",
             )
 
         val optionsFile =
@@ -259,13 +273,12 @@ internal object PatchCommand : Runnable {
         }
 
         // endregion
-
-        Patcher(
-            PatcherOptions(
+        val (packageName, patcherResult) = Patcher(
+            PatcherConfig(
                 apk,
-                resourceCachePath,
+                temporaryFilesPath,
                 aaptBinaryPath?.path,
-                resourceCachePath.absolutePath,
+                temporaryFilesPath.absolutePath,
                 true,
             ),
         ).use { patcher ->
@@ -282,65 +295,58 @@ internal object PatchCommand : Runnable {
 
             // region Patch
 
-            val patcherResult =
-                patcher.apply {
-                    acceptIntegrations(integrations)
-                    acceptPatches(filteredPatches.toList())
+            patcher.context.packageMetadata.packageName to patcher.apply {
+                acceptIntegrations(integrations)
+                acceptPatches(filteredPatches)
 
-                    // Execute patches.
-                    runBlocking {
-                        apply(false).collect { patchResult ->
-                            patchResult.exception?.let {
-                                StringWriter().use { writer ->
-                                    it.printStackTrace(PrintWriter(writer))
-                                    logger.severe("${patchResult.patch.name} failed:\n$writer")
-                                }
-                            } ?: logger.info("${patchResult.patch.name} succeeded")
-                        }
+                // Execute patches.
+                runBlocking {
+                    apply(false).collect { patchResult ->
+                        patchResult.exception?.let {
+                            StringWriter().use { writer ->
+                                it.printStackTrace(PrintWriter(writer))
+                                logger.severe("${patchResult.patch.name} failed:\n$writer")
+                            }
+                        } ?: logger.info("${patchResult.patch.name} succeeded")
                     }
-                }.get()
-
-            // endregion
-
-            // region Save
-
-            val alignedFile =
-                resourceCachePath.resolve(apk.name).apply {
-                    ApkUtils.copyAligned(apk, this, patcherResult)
                 }
-
-            if (!mount) {
-                ApkUtils.sign(
-                    alignedFile,
-                    outputFilePath,
-                    ApkUtils.SigningOptions(
-                        keystoreFilePath,
-                        keyStorePassword,
-                        alias,
-                        password,
-                        signer,
-                    ),
-                )
-            } else {
-                alignedFile.renameTo(outputFilePath)
-            }
-
-            logger.info("Saved to $outputFilePath")
-
-            // endregion
-
-            // region Install
-
-            deviceSerial?.let { serial ->
-                AdbManager.getAdbManager(deviceSerial = serial.ifEmpty { null }, mount)
-            }?.install(AdbManager.Apk(outputFilePath, patcher.context.packageMetadata.packageName))
-
+            }.get()
             // endregion
         }
 
+        // region Save
+
+        apk.copyTo(outputFilePath, overwrite = true)
+
+        patcherResult.applyTo(outputFilePath)
+
+        if (!mount) {
+            outputFilePath.sign(
+                ApkUtils.SigningOptions(
+                    keystoreFilePath,
+                    keyStorePassword,
+                    alias,
+                    password,
+                    signer,
+                ),
+            )
+        }
+
+        logger.info("Saved to $outputFilePath")
+
+        // endregion
+
+        // region Install
+
+        deviceSerial?.let { serial ->
+            AdbManager.getAdbManager(deviceSerial = serial.ifEmpty { null }, mount)
+        }?.install(AdbManager.Apk(outputFilePath, packageName))
+
+        // endregion
+
         if (purge) {
             logger.info("Purging temporary files")
-            purge(resourceCachePath)
+            purge(temporaryFilesPath)
         }
     }
 

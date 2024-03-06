@@ -1,15 +1,31 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
-    kotlin("jvm") version "1.9.10"
+    alias(libs.plugins.kotlin)
     alias(libs.plugins.shadow)
+    application
+    `maven-publish`
+    signing
 }
 
 group = "app.revanced"
+
+application {
+    mainClass = "app.revanced.cli.command.MainCommandKt"
+}
 
 repositories {
     mavenCentral()
     mavenLocal()
     google()
-    maven { url = uri("https://jitpack.io") }
+    maven {
+        // A repository must be speficied for some reason. "registry" is a dummy.
+        url = uri("https://maven.pkg.github.com/revanced/registry")
+        credentials {
+            username = project.findProperty("gpr.user") as String? ?: System.getenv("GITHUB_ACTOR")
+            password = project.findProperty("gpr.key") as String? ?: System.getenv("GITHUB_TOKEN")
+        }
+    }
 }
 
 dependencies {
@@ -21,7 +37,15 @@ dependencies {
     testImplementation(libs.kotlin.test)
 }
 
-kotlin { jvmToolchain(11) }
+kotlin {
+    compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_11)
+    }
+}
+
+java {
+    targetCompatibility = JavaVersion.VERSION_11
+}
 
 tasks {
     test {
@@ -36,9 +60,6 @@ tasks {
     }
 
     shadowJar {
-        manifest {
-            attributes("Main-Class" to "app.revanced.cli.command.MainCommandKt")
-        }
         minimize {
             exclude(dependency("org.jetbrains.kotlin:.*"))
             exclude(dependency("org.bouncycastle:.*"))
@@ -46,25 +67,29 @@ tasks {
         }
     }
 
-    build {
+    publish {
         dependsOn(shadowJar)
     }
+}
 
-    /*
-    Dummy task to hack gradle-semantic-release-plugin to release this project.
+// Needed by gradle-semantic-release-plugin.
+// Tracking: https://github.com/KengoTODA/gradle-semantic-release-plugin/issues/435
 
-    Explanation:
-    SemVer is a standard for versioning libraries.
-    For that reason the semantic-release plugin uses the "publish" task to publish libraries.
-    However, this subproject is not a library, and the "publish" task is not available for this subproject.
-    Because semantic-release is not designed to handle this case, we need to hack it.
-
-    RE: https://github.com/KengoTODA/gradle-semantic-release-plugin/issues/435
-     */
-
-    register<DefaultTask>("publish") {
-        group = "publishing"
-        description = "Dummy task to hack gradle-semantic-release-plugin to release ReVanced CLI"
-        dependsOn(build)
+// The maven-publish is also necessary to make the signing plugin work.
+publishing {
+    repositories {
+        mavenLocal()
     }
+
+    publications {
+        create<MavenPublication>("revanced-cli-publication") {
+            from(components["java"])
+        }
+    }
+}
+
+signing {
+    useGpgCmd()
+
+    sign(publishing.publications["revanced-cli-publication"])
 }
