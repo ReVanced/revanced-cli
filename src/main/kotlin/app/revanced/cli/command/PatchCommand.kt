@@ -143,17 +143,6 @@ internal object PatchCommand : Runnable {
     private var signer = "ReVanced"
 
     @CommandLine.Option(
-        names = ["-r", "--resource-cache"],
-        description = ["Path to temporary resource cache directory."],
-    )
-    private var resourceCachePath: File? = null
-        set(value) {
-            logger.warning("The --resource-cache option is deprecated. Use --temporary-files-patch instead.")
-            field = value
-            temporaryFilesPath = value
-        }
-
-    @CommandLine.Option(
         names = ["-t", "--temporary-files-path"],
         description = ["Path to temporary files directory."],
     )
