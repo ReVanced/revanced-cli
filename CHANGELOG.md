@@ -1,3 +1,16 @@
+# [4.5.0-dev.1](https://github.com/ReVanced/revanced-cli/compare/v4.4.2...v4.5.0-dev.1) (2024-03-11)
+
+
+### Bug Fixes
+
+* Show path for missing files instead of just the name ([f0f3e56](https://github.com/ReVanced/revanced-cli/commit/f0f3e5614b99b34391e0492177706f9c09781cad))
+* Sign APKs correctly ([5ff105c](https://github.com/ReVanced/revanced-cli/commit/5ff105cf6b3fac9cd12478efd10caf90d1ecf589))
+
+
+### Features
+
+* Remove deprecated CLI options ([48a1a39](https://github.com/ReVanced/revanced-cli/commit/48a1a39b94dd9121c400d28e3e93dec3fc13e3be))
+
 ## [4.4.2](https://github.com/ReVanced/revanced-cli/compare/v4.4.1...v4.4.2) (2024-03-10)
 
 ## [4.4.2-dev.2](https://github.com/ReVanced/revanced-cli/compare/v4.4.2-dev.1...v4.4.2-dev.2) (2024-03-10)
