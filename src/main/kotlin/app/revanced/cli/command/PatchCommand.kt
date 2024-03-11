@@ -143,17 +143,6 @@ internal object PatchCommand : Runnable {
     private var signer = "ReVanced"
 
     @CommandLine.Option(
-        names = ["-r", "--resource-cache"],
-        description = ["Path to temporary resource cache directory."],
-    )
-    private var resourceCachePath: File? = null
-        set(value) {
-            logger.warning("The --resource-cache option is deprecated. Use --temporary-files-patch instead.")
-            field = value
-            temporaryFilesPath = value
-        }
-
-    @CommandLine.Option(
         names = ["-t", "--temporary-files-path"],
         description = ["Path to temporary files directory."],
     )
@@ -184,7 +173,7 @@ internal object PatchCommand : Runnable {
         if (!apk.exists()) {
             throw CommandLine.ParameterException(
                 spec.commandLine(),
-                "APK file ${apk.name} does not exist",
+                "APK file ${apk.path} does not exist",
             )
         }
         this.apk = apk
@@ -197,7 +186,7 @@ internal object PatchCommand : Runnable {
     @Suppress("unused")
     private fun setIntegrations(integrations: Array<File>) {
         integrations.firstOrNull { !it.exists() }?.let {
-            throw CommandLine.ParameterException(spec.commandLine(), "Integrations file ${it.name} does not exist.")
+            throw CommandLine.ParameterException(spec.commandLine(), "Integrations file ${it.path} does not exist.")
         }
         this.integrations += integrations
     }
@@ -273,12 +262,13 @@ internal object PatchCommand : Runnable {
         }
 
         // endregion
+        val patcherTemporaryFilesPath = temporaryFilesPath.resolve("patcher")
         val (packageName, patcherResult) = Patcher(
             PatcherConfig(
                 apk,
-                temporaryFilesPath,
+                patcherTemporaryFilesPath,
                 aaptBinaryPath?.path,
-                temporaryFilesPath.absolutePath,
+                patcherTemporaryFilesPath.absolutePath,
                 true,
             ),
         ).use { patcher ->
@@ -315,21 +305,22 @@ internal object PatchCommand : Runnable {
         }
 
         // region Save
-
-        apk.copyTo(outputFilePath, overwrite = true)
-
-        patcherResult.applyTo(outputFilePath)
-
-        if (!mount) {
-            outputFilePath.sign(
-                ApkUtils.SigningOptions(
-                    keystoreFilePath,
-                    keyStorePassword,
-                    alias,
-                    password,
-                    signer,
-                ),
-            )
+        apk.copyTo(temporaryFilesPath.resolve(apk.name), overwrite = true).apply {
+            patcherResult.applyTo(this)
+        }.let {
+            if (!mount) {
+                sign(
+                    it,
+                    outputFilePath,
+                    ApkUtils.SigningOptions(
+                        keystoreFilePath,
+                        keyStorePassword,
+                        alias,
+                        password,
+                        signer,
+                    ),
+                )
+            }
         }
 
         logger.info("Saved to $outputFilePath")
