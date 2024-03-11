@@ -173,7 +173,7 @@ internal object PatchCommand : Runnable {
         if (!apk.exists()) {
             throw CommandLine.ParameterException(
                 spec.commandLine(),
-                "APK file ${apk.name} does not exist",
+                "APK file ${apk.path} does not exist",
             )
         }
         this.apk = apk
@@ -186,7 +186,7 @@ internal object PatchCommand : Runnable {
     @Suppress("unused")
     private fun setIntegrations(integrations: Array<File>) {
         integrations.firstOrNull { !it.exists() }?.let {
-            throw CommandLine.ParameterException(spec.commandLine(), "Integrations file ${it.name} does not exist.")
+            throw CommandLine.ParameterException(spec.commandLine(), "Integrations file ${it.path} does not exist.")
         }
         this.integrations += integrations
     }
