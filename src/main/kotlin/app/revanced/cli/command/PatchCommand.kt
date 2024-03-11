@@ -262,12 +262,13 @@ internal object PatchCommand : Runnable {
         }
 
         // endregion
+        val patcherTemporaryFilesPath = temporaryFilesPath.resolve("patcher")
         val (packageName, patcherResult) = Patcher(
             PatcherConfig(
                 apk,
-                temporaryFilesPath,
+                patcherTemporaryFilesPath,
                 aaptBinaryPath?.path,
-                temporaryFilesPath.absolutePath,
+                patcherTemporaryFilesPath.absolutePath,
                 true,
             ),
         ).use { patcher ->
@@ -304,21 +305,22 @@ internal object PatchCommand : Runnable {
         }
 
         // region Save
-
-        apk.copyTo(outputFilePath, overwrite = true)
-
-        patcherResult.applyTo(outputFilePath)
-
-        if (!mount) {
-            outputFilePath.sign(
-                ApkUtils.SigningOptions(
-                    keystoreFilePath,
-                    keyStorePassword,
-                    alias,
-                    password,
-                    signer,
-                ),
-            )
+        apk.copyTo(temporaryFilesPath.resolve(apk.name), overwrite = true).apply {
+            patcherResult.applyTo(this)
+        }.let {
+            if (!mount) {
+                sign(
+                    it,
+                    outputFilePath,
+                    ApkUtils.SigningOptions(
+                        keystoreFilePath,
+                        keyStorePassword,
+                        alias,
+                        password,
+                        signer,
+                    ),
+                )
+            }
         }
 
         logger.info("Saved to $outputFilePath")
