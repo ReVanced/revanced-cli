@@ -307,10 +307,10 @@ internal object PatchCommand : Runnable {
         // region Save
         apk.copyTo(temporaryFilesPath.resolve(apk.name), overwrite = true).apply {
             patcherResult.applyTo(this)
-        }.let {
+        }.let { patchedApkFile ->
             if (!mount) {
                 sign(
-                    it,
+                    patchedApkFile,
                     outputFilePath,
                     ApkUtils.SigningOptions(
                         keystoreFilePath,
@@ -320,6 +320,8 @@ internal object PatchCommand : Runnable {
                         signer,
                     ),
                 )
+            } else {
+                patchedApkFile.copyTo(outputFilePath, overwrite = true)
             }
         }
 
