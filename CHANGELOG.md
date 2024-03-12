@@ -1,3 +1,10 @@
+## [4.5.1-dev.1](https://github.com/ReVanced/revanced-cli/compare/v4.5.0...v4.5.1-dev.1) (2024-03-12)
+
+
+### Bug Fixes
+
+* Copy APK to output path when it is not being signed ([366f400](https://github.com/ReVanced/revanced-cli/commit/366f400c5a46491f3f262c7ff4b0df1ae3721f74))
+
 # [4.5.0](https://github.com/ReVanced/revanced-cli/compare/v4.4.2...v4.5.0) (2024-03-11)
 
 
