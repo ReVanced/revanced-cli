@@ -1,3 +1,15 @@
+# [4.6.0-dev.1](https://github.com/ReVanced/revanced-cli/compare/v4.5.1-dev.1...v4.6.0-dev.1) (2024-03-14)
+
+
+### Bug Fixes
+
+* Use correct option description ([45a2ffa](https://github.com/ReVanced/revanced-cli/commit/45a2ffa2dd95ee8ac3c4d466463c9a5b869b8da1))
+
+
+### Features
+
+* Use more consistent option name ([223629c](https://github.com/ReVanced/revanced-cli/commit/223629c663dcd94d237110e09e4e152aa03867f9))
+
 ## [4.5.1-dev.1](https://github.com/ReVanced/revanced-cli/compare/v4.5.0...v4.5.1-dev.1) (2024-03-12)
 
 
