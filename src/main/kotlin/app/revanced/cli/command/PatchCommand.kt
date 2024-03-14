@@ -115,7 +115,6 @@ internal object PatchCommand : Runnable {
     )
     private var keystoreFilePath: File? = null
 
-    // key store password
     @CommandLine.Option(
         names = ["--keystore-password"],
         description = ["The password of the keystore to sign the patched APK file with. Empty password by default."],
@@ -124,7 +123,7 @@ internal object PatchCommand : Runnable {
 
     @CommandLine.Option(
         names = ["--alias"],
-        description = ["The alias of the key from the keystore to sign the patched APK file with."],
+        description = ["The alias of the keystore entry to sign the patched APK file with."],
         showDefaultValue = ALWAYS,
     )
     private var alias = "ReVanced Key"
