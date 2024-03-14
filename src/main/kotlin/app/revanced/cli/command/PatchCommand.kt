@@ -2,7 +2,6 @@ package app.revanced.cli.command
 
 import app.revanced.library.ApkUtils
 import app.revanced.library.ApkUtils.applyTo
-import app.revanced.library.ApkUtils.sign
 import app.revanced.library.Options
 import app.revanced.library.Options.setOptions
 import app.revanced.library.adb.AdbManager
@@ -86,6 +85,7 @@ internal object PatchCommand : Runnable {
         names = ["-o", "--out"],
         description = ["Path to save the patched APK file to. Defaults to the same directory as the supplied APK file."],
     )
+    @Suppress("unused")
     private fun setOutputFilePath(outputFilePath: File?) {
         this.outputFilePath = outputFilePath?.absoluteFile
     }
@@ -115,7 +115,6 @@ internal object PatchCommand : Runnable {
     )
     private var keystoreFilePath: File? = null
 
-    // key store password
     @CommandLine.Option(
         names = ["--keystore-password"],
         description = ["The password of the keystore to sign the patched APK file with. Empty password by default."],
@@ -124,16 +123,26 @@ internal object PatchCommand : Runnable {
 
     @CommandLine.Option(
         names = ["--alias"],
-        description = ["The alias of the key from the keystore to sign the patched APK file with."],
+        description = ["The alias of the keystore entry to sign the patched APK file with."],
         showDefaultValue = ALWAYS,
     )
-    private var alias = "ReVanced Key"
+    private fun setKeyStoreEntryAlias(alias: String = "ReVanced Key") {
+        logger.warning("The --alias option is deprecated. Use --keystore-entry-alias instead.")
+        keyStoreEntryAlias = alias
+    }
+
+    @CommandLine.Option(
+        names = ["--keystore-entry-alias"],
+        description = ["The alias of the keystore entry to sign the patched APK file with."],
+        showDefaultValue = ALWAYS,
+    )
+    private var keyStoreEntryAlias = "ReVanced Key"
 
     @CommandLine.Option(
         names = ["--keystore-entry-password"],
         description = ["The password of the entry from the keystore for the key to sign the patched APK file with."],
     )
-    private var password = "" // Empty password by default
+    private var keyStoreEntryPassword = "" // Empty password by default
 
     @CommandLine.Option(
         names = ["--signer"],
@@ -307,19 +316,21 @@ internal object PatchCommand : Runnable {
         // region Save
         apk.copyTo(temporaryFilesPath.resolve(apk.name), overwrite = true).apply {
             patcherResult.applyTo(this)
-        }.let {
+        }.let { patchedApkFile ->
             if (!mount) {
-                sign(
-                    it,
+                ApkUtils.signApk(
+                    patchedApkFile,
                     outputFilePath,
-                    ApkUtils.SigningOptions(
+                    signer,
+                    ApkUtils.KeyStoreDetails(
                         keystoreFilePath,
                         keyStorePassword,
-                        alias,
-                        password,
-                        signer,
+                        keyStoreEntryAlias,
+                        keyStoreEntryPassword,
                     ),
                 )
+            } else {
+                patchedApkFile.copyTo(outputFilePath, overwrite = true)
             }
         }
 
