@@ -23,4 +23,15 @@ To build ReVanced CLI, follow these steps:
     ./gradlew build
    ```
 
+> [!NOTE]
+> If the build fails due to authentication, you may need to authenticate to GitHub Packages.
+> Create a PAT with the scope `read:packages` [here](https://github.com/settings/tokens/new?scopes=read:packages&description=ReVanced) and add your token to ~/.gradle/gradle.properties.
+>
+> Example `gradle.properties` file:
+>
+> ```properties
+> gpr.user = user
+> gpr.key = key
+> ```
+
 After the build succeeds, the built JAR file will be located at `build/libs/revanced-cli-<version>-all.jar`.
