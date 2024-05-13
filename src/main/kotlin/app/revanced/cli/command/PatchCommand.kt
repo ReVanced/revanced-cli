@@ -316,6 +316,7 @@ internal object PatchCommand : Runnable {
         // region Save
         apk.copyTo(temporaryFilesPath.resolve(apk.name), overwrite = true).apply {
             patcherResult.applyTo(this)
+            patcherResult.dexFiles.forEach{it.stream.close()}   
         }.let { patchedApkFile ->
             if (!mount) {
                 ApkUtils.signApk(
