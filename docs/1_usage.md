@@ -126,4 +126,4 @@ ReVanced CLI is divided into the following fundamental commands:
 
   > **💡 Tip**  
   > You can mount an APK file
-  > by supplying the app's package name to mount the supplied APK file over the option `-mount`.
+  > by supplying the app's package name to mount the supplied APK file over the option `--mount`.
