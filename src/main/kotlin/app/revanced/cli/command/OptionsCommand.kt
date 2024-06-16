@@ -2,7 +2,7 @@ package app.revanced.cli.command
 
 import app.revanced.library.Options
 import app.revanced.library.Options.setOptions
-import app.revanced.patcher.PatchBundleLoader
+import app.revanced.patcher.patch.loadPatchesFromJar
 import picocli.CommandLine
 import picocli.CommandLine.Help.Visibility.ALWAYS
 import java.io.File
@@ -19,7 +19,7 @@ internal object OptionsCommand : Runnable {
         description = ["Paths to patch bundles."],
         arity = "1..*",
     )
-    private lateinit var patchBundles: Array<File>
+    private lateinit var patchBundles: Set<File>
 
     @CommandLine.Option(
         names = ["-p", "--path"],
@@ -44,7 +44,7 @@ internal object OptionsCommand : Runnable {
 
     override fun run() =
         try {
-            PatchBundleLoader.Jar(*patchBundles).let { patches ->
+            loadPatchesFromJar(patchBundles).let { patches ->
                 val exists = filePath.exists()
                 if (!exists || overwrite) {
                     if (exists && update) patches.setOptions(filePath)

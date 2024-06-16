@@ -4,11 +4,11 @@ import app.revanced.library.ApkUtils
 import app.revanced.library.ApkUtils.applyTo
 import app.revanced.library.Options
 import app.revanced.library.Options.setOptions
-import app.revanced.library.adb.AdbManager
-import app.revanced.patcher.PatchBundleLoader
-import app.revanced.patcher.PatchSet
+import app.revanced.library.installation.installer.*
 import app.revanced.patcher.Patcher
 import app.revanced.patcher.PatcherConfig
+import app.revanced.patcher.patch.Patch
+import app.revanced.patcher.patch.loadPatchesFromJar
 import kotlinx.coroutines.runBlocking
 import picocli.CommandLine
 import picocli.CommandLine.Help.Visibility.ALWAYS
@@ -31,7 +31,7 @@ internal object PatchCommand : Runnable {
 
     private lateinit var apk: File
 
-    private var integrations = setOf<File>()
+    private var integrations = emptySet<File>()
 
     private var patchBundles = emptySet<File>()
 
@@ -193,7 +193,7 @@ internal object PatchCommand : Runnable {
         description = ["One or more DEX files or containers to merge into the APK."],
     )
     @Suppress("unused")
-    private fun setIntegrations(integrations: Array<File>) {
+    private fun setIntegrations(integrations: Set<File>) {
         integrations.firstOrNull { !it.exists() }?.let {
             throw CommandLine.ParameterException(spec.commandLine(), "Integrations file ${it.path} does not exist.")
         }
@@ -256,7 +256,7 @@ internal object PatchCommand : Runnable {
 
         logger.info("Loading patches")
 
-        val patches = PatchBundleLoader.Jar(*patchBundles.toTypedArray())
+        val patches = loadPatchesFromJar(patchBundles)
 
         // Warn if a patch can not be found in the supplied patch bundles.
         if (warn) {
@@ -271,6 +271,7 @@ internal object PatchCommand : Runnable {
         }
 
         // endregion
+
         val patcherTemporaryFilesPath = temporaryFilesPath.resolve("patcher")
         val (packageName, patcherResult) = Patcher(
             PatcherConfig(
@@ -295,8 +296,7 @@ internal object PatchCommand : Runnable {
             // region Patch
 
             patcher.context.packageMetadata.packageName to patcher.apply {
-                acceptIntegrations(integrations)
-                acceptPatches(filteredPatches)
+                accept(filteredPatches, integrations)
 
                 // Execute patches.
                 runBlocking {
@@ -304,16 +304,18 @@ internal object PatchCommand : Runnable {
                         patchResult.exception?.let {
                             StringWriter().use { writer ->
                                 it.printStackTrace(PrintWriter(writer))
-                                logger.severe("${patchResult.patch.name} failed:\n$writer")
+                                logger.severe("\"${patchResult.patch.name}\" failed:\n$writer")
                             }
-                        } ?: logger.info("${patchResult.patch.name} succeeded")
+                        } ?: logger.info("\"${patchResult.patch.name}\" succeeded")
                     }
                 }
             }.get()
+
             // endregion
         }
 
         // region Save
+
         apk.copyTo(temporaryFilesPath.resolve(apk.name), overwrite = true).apply {
             patcherResult.applyTo(this)
         }.let { patchedApkFile ->
@@ -340,9 +342,23 @@ internal object PatchCommand : Runnable {
 
         // region Install
 
-        deviceSerial?.let { serial ->
-            AdbManager.getAdbManager(deviceSerial = serial.ifEmpty { null }, mount)
-        }?.install(AdbManager.Apk(outputFilePath, packageName))
+        deviceSerial?.let { it ->
+            val deviceSerial = it.ifEmpty { null }
+
+            runBlocking {
+                val result = if (mount) {
+                    AdbRootInstaller(deviceSerial)
+                } else {
+                    AdbInstaller(deviceSerial)
+                }.install(Installer.Apk(outputFilePath, packageName))
+
+                when (result) {
+                    RootInstallerResult.FAILURE -> logger.severe("Failed to mount the patched APK file")
+                    is AdbInstallerResult.Failure -> logger.severe(result.exception.toString())
+                    else -> logger.info("Installed the patched APK file")
+                }
+            }
+        }
 
         // endregion
 
@@ -358,7 +374,7 @@ internal object PatchCommand : Runnable {
      * @param patches The patches to filter.
      * @return The filtered patches.
      */
-    private fun Patcher.filterPatchSelection(patches: PatchSet): PatchSet =
+    private fun Patcher.filterPatchSelection(patches: Set<Patch<*>>): Set<Patch<*>> =
         buildSet {
             val packageName = context.packageMetadata.packageName
             val packageVersion = context.packageMetadata.packageVersion
@@ -367,33 +383,32 @@ internal object PatchCommand : Runnable {
                 val patchName = patch.name!!
 
                 val explicitlyExcluded = excludedPatches.contains(patchName) || excludedPatchesByIndex.contains(i)
-                if (explicitlyExcluded) return@patch logger.info("Excluding $patchName")
+                if (explicitlyExcluded) return@patch logger.info("Excluding \"$patchName\"")
 
                 // Make sure the patch is compatible with the supplied APK files package name and version.
                 patch.compatiblePackages?.let { packages ->
-                    packages.singleOrNull { it.name == packageName }?.let { `package` ->
-                        val matchesVersion =
-                            force || `package`.versions?.let {
-                                it.any { version -> version == packageVersion }
-                            } ?: true
+                    packages.singleOrNull { (name, _) -> name == packageName }?.let { (_, versions) ->
+                        val matchesVersion = force ||
+                            versions?.let { it.any { version -> version == packageVersion } }
+                                ?: true
 
                         if (!matchesVersion) {
                             return@patch logger.warning(
-                                "$patchName is incompatible with version $packageVersion. " +
+                                "The patch \"$patchName\" is incompatible with version $packageVersion. " +
                                     "This patch is only compatible with version " +
-                                    packages.joinToString(";") { pkg ->
-                                        pkg.versions!!.joinToString(", ")
+                                    packages.joinToString(";") { (_, versions) ->
+                                        versions!!.joinToString(", ")
                                     },
                             )
                         }
                     } ?: return@patch logger.fine(
-                        "$patchName is incompatible with $packageName. " +
+                        "The patch \"$patchName\" is incompatible with $packageName. " +
                             "This patch is only compatible with " +
-                            packages.joinToString(", ") { `package` -> `package`.name },
+                            packages.joinToString(", ") { (name, _) -> name },
                     )
 
                     return@let
-                } ?: logger.fine("$patchName has no constraint on packages.")
+                } ?: logger.fine("\"$patchName\" has no constraint on packages.")
 
                 // If the patch is implicitly used, it will be only included if [exclusive] is false.
                 val implicitlyIncluded = !exclusive && patch.use
@@ -401,9 +416,9 @@ internal object PatchCommand : Runnable {
                 val explicitlyIncluded = includedPatches.contains(patchName) || includedPatchesByIndex.contains(i)
 
                 val included = implicitlyIncluded || explicitlyIncluded
-                if (!included) return@patch logger.info("$patchName excluded") // Case 1.
+                if (!included) return@patch logger.info("\"$patchName\" excluded") // Case 1.
 
-                logger.fine("Adding $patchName")
+                logger.fine("Adding \"$patchName\"")
 
                 add(patch)
             }
