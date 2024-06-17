@@ -296,11 +296,11 @@ internal object PatchCommand : Runnable {
             // region Patch
 
             patcher.context.packageMetadata.packageName to patcher.apply {
-                accept(filteredPatches, integrations)
+                this += filteredPatches to integrations
 
                 // Execute patches.
                 runBlocking {
-                    apply(false).collect { patchResult ->
+                    execute().collect { patchResult ->
                         patchResult.exception?.let {
                             StringWriter().use { writer ->
                                 it.printStackTrace(PrintWriter(writer))
