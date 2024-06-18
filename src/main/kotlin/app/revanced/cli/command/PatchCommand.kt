@@ -293,25 +293,23 @@ internal object PatchCommand : Runnable {
                     }
                 }
 
-            // region Patch
+            patcher += filteredPatches to integrations
 
-            patcher.context.packageMetadata.packageName to patcher.apply {
-                this += filteredPatches to integrations
+            // Execute patches.
+            runBlocking {
+                patcher().collect { patchResult ->
+                    val exception = patchResult.exception
+                        ?: return@collect logger.info("\"${patchResult.patch}\" succeeded")
 
-                // Execute patches.
-                runBlocking {
-                    execute().collect { patchResult ->
-                        patchResult.exception?.let {
-                            StringWriter().use { writer ->
-                                it.printStackTrace(PrintWriter(writer))
-                                logger.severe("\"${patchResult.patch.name}\" failed:\n$writer")
-                            }
-                        } ?: logger.info("\"${patchResult.patch.name}\" succeeded")
+                    StringWriter().use { writer ->
+                        exception.printStackTrace(PrintWriter(writer))
+
+                        logger.severe("\"${patchResult.patch}\" failed:\n$writer")
                     }
                 }
-            }.get()
+            }
 
-            // endregion
+            patcher.context.packageMetadata.packageName to patcher.get()
         }
 
         // region Save
