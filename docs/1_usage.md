@@ -1,129 +1,100 @@
 # 🛠️ Using ReVanced CLI
 
 Learn how to use ReVanced CLI.
+The following examples will show you how to perform basic operations.
+You can list patches, patch an app, uninstall, and install an app.
 
-## 🔨 Usage
+## 🚀 Show all commands
 
-ReVanced CLI is divided into the following fundamental commands:
+```bash
+java -jar revanced-cli.jar -h
+```
 
-- ### 🚀 Show all available options for ReVanced CLI
+## 📃 List patches
 
-  ```bash
-  java -jar revanced-cli.jar -h
-  ```
+```bash
+java -jar revanced-cli.jar list-patches --with-descriptions --with-packages --with-versions --with-options --with-universal-patches revanced-patches.rvp
+```
 
-- ### 📃 List patches
+## 💉 Patch an app with the default list of patches
 
-  ```bash
-  java -jar revanced-cli.jar list-patches \
-   --with-packages \
-   --with-versions \
-   --with-options \
-   revanced-patches.jar [<patch-bundle> ...]
-  ```
+```bash
+java -jar revanced-cli.jar patch -b revanced-patches.rvp input.apk
+```
 
-- ### ⚙️ Generate options
+You can also use multiple patch bundles:
 
-  This will generate an `options.json` file for the patches from a list of supplied patch bundles.
-  The file can be supplied to ReVanced CLI later on.
+```bash
+java -jar revanced-cli.jar patch -b revanced-patches.rvp -b another-patches.rvp input.apk
+```
 
-  ```bash
-  java -jar revanced-cli.jar options \
-   --path options.json \
-   --overwrite \
-   revanced-patches.jar [<patch-bundle> ...]
-  ```
+To manually include or exclude patches, use the options `-i` and `-e`.
+Keep in mind the name of the patch must be an exact match.
+You can also use the options `--ii` and `--ie` to include or exclude patches by their index
+if two patches have the same name.
+To know the indices of patches, use the option `--with-indices` when listing patches:
 
-  > **ℹ️ Note**  
-  > A default `options.json` file will be automatically created if it does not exist
-  > without any need for intervention when using the `patch` command.
+```bash
+java -jar revanced-cli.jar list-patches --with-indices revanced-patches.rvp
+```
 
-- ### 💉 Patch an app
+Then you can use the indices to include or exclude patches:
 
-  You can patch apps by supplying patch bundles and the app to patch.
-  After patching, ReVanced CLI can install the patched app on your device using two methods:
+```bash
+java -jar revanced-cli.jar patch -b revanced-patches.rvp --ii 123 --ie 456 input.apk
+```
 
-  > **💡 Tip**  
-  > For ReVanced CLI to be able to install the patched app on your device, make sure ADB is working:
-  >
-  > ```bash
-  > adb shell exit
-  > ```
-  >
-  > If you want to mount the patched app on top of the un-patched app, make sure you have root permissions:
-  >
-  > ```bash
-  > adb shell su -c exit
-  > ```
+> [!TIP]
+> You can use the option `-d` to automatically install the patched app after patching.
+> Make sure ADB is working:
+>
+> ```bash
+>  adb shell exit
+> ```
 
-  > **⚠️ Warning**  
-  > Some patches may require integrations
-  > such as [ReVanced Integrations](https://github.com/revanced/revanced-integrations).
-  > Supply them with the option `--merge`. ReVanced Patcher will automatically determine if they are necessary.
 
-  - #### 👾 Patch an app and install it on your device regularly
+> [!TIP]
+> You can use the option `--mount` to mount the patched app on top of the un-patched app.
+> Make sure you have root permissions and the same app you are patching and mounting over is installed on your device:
+>
+> ```bash
+> adb shell su -c exit
+> adb install input.apk
+> ```
 
-    ```bash
-    java -jar revanced-cli.jar patch \
-     --patch-bundle revanced-patches.jar \
-     -d \
-     input.apk
-    ```
+## 📦 Install an app manually
 
-  - #### 👾 Patch an app and mount it on top of the un-patched app with root permissions
+```bash
+java -jar revanced-cli.jar utility install -a input.apk
+```
 
-    > **❗ Caution**  
-    > Ensure that the same app you are patching and mounting over is installed on your device:
-    >
-    > ```bash
-    > adb install app.apk
-    > ```
+> [!TIP]
+> You can use the option `--mount` to mount the patched app on top of the un-patched app.
+> Make sure you have root permissions and the same app you are patching and mounting over is installed on your device:
+>
+> ```bash
+> adb shell su -c exit
+> adb install input.apk
+> ```
 
-    ```bash
-    java -jar revanced-cli.jar patch \
-     --patch-bundle revanced-patches.jar \
-     --include "Some patch" \
-     --ii 123 \
-     --exclude "Some other patch" \
-     -d \
-     --mount \
-     app.apk
-    ```
+## 🗑️ Uninstall an app manually
 
-    > **💡 Tip**  
-    > You can use the option `--ii` to include or `--ie` to exclude
-    > patches by their index in relation to supplied patch bundles,
-    > similarly to the option `--include` and `--exclude`.
-    >
-    > This is useful in case two patches have the same name, and you must include or exclude one.  
-    > The patch index is calculated by the position of the patch in the list of patches
-    > from patch bundles supplied using the option `--patch-bundle`.
-    >
-    > You can list all patches with their indices using the command `list-patches`.
-    >
-    > Keep in mind that the indices can change based on the order of the patch bundles supplied,
-    > as well if the patch bundles are updated because patches can be added or removed.
+Here `<package-name>` is the package name of the app you want to uninstall:
 
-- ### 🗑️ Uninstall an app
+```bash
+java -jar revanced-cli.jar utility uninstall --package-name <package-name>
+```
 
-  ```bash
-  java -jar revanced-cli.jar utility uninstall \
-   --package-name <package-name> \
-   [<device-serial>]
-  ```
+If the app is mounted, you need to unmount it by using the option `--unmount`:
 
-  > **💡 Tip**  
-  > You can unmount an APK file
-  > by adding the option `--unmount`.
+```bash
+java -jar revanced-cli.jar utility uninstall --package-name <package-name> --unmount
+```
 
-- ### ️ 📦 Install an app
-
-  ```bash
-  java -jar revanced-cli.jar utility install \
-   -a input.apk \
-   [<device-serial>]
-  ```
-
-  > **💡 Tip**  
-  > You can mount an APK file
-  > by supplying the app's package name to mount the supplied APK file over the option `--mount`.
+> [!TIP]
+> By default, the app is installed or uninstalled to the first connected device.
+> You can append one or more devices by their serial to install or uninstall an app on your selected choice of devices:
+>
+> ```bash
+> java -jar revanced-cli.jar utility uninstall --package-name <package-name> [<device-serial> ...]
+> ```
