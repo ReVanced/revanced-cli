@@ -13,10 +13,12 @@ java -jar revanced-cli.jar -h
 ## 📃 List patches
 
 ```bash
-java -jar revanced-cli.jar list-patches --with-descriptions --with-packages --with-versions --with-options --with-universal-patches revanced-patches.rvp
+java -jar revanced-cli.jar list-patches --with-packages --with-versions --with-options revanced-patches.rvp
 ```
 
-## 💉 Patch an app with the default list of patches
+## 💉 Patch an app
+
+To patch an app using the default list of patches, use the `patch` command:
 
 ```bash
 java -jar revanced-cli.jar patch -b revanced-patches.rvp input.apk
@@ -28,21 +30,36 @@ You can also use multiple patch bundles:
 java -jar revanced-cli.jar patch -b revanced-patches.rvp -b another-patches.rvp input.apk
 ```
 
-To manually include or exclude patches, use the options `-i` and `-e`.
-Keep in mind the name of the patch must be an exact match.
-You can also use the options `--ii` and `--ie` to include or exclude patches by their index
-if two patches have the same name.
-To know the indices of patches, use the option `--with-indices` when listing patches:
+To change the default set of used patches, use the option `-i` or `-e` to use or disuse specific patches.
+You can use the `list-patches` command to see which patches are used by default.
+
+To only use specific patches, you can use the option `--exclusive` combined with `-i`.
+Remember that the options `-i` and `-e` match the patch's name exactly. Here is an example:
 
 ```bash
-java -jar revanced-cli.jar list-patches --with-indices revanced-patches.rvp
+java -jar revanced-cli.jar patch -b revanced-patches.rvp --exclusive -i "Patch name" -i "Another patch name" input.apk
 ```
 
-Then you can use the indices to include or exclude patches:
+You can also use the options `--ii` and `--ie` to use or disuse patches by their index.
+This is useful, if two patches happen to have the same name.
+To know the indices of patches, use the command `list-patches`:
+
+```bash
+java -jar revanced-cli.jar list-patches revanced-patches.rvp
+```
+
+Then you can use the indices to use or disuse patches:
 
 ```bash
 java -jar revanced-cli.jar patch -b revanced-patches.rvp --ii 123 --ie 456 input.apk
 ```
+
+You can combine the option `-i`, `-e`, `--ii`, `--ie` and `--exclusive`. Here is an example:
+
+```bash
+java -jar revanced-cli.jar patch -b revanced-patches.rvp --exclusive -i "Patch name" --ii 123 input.apk
+```
+
 
 > [!TIP]
 > You can use the option `-d` to automatically install the patched app after patching.
@@ -62,7 +79,52 @@ java -jar revanced-cli.jar patch -b revanced-patches.rvp --ii 123 --ie 456 input
 > adb install input.apk
 > ```
 
-## 📦 Install an app manually
+Patches can have options you can set using the option `--set-options`.
+To know the options of a patch, use the option `--with-options` when listing patches:
+
+```bash
+java -jar revanced-cli.jar list-patches --with-options revanced-patches.rvp
+```
+
+Each patch can have multiple options. You can set them using the option `--set-options`.
+For example, to set the options for the patch with the name `Patch name`
+with the key `key1` and `key2` to `value1` and `value2` respectively, use the following command:
+
+```bash
+java -jar revanced-cli.jar patch -b revanced-patches.rvp --set-options "Patch name" -Okey1=value1 -Okey2=value2 input.apk
+```
+
+If you want to set a value to `null`, you can omit the value:
+
+```bash
+java -jar revanced-cli.jar patch -b revanced-patches.rvp --set-options "Patch name" -Okey1 input.apk
+```
+
+> [!WARNING]
+> The values of options are typed. If you set a value with the wrong type, the patching process will fail.
+> The type of the option value can be seen when listing patches with the option `--with-options`.
+> 
+> Example values:
+>
+> String: `string`  
+> Boolean: `true`, `false`  
+> Integer: `123`  
+> Double: `1.0`  
+> Float: `1.0f`  
+> Long: `1234567890`, `1L`  
+> List: `item1,item2,item3`  
+>
+> In addition to that, you can escape quotes (`\"`, `\'`) and commas (`\,`) to treat values as string literals:
+> 
+> Integer as string: `\'123\'`  
+> List with an integer, an integer as a string and a string with a comma: `123,\'123\',str\,ing`
+>
+> Example command with escaped quotes:
+> 
+> ```bash
+> java -jar revanced-cli.jar -b revanced-patches.rvp --set-options "Patch name" -OstringKey=\'1\' input.apk
+> ```
+## 📦 Install an app manually 
 
 ```bash
 java -jar revanced-cli.jar utility install -a input.apk

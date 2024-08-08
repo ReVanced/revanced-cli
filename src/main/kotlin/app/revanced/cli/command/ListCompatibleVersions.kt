@@ -1,8 +1,8 @@
 package app.revanced.cli.command
 
 import app.revanced.library.PackageName
-import app.revanced.library.PatchUtils
 import app.revanced.library.VersionMap
+import app.revanced.library.mostCommonCompatibleVersions
 import app.revanced.patcher.patch.loadPatchesFromJar
 import picocli.CommandLine
 import java.io.File
@@ -12,7 +12,7 @@ import java.util.logging.Logger
     name = "list-versions",
     description = [
         "List the most common compatible versions of apps that are compatible " +
-                "with the patches in the supplied patch bundles.",
+            "with the patches in the supplied patch bundles.",
     ],
 )
 internal class ListCompatibleVersions : Runnable {
@@ -58,8 +58,7 @@ internal class ListCompatibleVersions : Runnable {
 
         val patches = loadPatchesFromJar(patchBundles)
 
-        PatchUtils.getMostCommonCompatibleVersions(
-            patches,
+        patches.mostCommonCompatibleVersions(
             packageNames,
             countUnusedPatches,
         ).entries.joinToString("\n", transform = ::buildString).let(logger::info)

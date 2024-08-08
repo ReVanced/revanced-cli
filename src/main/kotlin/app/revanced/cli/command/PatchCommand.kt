@@ -2,21 +2,22 @@ package app.revanced.cli.command
 
 import app.revanced.library.ApkUtils
 import app.revanced.library.ApkUtils.applyTo
-import app.revanced.library.Options
-import app.revanced.library.Options.setOptions
 import app.revanced.library.installation.installer.*
+import app.revanced.library.setOptions
 import app.revanced.patcher.Patcher
 import app.revanced.patcher.PatcherConfig
 import app.revanced.patcher.patch.Patch
 import app.revanced.patcher.patch.loadPatchesFromJar
 import kotlinx.coroutines.runBlocking
 import picocli.CommandLine
+import picocli.CommandLine.ArgGroup
 import picocli.CommandLine.Help.Visibility.ALWAYS
 import picocli.CommandLine.Model.CommandSpec
 import picocli.CommandLine.Spec
 import java.io.File
 import java.io.PrintWriter
 import java.io.StringWriter
+import java.util.*
 import java.util.logging.Logger
 
 @CommandLine.Command(
@@ -27,7 +28,7 @@ internal object PatchCommand : Runnable {
     private val logger = Logger.getLogger(PatchCommand::class.java.name)
 
     @Spec
-    lateinit var spec: CommandSpec // injected by picocli
+    lateinit var spec: CommandSpec
 
     private lateinit var apk: File
 
@@ -35,15 +36,15 @@ internal object PatchCommand : Runnable {
 
     @CommandLine.Option(
         names = ["-i", "--include"],
-        description = ["List of patches to include."],
+        description = ["List of patches to include by name."],
     )
     private var includedPatches = hashSetOf<String>()
 
     @CommandLine.Option(
         names = ["--ii"],
-        description = ["List of patches to include by their index in relation to the supplied patch bundles."],
+        description = ["List of patches to include by their index in the combined list of all supplied patch bundles."],
     )
-    private var includedPatchesByIndex = arrayOf<Int>()
+    private var includedPatchesByIndex = setOf<Int>()
 
     @CommandLine.Option(
         names = ["-e", "--exclude"],
@@ -53,15 +54,29 @@ internal object PatchCommand : Runnable {
 
     @CommandLine.Option(
         names = ["--ei"],
-        description = ["List of patches to exclude by their index in relation to the supplied patch bundles."],
+        description = ["List of patches to exclude by their index in the combined list of all supplied patch bundles."],
     )
-    private var excludedPatchesByIndex = arrayOf<Int>()
+    private var excludedPatchesByIndex = setOf<Int>()
 
-    @CommandLine.Option(
-        names = ["--options"],
-        description = ["Path to patch options JSON file."],
-    )
-    private var optionsFile: File? = null
+    @ArgGroup(exclusive = false, multiplicity = "0..*", heading = "Options:%n")
+    private lateinit var options: Set<Option>
+
+    private class Option {
+        @CommandLine.Option(
+            names = ["--set-options"],
+            description = ["The name of the patch to set the options of."],
+            required = true,
+        )
+        lateinit var patch: String
+
+        @CommandLine.Option(
+            names = ["-O", "--options"],
+            description = ["The option values keyed by the option keys."],
+            mapFallbackValue = CommandLine.Option.NULL_VALUE,
+            converter = [OptionKeyConverter::class, OptionValueConverter::class],
+        )
+        lateinit var options: Map<String, Any?>
+    }
 
     @CommandLine.Option(
         names = ["--exclusive"],
@@ -154,13 +169,6 @@ internal object PatchCommand : Runnable {
     )
     private var purge: Boolean = false
 
-    @CommandLine.Option(
-        names = ["-w", "--warn"],
-        description = ["Warn if a patch can not be found in the supplied patch bundles."],
-        showDefaultValue = ALWAYS,
-    )
-    private var warn: Boolean = false
-
     @CommandLine.Parameters(
         description = ["APK file to be patched."],
         arity = "1..1",
@@ -174,15 +182,6 @@ internal object PatchCommand : Runnable {
             )
         }
         this.apk = apk
-    }
-
-    @CommandLine.Option(
-        names = ["-m", "--merge"],
-        description = ["One or more DEX files or containers to merge into the APK."],
-    )
-    @Suppress("unused")
-    private fun setIntegrations(integrations: Set<File>) {
-        logger.warning("The --merge option is not used anymore.")
     }
 
     @CommandLine.Option(
@@ -226,11 +225,6 @@ internal object PatchCommand : Runnable {
                 "${outputFilePath.nameWithoutExtension}-temporary-files",
             )
 
-        val optionsFile =
-            optionsFile ?: outputFilePath.parentFile.resolve(
-                "${outputFilePath.nameWithoutExtension}-options.json",
-            )
-
         val keystoreFilePath =
             keystoreFilePath ?: outputFilePath.parentFile
                 .resolve("${outputFilePath.nameWithoutExtension}.keystore")
@@ -243,21 +237,10 @@ internal object PatchCommand : Runnable {
 
         val patches = loadPatchesFromJar(patchBundles)
 
-        // Warn if a patch can not be found in the supplied patch bundles.
-        if (warn) {
-            patches.map { it.name }.toHashSet().let { availableNames ->
-                (includedPatches + excludedPatches).filter { name ->
-                    !availableNames.contains(name)
-                }
-            }.let { unknownPatches ->
-                if (unknownPatches.isEmpty()) return@let
-                logger.warning("Unknown input of patches:\n${unknownPatches.joinToString("\n")}")
-            }
-        }
-
         // endregion
 
         val patcherTemporaryFilesPath = temporaryFilesPath.resolve("patcher")
+
         val (packageName, patcherResult) = Patcher(
             PatcherConfig(
                 apk,
@@ -267,16 +250,10 @@ internal object PatchCommand : Runnable {
                 true,
             ),
         ).use { patcher ->
-            val filteredPatches =
-                patcher.filterPatchSelection(patches).also { patches ->
-                    logger.info("Setting patch options")
+            val filteredPatches = patcher.filterPatchSelection(patches)
 
-                    if (optionsFile.exists()) {
-                        patches.setOptions(optionsFile)
-                    } else {
-                        Options.serialize(patches, prettyPrint = true).let(optionsFile::writeText)
-                    }
-                }
+            logger.info("Setting patch options")
+            filteredPatches.setOptions(options.associate { it.patch to it.options })
 
             patcher += filteredPatches
 
@@ -419,5 +396,68 @@ internal object PatchCommand : Runnable {
                 "Failed to purge resource cache directory"
             }
         logger.info(result)
+    }
+}
+
+class OptionKeyConverter : CommandLine.ITypeConverter<String> {
+    override fun convert(value: String): String = value
+}
+
+class OptionValueConverter : CommandLine.ITypeConverter<Any?> {
+    override fun convert(value: String?): Any? {
+        value ?: return null
+
+        // Check if the value starts with '[' and ends with ']'
+        if (value.startsWith("[") && value.endsWith("]")) {
+            val innerValue = value.substring(1, value.length - 1)
+
+            val list = buildList {
+                var escaped = false
+                var insideEscape = false
+
+                buildString {
+                    for (char in innerValue) {
+                        if (escaped) {
+                            append(char)
+                            escaped = false
+                        } else if (char == '\\') {
+                            escaped = true
+                        } else if (char == '[' && !insideEscape) {
+                            insideEscape = true
+                            append(char)
+                        } else if (char == ']' && insideEscape) {
+                            insideEscape = false
+                            append(char)
+                        } else if (char == ',' && !insideEscape) {
+                            add(toString())
+                            setLength(0)
+                        } else {
+                            append(char)
+                        }
+                    }
+                    add(toString()) // Add the last element
+                }
+            }
+
+            if (list.size > 1) {
+                return list.map(::convert)
+            }
+
+            return list
+        }
+
+        return when {
+            value.startsWith("\"") && value.endsWith("\"") -> value.substring(1, value.length - 1)
+            value.startsWith("'") && value.endsWith("'") -> value.substring(1, value.length - 1)
+            value.endsWith("f") -> value.dropLast(1).toFloatOrNull() ?: value
+            value.endsWith("L") -> value.dropLast(1).toLongOrNull() ?: value
+            value.equals("true", ignoreCase = true) -> true
+            value.equals("false", ignoreCase = true) -> false
+            value.toIntOrNull() != null -> value.toInt()
+            value.toLongOrNull() != null -> value.toLong()
+            value.toDoubleOrNull() != null -> value.toDouble()
+            value.toFloatOrNull() != null -> value.toFloat()
+            else -> value
+        }
     }
 }

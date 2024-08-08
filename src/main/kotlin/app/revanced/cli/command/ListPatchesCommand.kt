@@ -95,9 +95,11 @@ internal object ListPatchesCommand : Runnable {
                 } ?: append("Key: $key")
 
                 values?.let { values ->
-                    appendLine("\nValid values:")
+                    appendLine("\nPossible values:")
                     append(values.map { "${it.value} (${it.key})" }.joinToString("\n").prependIndent("\t"))
                 }
+
+                append("\nType: $type")
             }
 
         fun IndexedValue<Patch<*>>.buildString() =
