@@ -101,25 +101,34 @@ java -jar revanced-cli.jar patch -b revanced-patches.rvp --set-options "Patch na
 ```
 
 > [!WARNING]
-> The values of options are typed. If you set a value with the wrong type, the patching process will fail.
-> The type of the option value can be seen when listing patches with the option `--with-options`.
+> Option values are usually typed. If you set a value with the wrong type, the patch can fail.
+> Option value types can be seen when listing patches with the option `--with-options`.
 > 
-> Example values:
+> Example option values:
 >
-> String: `string`  
-> Boolean: `true`, `false`  
-> Integer: `123`  
-> Double: `1.0`  
-> Float: `1.0f`  
-> Long: `1234567890`, `1L`  
-> List: `item1,item2,item3`  
+> - String: `string`
+> - Boolean: `true`, `false`
+> - Integer: `123`
+> - Double: `1.0`
+> - Float: `1.0f`
+> - Long: `1234567890`, `1L`
+> - List: `[item1,item2,item3]`
+> - List of type `Any`: `[item1,123,true,1.0]`
+> - Empty list of type `Any`: `[]`
+> - Typed empty list: `int[]`
+> - Typed and nested empty list: `[int[]]`
+> - List with null value and two empty strings: `[null,\'\',\"\"]`
 >
-> In addition to that, you can escape quotes (`\"`, `\'`) and commas (`\,`) to treat values as string literals:
+> Quotes and commas escaped in strings (`\"`, `\'`, `\,`) are parsed as part of the string.
+> List items are recursively parsed, so you can escape values in lists:
 > 
-> Integer as string: `\'123\'`  
-> List with an integer, an integer as a string and a string with a comma: `123,\'123\',str\,ing`
->
-> Example command with escaped quotes:
+> - Escaped integer as a string: `[\'123\']`
+> - Escaped boolean as a string: `[\'true\']`
+> - Escaped list as a string: `[\'[item1,item2]\']`
+> - Escaped null value as a string: `[\'null\']`
+> - List with an integer, an integer as a string and a string with a comma, and an escaped list: [`123,\'123\',str\,ing`,`\'[]\'`]
+> 
+> Example command with an escaped integer as a string:
 > 
 > ```bash
 > java -jar revanced-cli.jar -b revanced-patches.rvp --set-options "Patch name" -OstringKey=\'1\' input.apk

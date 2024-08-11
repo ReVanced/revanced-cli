@@ -17,7 +17,6 @@ import picocli.CommandLine.Spec
 import java.io.File
 import java.io.PrintWriter
 import java.io.StringWriter
-import java.util.*
 import java.util.logging.Logger
 
 @CommandLine.Command(
@@ -407,56 +406,93 @@ class OptionValueConverter : CommandLine.ITypeConverter<Any?> {
     override fun convert(value: String?): Any? {
         value ?: return null
 
-        // Check if the value starts with '[' and ends with ']'
-        if (value.startsWith("[") && value.endsWith("]")) {
-            val innerValue = value.substring(1, value.length - 1)
+        return when {
+            value.startsWith("[") && value.endsWith("]") -> {
+                val innerValue = value.substring(1, value.length - 1)
 
-            val list = buildList {
-                var escaped = false
-                var insideEscape = false
+                buildList {
+                    var nestLevel = 0
+                    var insideQuote = false
+                    var escaped = false
 
-                buildString {
-                    for (char in innerValue) {
-                        if (escaped) {
-                            append(char)
-                            escaped = false
-                        } else if (char == '\\') {
-                            escaped = true
-                        } else if (char == '[' && !insideEscape) {
-                            insideEscape = true
-                            append(char)
-                        } else if (char == ']' && insideEscape) {
-                            insideEscape = false
-                            append(char)
-                        } else if (char == ',' && !insideEscape) {
-                            add(toString())
-                            setLength(0)
-                        } else {
-                            append(char)
+                    val item = buildString {
+                        for (char in innerValue) {
+                            when (char) {
+                                '\\' -> {
+                                    if (escaped || nestLevel != 0) {
+                                        append(char)
+                                    }
+
+                                    escaped = !escaped
+                                }
+                                '"', '\'' -> {
+                                    if (!escaped) {
+                                        insideQuote = !insideQuote
+                                    } else {
+                                        escaped = false
+                                    }
+
+                                    append(char)
+                                }
+
+                                '[' -> {
+                                    if (!insideQuote) {
+                                        nestLevel++
+                                    }
+
+                                    append(char)
+                                }
+
+                                ']' -> {
+                                    if (!insideQuote) {
+                                        nestLevel--
+
+                                        if (nestLevel == -1) {
+                                            return value
+                                        }
+                                    }
+
+                                    append(char)
+                                }
+
+                                ',' -> if (nestLevel == 0) {
+                                    if (insideQuote) {
+                                        append(char)
+                                    } else {
+                                        add(convert(toString()))
+                                        setLength(0)
+                                    }
+                                } else {
+                                    append(char)
+                                }
+
+                                else -> append(char)
+                            }
                         }
                     }
-                    add(toString()) // Add the last element
+
+                    if (item.isNotEmpty()) {
+                        add(convert(item))
+                    }
                 }
             }
-
-            if (list.size > 1) {
-                return list.map(::convert)
-            }
-
-            return list
-        }
-
-        return when {
             value.startsWith("\"") && value.endsWith("\"") -> value.substring(1, value.length - 1)
             value.startsWith("'") && value.endsWith("'") -> value.substring(1, value.length - 1)
-            value.endsWith("f") -> value.dropLast(1).toFloatOrNull() ?: value
-            value.endsWith("L") -> value.dropLast(1).toLongOrNull() ?: value
+            value.endsWith("f") -> value.dropLast(1).toFloat()
+            value.endsWith("L") -> value.dropLast(1).toLong()
             value.equals("true", ignoreCase = true) -> true
             value.equals("false", ignoreCase = true) -> false
             value.toIntOrNull() != null -> value.toInt()
             value.toLongOrNull() != null -> value.toLong()
             value.toDoubleOrNull() != null -> value.toDouble()
             value.toFloatOrNull() != null -> value.toFloat()
+            value == "null" -> null
+            value == "int[]" -> emptyList<Int>()
+            value == "long[]" -> emptyList<Long>()
+            value == "double[]" -> emptyList<Double>()
+            value == "float[]" -> emptyList<Float>()
+            value == "boolean[]" -> emptyList<Boolean>()
+            value == "string[]" -> emptyList<String>()
             else -> value
         }
     }
