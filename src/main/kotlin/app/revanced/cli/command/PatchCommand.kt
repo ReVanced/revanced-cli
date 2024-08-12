@@ -2,15 +2,15 @@ package app.revanced.cli.command
 
 import app.revanced.library.ApkUtils
 import app.revanced.library.ApkUtils.applyTo
-import app.revanced.library.Options
-import app.revanced.library.Options.setOptions
 import app.revanced.library.installation.installer.*
+import app.revanced.library.setOptions
 import app.revanced.patcher.Patcher
 import app.revanced.patcher.PatcherConfig
 import app.revanced.patcher.patch.Patch
 import app.revanced.patcher.patch.loadPatchesFromJar
 import kotlinx.coroutines.runBlocking
 import picocli.CommandLine
+import picocli.CommandLine.ArgGroup
 import picocli.CommandLine.Help.Visibility.ALWAYS
 import picocli.CommandLine.Model.CommandSpec
 import picocli.CommandLine.Spec
@@ -24,44 +24,71 @@ import java.util.logging.Logger
     description = ["Patch an APK file."],
 )
 internal object PatchCommand : Runnable {
-    private val logger = Logger.getLogger(PatchCommand::class.java.name)
+    private val logger = Logger.getLogger(this::class.java.name)
 
     @Spec
-    lateinit var spec: CommandSpec // injected by picocli
+    private lateinit var spec: CommandSpec
 
-    private lateinit var apk: File
+    @ArgGroup(multiplicity = "0..*")
+    private lateinit var selection: Set<Selection>
 
-    private var patchBundles = emptySet<File>()
+    internal class Selection {
+        @ArgGroup(exclusive = false, multiplicity = "1")
+        internal var include: IncludeSelection? = null
 
-    @CommandLine.Option(
-        names = ["-i", "--include"],
-        description = ["List of patches to include."],
-    )
-    private var includedPatches = hashSetOf<String>()
+        internal class IncludeSelection {
+            @ArgGroup(multiplicity = "1")
+            internal lateinit var selector: IncludeSelector
 
-    @CommandLine.Option(
-        names = ["--ii"],
-        description = ["List of patches to include by their index in relation to the supplied patch bundles."],
-    )
-    private var includedPatchesByIndex = arrayOf<Int>()
+            internal class IncludeSelector {
+                @CommandLine.Option(
+                    names = ["-i", "--include"],
+                    description = ["The name of the patch."],
+                    required = true,
+                )
+                internal var name: String? = null
 
-    @CommandLine.Option(
-        names = ["-e", "--exclude"],
-        description = ["List of patches to exclude."],
-    )
-    private var excludedPatches = hashSetOf<String>()
+                @CommandLine.Option(
+                    names = ["--ii"],
+                    description = ["The index of the patch in the combined list of all supplied patch bundles."],
+                    required = true,
+                )
+                internal var index: Int? = null
+            }
 
-    @CommandLine.Option(
-        names = ["--ei"],
-        description = ["List of patches to exclude by their index in relation to the supplied patch bundles."],
-    )
-    private var excludedPatchesByIndex = arrayOf<Int>()
+            @CommandLine.Option(
+                names = ["-O", "--options"],
+                description = ["The option values keyed by the option keys."],
+                mapFallbackValue = CommandLine.Option.NULL_VALUE,
+                converter = [OptionKeyConverter::class, OptionValueConverter::class],
+            )
+            internal var options = mutableMapOf<String, Any?>()
+        }
 
-    @CommandLine.Option(
-        names = ["--options"],
-        description = ["Path to patch options JSON file."],
-    )
-    private var optionsFile: File? = null
+        @ArgGroup(exclusive = false, multiplicity = "1")
+        internal var exclude: ExcludeSelection? = null
+
+        internal class ExcludeSelection {
+            @ArgGroup(multiplicity = "1")
+            internal lateinit var selector: ExcludeSelector
+
+            internal class ExcludeSelector {
+                @CommandLine.Option(
+                    names = ["-e", "--exclude"],
+                    description = ["The name of the patch."],
+                    required = true,
+                )
+                internal var name: String? = null
+
+                @CommandLine.Option(
+                    names = ["--ie"],
+                    description = ["The index of the patch in the combined list of all supplied patch bundles."],
+                    required = true,
+                )
+                internal var index: Int? = null
+            }
+        }
+    }
 
     @CommandLine.Option(
         names = ["--exclusive"],
@@ -141,7 +168,7 @@ internal object PatchCommand : Runnable {
 
     @CommandLine.Option(
         names = ["-t", "--temporary-files-path"],
-        description = ["Path to temporary files directory."],
+        description = ["Path to store temporary files."],
     )
     private var temporaryFilesPath: File? = null
 
@@ -153,13 +180,6 @@ internal object PatchCommand : Runnable {
         showDefaultValue = ALWAYS,
     )
     private var purge: Boolean = false
-
-    @CommandLine.Option(
-        names = ["-w", "--warn"],
-        description = ["Warn if a patch can not be found in the supplied patch bundles."],
-        showDefaultValue = ALWAYS,
-    )
-    private var warn: Boolean = false
 
     @CommandLine.Parameters(
         description = ["APK file to be patched."],
@@ -176,14 +196,7 @@ internal object PatchCommand : Runnable {
         this.apk = apk
     }
 
-    @CommandLine.Option(
-        names = ["-m", "--merge"],
-        description = ["One or more DEX files or containers to merge into the APK."],
-    )
-    @Suppress("unused")
-    private fun setIntegrations(integrations: Set<File>) {
-        logger.warning("The --merge option is not used anymore.")
-    }
+    private lateinit var apk: File
 
     @CommandLine.Option(
         names = ["-b", "--patch-bundle"],
@@ -197,6 +210,8 @@ internal object PatchCommand : Runnable {
         }
         this.patchBundles = patchBundles
     }
+
+    private var patchBundles = emptySet<File>()
 
     @CommandLine.Option(
         names = ["--custom-aapt2-binary"],
@@ -226,11 +241,6 @@ internal object PatchCommand : Runnable {
                 "${outputFilePath.nameWithoutExtension}-temporary-files",
             )
 
-        val optionsFile =
-            optionsFile ?: outputFilePath.parentFile.resolve(
-                "${outputFilePath.nameWithoutExtension}-options.json",
-            )
-
         val keystoreFilePath =
             keystoreFilePath ?: outputFilePath.parentFile
                 .resolve("${outputFilePath.nameWithoutExtension}.keystore")
@@ -243,21 +253,10 @@ internal object PatchCommand : Runnable {
 
         val patches = loadPatchesFromJar(patchBundles)
 
-        // Warn if a patch can not be found in the supplied patch bundles.
-        if (warn) {
-            patches.map { it.name }.toHashSet().let { availableNames ->
-                (includedPatches + excludedPatches).filter { name ->
-                    !availableNames.contains(name)
-                }
-            }.let { unknownPatches ->
-                if (unknownPatches.isEmpty()) return@let
-                logger.warning("Unknown input of patches:\n${unknownPatches.joinToString("\n")}")
-            }
-        }
-
         // endregion
 
         val patcherTemporaryFilesPath = temporaryFilesPath.resolve("patcher")
+
         val (packageName, patcherResult) = Patcher(
             PatcherConfig(
                 apk,
@@ -267,16 +266,20 @@ internal object PatchCommand : Runnable {
                 true,
             ),
         ).use { patcher ->
-            val filteredPatches =
-                patcher.filterPatchSelection(patches).also { patches ->
-                    logger.info("Setting patch options")
+            val packageName = patcher.context.packageMetadata.packageName
+            val packageVersion = patcher.context.packageMetadata.packageVersion
 
-                    if (optionsFile.exists()) {
-                        patches.setOptions(optionsFile)
-                    } else {
-                        Options.serialize(patches, prettyPrint = true).let(optionsFile::writeText)
-                    }
-                }
+            val filteredPatches = patches.filterPatchSelection(packageName, packageVersion)
+
+            logger.info("Setting patch options")
+
+            val patchesList = patches.toList()
+            selection.filter { it.include != null }.associate {
+                val includeSelection = it.include!!
+
+                (includeSelection.selector.name ?: patchesList[includeSelection.selector.index!!].name!!) to
+                    includeSelection.options
+            }.let(filteredPatches::setOptions)
 
             patcher += filteredPatches
 
@@ -297,7 +300,7 @@ internal object PatchCommand : Runnable {
             patcher.context.packageMetadata.packageName to patcher.get()
         }
 
-        // region Save
+        // region Save.
 
         apk.copyTo(temporaryFilesPath.resolve(apk.name), overwrite = true).apply {
             patcherResult.applyTo(this)
@@ -323,9 +326,9 @@ internal object PatchCommand : Runnable {
 
         // endregion
 
-        // region Install
+        // region Install.
 
-        deviceSerial?.let { it ->
+        deviceSerial?.let {
             val deviceSerial = it.ifEmpty { null }
 
             runBlocking {
@@ -352,64 +355,72 @@ internal object PatchCommand : Runnable {
     }
 
     /**
-     * Filter the patches to be added to the patcher. The filter is based on the following:
+     * Filter the patches based on the selection.
      *
-     * @param patches The patches to filter.
+     * @param packageName The package name of the APK file to be patched.
+     * @param packageVersion The version of the APK file to be patched.
      * @return The filtered patches.
      */
-    private fun Patcher.filterPatchSelection(patches: Set<Patch<*>>): Set<Patch<*>> =
-        buildSet {
-            val packageName = context.packageMetadata.packageName
-            val packageVersion = context.packageMetadata.packageVersion
+    private fun Set<Patch<*>>.filterPatchSelection(
+        packageName: String,
+        packageVersion: String,
+    ): Set<Patch<*>> = buildSet {
+        val includedPatchesByName =
+            selection.asSequence().mapNotNull { it.include?.selector?.name }.toSet()
+        val includedPatchesByIndex =
+            selection.asSequence().mapNotNull { it.include?.selector?.index }.toSet()
 
-            patches.withIndex().forEach patch@{ (i, patch) ->
-                val patchName = patch.name!!
+        val excludedPatches =
+            selection.asSequence().mapNotNull { it.exclude?.selector?.name }.toSet()
+        val excludedPatchesByIndex =
+            selection.asSequence().mapNotNull { it.exclude?.selector?.index }.toSet()
 
-                val explicitlyExcluded = excludedPatches.contains(patchName) || excludedPatchesByIndex.contains(i)
-                if (explicitlyExcluded) return@patch logger.info("\"$patchName\" excluded manually")
+        this@filterPatchSelection.withIndex().forEach patchLoop@{ (i, patch) ->
+            val patchName = patch.name!!
 
-                // Make sure the patch is compatible with the supplied APK files package name and version.
-                patch.compatiblePackages?.let { packages ->
-                    packages.singleOrNull { (name, _) -> name == packageName }?.let { (_, versions) ->
-                        if (versions?.isEmpty() == true) {
-                            return@patch logger.warning("\"$patchName\" incompatible with \"$packageName\"")
-                        }
+            val isManuallyExcluded = patchName in excludedPatches || i in excludedPatchesByIndex
+            if (isManuallyExcluded) return@patchLoop logger.info("\"$patchName\" excluded manually")
 
-                        val matchesVersion = force ||
-                            versions?.let { it.any { version -> version == packageVersion } }
-                                ?: true
+            // Make sure the patch is compatible with the supplied APK files package name and version.
+            patch.compatiblePackages?.let { packages ->
+                packages.singleOrNull { (name, _) -> name == packageName }?.let { (_, versions) ->
+                    if (versions?.isEmpty() == true) {
+                        return@patchLoop logger.warning("\"$patchName\" incompatible with \"$packageName\"")
+                    }
 
-                        if (!matchesVersion) {
-                            return@patch logger.warning(
-                                "\"$patchName\" incompatible with $packageName $packageVersion " +
-                                    "but compatible with " +
-                                    packages.joinToString("; ") { (packageName, versions) ->
-                                        packageName + " " + versions!!.joinToString(", ")
-                                    },
-                            )
-                        }
-                    } ?: return@patch logger.fine(
-                        "\"$patchName\" incompatible with $packageName. " +
-                            "It is only compatible with " +
-                            packages.joinToString(", ") { (name, _) -> name },
-                    )
+                    val matchesVersion =
+                        force || versions?.let { it.any { version -> version == packageVersion } } ?: true
 
-                    return@let
-                } ?: logger.fine("\"$patchName\" has no package constraints")
+                    if (!matchesVersion) {
+                        return@patchLoop logger.warning(
+                            "\"$patchName\" incompatible with $packageName $packageVersion " +
+                                "but compatible with " +
+                                packages.joinToString("; ") { (packageName, versions) ->
+                                    packageName + " " + versions!!.joinToString(", ")
+                                },
+                        )
+                    }
+                } ?: return@patchLoop logger.fine(
+                    "\"$patchName\" incompatible with $packageName. " +
+                        "It is only compatible with " +
+                        packages.joinToString(", ") { (name, _) -> name },
+                )
 
-                // If the patch is implicitly used, it will be only included if [exclusive] is false.
-                val implicitlyIncluded = !exclusive && patch.use
-                // If the patch is explicitly used, it will be included even if [exclusive] is false.
-                val explicitlyIncluded = includedPatches.contains(patchName) || includedPatchesByIndex.contains(i)
+                return@let
+            } ?: logger.fine("\"$patchName\" has no package constraints")
 
-                val included = implicitlyIncluded || explicitlyIncluded
-                if (!included) return@patch logger.info("\"$patchName\" excluded") // Case 1.
+            val isIncluded = !exclusive && patch.use
+            val isManuallyIncluded = patchName in includedPatchesByName || i in includedPatchesByIndex
 
-                add(patch)
-
-                logger.fine("\"$patchName\" added")
+            if (!(isIncluded || isManuallyIncluded)) {
+                return@patchLoop logger.info("\"$patchName\" excluded")
             }
+
+            add(patch)
+
+            logger.fine("\"$patchName\" added")
         }
+    }
 
     private fun purge(resourceCachePath: File) {
         val result =

@@ -14,7 +14,7 @@ import app.revanced.patcher.patch.Option as PatchOption
     description = ["List patches from supplied patch bundles."],
 )
 internal object ListPatchesCommand : Runnable {
-    private val logger = Logger.getLogger(ListPatchesCommand::class.java.name)
+    private val logger = Logger.getLogger(this::class.java.name)
 
     @Parameters(
         description = ["Paths to patch bundles."],
@@ -95,9 +95,11 @@ internal object ListPatchesCommand : Runnable {
                 } ?: append("Key: $key")
 
                 values?.let { values ->
-                    appendLine("\nValid values:")
+                    appendLine("\nPossible values:")
                     append(values.map { "${it.value} (${it.key})" }.joinToString("\n").prependIndent("\t"))
                 }
+
+                append("\nType: $type")
             }
 
         fun IndexedValue<Patch<*>>.buildString() =

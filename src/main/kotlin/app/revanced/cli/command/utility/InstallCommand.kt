@@ -13,7 +13,7 @@ import java.util.logging.Logger
     description = ["Install an APK file to devices with the supplied ADB device serials"],
 )
 internal object InstallCommand : Runnable {
-    private val logger = Logger.getLogger(InstallCommand::class.java.name)
+    private val logger = Logger.getLogger(this::class.java.name)
 
     @Parameters(
         description = ["ADB device serials. If not supplied, the first connected device will be used."],
