@@ -16,7 +16,7 @@ import java.util.logging.Logger
     ],
 )
 internal class ListCompatibleVersions : Runnable {
-    private val logger = Logger.getLogger(ListCompatibleVersions::class.java.name)
+    private val logger = Logger.getLogger(this::class.java.name)
 
     @CommandLine.Parameters(
         description = ["Paths to patch bundles."],

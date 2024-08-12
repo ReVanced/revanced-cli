@@ -79,25 +79,25 @@ java -jar revanced-cli.jar patch -b revanced-patches.rvp --exclusive -i "Patch n
 > adb install input.apk
 > ```
 
-Patches can have options you can set using the option `--set-options`.
+Patches can have options you can set using the option `-O` alongside the option to include the patch by name or index.
 To know the options of a patch, use the option `--with-options` when listing patches:
 
 ```bash
 java -jar revanced-cli.jar list-patches --with-options revanced-patches.rvp
 ```
 
-Each patch can have multiple options. You can set them using the option `--set-options`.
+Each patch can have multiple options. You can set them using the option `-O`.
 For example, to set the options for the patch with the name `Patch name`
 with the key `key1` and `key2` to `value1` and `value2` respectively, use the following command:
 
 ```bash
-java -jar revanced-cli.jar patch -b revanced-patches.rvp --set-options "Patch name" -Okey1=value1 -Okey2=value2 input.apk
+java -jar revanced-cli.jar patch -b revanced-patches.rvp -i "Patch name" -Okey1=value1 -Okey2=value2 input.apk
 ```
 
 If you want to set a value to `null`, you can omit the value:
 
 ```bash
-java -jar revanced-cli.jar patch -b revanced-patches.rvp --set-options "Patch name" -Okey1 input.apk
+java -jar revanced-cli.jar patch -b revanced-patches.rvp -i "Patch name" -Okey1 input.apk
 ```
 
 > [!WARNING]
@@ -131,7 +131,7 @@ java -jar revanced-cli.jar patch -b revanced-patches.rvp --set-options "Patch na
 > Example command with an escaped integer as a string:
 > 
 > ```bash
-> java -jar revanced-cli.jar -b revanced-patches.rvp --set-options "Patch name" -OstringKey=\'1\' input.apk
+> java -jar revanced-cli.jar -b revanced-patches.rvp -i "Patch name" -OstringKey=\'1\' input.apk
 > ```
 ## 📦 Install an app manually 
 

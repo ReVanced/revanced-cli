@@ -1,6 +1,9 @@
 package app.revanced.cli.command.utility
 
-import app.revanced.library.installation.installer.*
+import app.revanced.library.installation.installer.AdbInstaller
+import app.revanced.library.installation.installer.AdbInstallerResult
+import app.revanced.library.installation.installer.AdbRootInstaller
+import app.revanced.library.installation.installer.RootInstallerResult
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.runBlocking
@@ -13,7 +16,7 @@ import java.util.logging.Logger
     description = ["Uninstall a patched app from the devices with the supplied ADB device serials"],
 )
 internal object UninstallCommand : Runnable {
-    private val logger = Logger.getLogger(UninstallCommand::class.java.name)
+    private val logger = Logger.getLogger(this::class.java.name)
 
     @Parameters(
         description = ["ADB device serials. If not supplied, the first connected device will be used."],

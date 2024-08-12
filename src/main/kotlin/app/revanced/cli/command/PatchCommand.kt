@@ -24,57 +24,70 @@ import java.util.logging.Logger
     description = ["Patch an APK file."],
 )
 internal object PatchCommand : Runnable {
-    private val logger = Logger.getLogger(PatchCommand::class.java.name)
+    private val logger = Logger.getLogger(this::class.java.name)
 
     @Spec
-    lateinit var spec: CommandSpec
+    private lateinit var spec: CommandSpec
 
-    private lateinit var apk: File
+    @ArgGroup(multiplicity = "0..*")
+    private lateinit var selection: Set<Selection>
 
-    private var patchBundles = emptySet<File>()
+    internal class Selection {
+        @ArgGroup(exclusive = false, multiplicity = "1")
+        internal var include: IncludeSelection? = null
 
-    @CommandLine.Option(
-        names = ["-i", "--include"],
-        description = ["List of patches to include by name."],
-    )
-    private var includedPatches = hashSetOf<String>()
+        internal class IncludeSelection {
+            @ArgGroup(multiplicity = "1")
+            internal lateinit var selector: IncludeSelector
 
-    @CommandLine.Option(
-        names = ["--ii"],
-        description = ["List of patches to include by their index in the combined list of all supplied patch bundles."],
-    )
-    private var includedPatchesByIndex = setOf<Int>()
+            internal class IncludeSelector {
+                @CommandLine.Option(
+                    names = ["-i", "--include"],
+                    description = ["The name of the patch."],
+                    required = true,
+                )
+                internal var name: String? = null
 
-    @CommandLine.Option(
-        names = ["-e", "--exclude"],
-        description = ["List of patches to exclude."],
-    )
-    private var excludedPatches = hashSetOf<String>()
+                @CommandLine.Option(
+                    names = ["--ii"],
+                    description = ["The index of the patch in the combined list of all supplied patch bundles."],
+                    required = true,
+                )
+                internal var index: Int? = null
+            }
 
-    @CommandLine.Option(
-        names = ["--ei"],
-        description = ["List of patches to exclude by their index in the combined list of all supplied patch bundles."],
-    )
-    private var excludedPatchesByIndex = setOf<Int>()
+            @CommandLine.Option(
+                names = ["-O", "--options"],
+                description = ["The option values keyed by the option keys."],
+                mapFallbackValue = CommandLine.Option.NULL_VALUE,
+                converter = [OptionKeyConverter::class, OptionValueConverter::class],
+            )
+            internal var options = mutableMapOf<String, Any?>()
+        }
 
-    @ArgGroup(exclusive = false, multiplicity = "0..*", heading = "Options:%n")
-    private lateinit var options: Set<Option>
+        @ArgGroup(exclusive = false, multiplicity = "1")
+        internal var exclude: ExcludeSelection? = null
 
-    private class Option {
-        @CommandLine.Option(
-            names = ["--set-options"],
-            description = ["The name of the patch to set the options of."],
-            required = true,
-        )
-        lateinit var patch: String
+        internal class ExcludeSelection {
+            @ArgGroup(multiplicity = "1")
+            internal lateinit var selector: ExcludeSelector
 
-        @CommandLine.Option(
-            names = ["-O", "--options"],
-            description = ["The option values keyed by the option keys."],
-            mapFallbackValue = CommandLine.Option.NULL_VALUE,
-            converter = [OptionKeyConverter::class, OptionValueConverter::class],
-        )
-        lateinit var options: Map<String, Any?>
+            internal class ExcludeSelector {
+                @CommandLine.Option(
+                    names = ["-e", "--exclude"],
+                    description = ["The name of the patch."],
+                    required = true,
+                )
+                internal var name: String? = null
+
+                @CommandLine.Option(
+                    names = ["--ie"],
+                    description = ["The index of the patch in the combined list of all supplied patch bundles."],
+                    required = true,
+                )
+                internal var index: Int? = null
+            }
+        }
     }
 
     @CommandLine.Option(
@@ -155,7 +168,7 @@ internal object PatchCommand : Runnable {
 
     @CommandLine.Option(
         names = ["-t", "--temporary-files-path"],
-        description = ["Path to temporary files directory."],
+        description = ["Path to store temporary files."],
     )
     private var temporaryFilesPath: File? = null
 
@@ -183,6 +196,8 @@ internal object PatchCommand : Runnable {
         this.apk = apk
     }
 
+    private lateinit var apk: File
+
     @CommandLine.Option(
         names = ["-b", "--patch-bundle"],
         description = ["One or more bundles of patches."],
@@ -195,6 +210,8 @@ internal object PatchCommand : Runnable {
         }
         this.patchBundles = patchBundles
     }
+
+    private var patchBundles = emptySet<File>()
 
     @CommandLine.Option(
         names = ["--custom-aapt2-binary"],
@@ -249,10 +266,20 @@ internal object PatchCommand : Runnable {
                 true,
             ),
         ).use { patcher ->
-            val filteredPatches = patcher.filterPatchSelection(patches)
+            val packageName = patcher.context.packageMetadata.packageName
+            val packageVersion = patcher.context.packageMetadata.packageVersion
+
+            val filteredPatches = patches.filterPatchSelection(packageName, packageVersion)
 
             logger.info("Setting patch options")
-            filteredPatches.setOptions(options.associate { it.patch to it.options })
+
+            val patchesList = patches.toList()
+            selection.filter { it.include != null }.associate {
+                val includeSelection = it.include!!
+
+                (includeSelection.selector.name ?: patchesList[includeSelection.selector.index!!].name!!) to
+                    includeSelection.options
+            }.let(filteredPatches::setOptions)
 
             patcher += filteredPatches
 
@@ -273,7 +300,7 @@ internal object PatchCommand : Runnable {
             patcher.context.packageMetadata.packageName to patcher.get()
         }
 
-        // region Save
+        // region Save.
 
         apk.copyTo(temporaryFilesPath.resolve(apk.name), overwrite = true).apply {
             patcherResult.applyTo(this)
@@ -299,9 +326,9 @@ internal object PatchCommand : Runnable {
 
         // endregion
 
-        // region Install
+        // region Install.
 
-        deviceSerial?.let { it ->
+        deviceSerial?.let {
             val deviceSerial = it.ifEmpty { null }
 
             runBlocking {
@@ -328,64 +355,72 @@ internal object PatchCommand : Runnable {
     }
 
     /**
-     * Filter the patches to be added to the patcher. The filter is based on the following:
+     * Filter the patches based on the selection.
      *
-     * @param patches The patches to filter.
+     * @param packageName The package name of the APK file to be patched.
+     * @param packageVersion The version of the APK file to be patched.
      * @return The filtered patches.
      */
-    private fun Patcher.filterPatchSelection(patches: Set<Patch<*>>): Set<Patch<*>> =
-        buildSet {
-            val packageName = context.packageMetadata.packageName
-            val packageVersion = context.packageMetadata.packageVersion
+    private fun Set<Patch<*>>.filterPatchSelection(
+        packageName: String,
+        packageVersion: String,
+    ): Set<Patch<*>> = buildSet {
+        val includedPatchesByName =
+            selection.asSequence().mapNotNull { it.include?.selector?.name }.toSet()
+        val includedPatchesByIndex =
+            selection.asSequence().mapNotNull { it.include?.selector?.index }.toSet()
 
-            patches.withIndex().forEach patch@{ (i, patch) ->
-                val patchName = patch.name!!
+        val excludedPatches =
+            selection.asSequence().mapNotNull { it.exclude?.selector?.name }.toSet()
+        val excludedPatchesByIndex =
+            selection.asSequence().mapNotNull { it.exclude?.selector?.index }.toSet()
 
-                val explicitlyExcluded = excludedPatches.contains(patchName) || excludedPatchesByIndex.contains(i)
-                if (explicitlyExcluded) return@patch logger.info("\"$patchName\" excluded manually")
+        this@filterPatchSelection.withIndex().forEach patchLoop@{ (i, patch) ->
+            val patchName = patch.name!!
 
-                // Make sure the patch is compatible with the supplied APK files package name and version.
-                patch.compatiblePackages?.let { packages ->
-                    packages.singleOrNull { (name, _) -> name == packageName }?.let { (_, versions) ->
-                        if (versions?.isEmpty() == true) {
-                            return@patch logger.warning("\"$patchName\" incompatible with \"$packageName\"")
-                        }
+            val isManuallyExcluded = patchName in excludedPatches || i in excludedPatchesByIndex
+            if (isManuallyExcluded) return@patchLoop logger.info("\"$patchName\" excluded manually")
 
-                        val matchesVersion = force ||
-                            versions?.let { it.any { version -> version == packageVersion } }
-                                ?: true
+            // Make sure the patch is compatible with the supplied APK files package name and version.
+            patch.compatiblePackages?.let { packages ->
+                packages.singleOrNull { (name, _) -> name == packageName }?.let { (_, versions) ->
+                    if (versions?.isEmpty() == true) {
+                        return@patchLoop logger.warning("\"$patchName\" incompatible with \"$packageName\"")
+                    }
 
-                        if (!matchesVersion) {
-                            return@patch logger.warning(
-                                "\"$patchName\" incompatible with $packageName $packageVersion " +
-                                    "but compatible with " +
-                                    packages.joinToString("; ") { (packageName, versions) ->
-                                        packageName + " " + versions!!.joinToString(", ")
-                                    },
-                            )
-                        }
-                    } ?: return@patch logger.fine(
-                        "\"$patchName\" incompatible with $packageName. " +
-                            "It is only compatible with " +
-                            packages.joinToString(", ") { (name, _) -> name },
-                    )
+                    val matchesVersion =
+                        force || versions?.let { it.any { version -> version == packageVersion } } ?: true
 
-                    return@let
-                } ?: logger.fine("\"$patchName\" has no package constraints")
+                    if (!matchesVersion) {
+                        return@patchLoop logger.warning(
+                            "\"$patchName\" incompatible with $packageName $packageVersion " +
+                                "but compatible with " +
+                                packages.joinToString("; ") { (packageName, versions) ->
+                                    packageName + " " + versions!!.joinToString(", ")
+                                },
+                        )
+                    }
+                } ?: return@patchLoop logger.fine(
+                    "\"$patchName\" incompatible with $packageName. " +
+                        "It is only compatible with " +
+                        packages.joinToString(", ") { (name, _) -> name },
+                )
 
-                // If the patch is implicitly used, it will be only included if [exclusive] is false.
-                val implicitlyIncluded = !exclusive && patch.use
-                // If the patch is explicitly used, it will be included even if [exclusive] is false.
-                val explicitlyIncluded = includedPatches.contains(patchName) || includedPatchesByIndex.contains(i)
+                return@let
+            } ?: logger.fine("\"$patchName\" has no package constraints")
 
-                val included = implicitlyIncluded || explicitlyIncluded
-                if (!included) return@patch logger.info("\"$patchName\" excluded") // Case 1.
+            val isIncluded = !exclusive && patch.use
+            val isManuallyIncluded = patchName in includedPatchesByName || i in includedPatchesByIndex
 
-                add(patch)
-
-                logger.fine("\"$patchName\" added")
+            if (!(isIncluded || isManuallyIncluded)) {
+                return@patchLoop logger.info("\"$patchName\" excluded")
             }
+
+            add(patch)
+
+            logger.fine("\"$patchName\" added")
         }
+    }
 
     private fun purge(resourceCachePath: File) {
         val result =
@@ -395,105 +430,5 @@ internal object PatchCommand : Runnable {
                 "Failed to purge resource cache directory"
             }
         logger.info(result)
-    }
-}
-
-class OptionKeyConverter : CommandLine.ITypeConverter<String> {
-    override fun convert(value: String): String = value
-}
-
-class OptionValueConverter : CommandLine.ITypeConverter<Any?> {
-    override fun convert(value: String?): Any? {
-        value ?: return null
-
-        return when {
-            value.startsWith("[") && value.endsWith("]") -> {
-                val innerValue = value.substring(1, value.length - 1)
-
-                buildList {
-                    var nestLevel = 0
-                    var insideQuote = false
-                    var escaped = false
-
-                    val item = buildString {
-                        for (char in innerValue) {
-                            when (char) {
-                                '\\' -> {
-                                    if (escaped || nestLevel != 0) {
-                                        append(char)
-                                    }
-
-                                    escaped = !escaped
-                                }
-                                '"', '\'' -> {
-                                    if (!escaped) {
-                                        insideQuote = !insideQuote
-                                    } else {
-                                        escaped = false
-                                    }
-
-                                    append(char)
-                                }
-
-                                '[' -> {
-                                    if (!insideQuote) {
-                                        nestLevel++
-                                    }
-
-                                    append(char)
-                                }
-
-                                ']' -> {
-                                    if (!insideQuote) {
-                                        nestLevel--
-
-                                        if (nestLevel == -1) {
-                                            return value
-                                        }
-                                    }
-
-                                    append(char)
-                                }
-
-                                ',' -> if (nestLevel == 0) {
-                                    if (insideQuote) {
-                                        append(char)
-                                    } else {
-                                        add(convert(toString()))
-                                        setLength(0)
-                                    }
-                                } else {
-                                    append(char)
-                                }
-
-                                else -> append(char)
-                            }
-                        }
-                    }
-
-                    if (item.isNotEmpty()) {
-                        add(convert(item))
-                    }
-                }
-            }
-            value.startsWith("\"") && value.endsWith("\"") -> value.substring(1, value.length - 1)
-            value.startsWith("'") && value.endsWith("'") -> value.substring(1, value.length - 1)
-            value.endsWith("f") -> value.dropLast(1).toFloat()
-            value.endsWith("L") -> value.dropLast(1).toLong()
-            value.equals("true", ignoreCase = true) -> true
-            value.equals("false", ignoreCase = true) -> false
-            value.toIntOrNull() != null -> value.toInt()
-            value.toLongOrNull() != null -> value.toLong()
-            value.toDoubleOrNull() != null -> value.toDouble()
-            value.toFloatOrNull() != null -> value.toFloat()
-            value == "null" -> null
-            value == "int[]" -> emptyList<Int>()
-            value == "long[]" -> emptyList<Long>()
-            value == "double[]" -> emptyList<Double>()
-            value == "float[]" -> emptyList<Float>()
-            value == "boolean[]" -> emptyList<Boolean>()
-            value == "string[]" -> emptyList<String>()
-            else -> value
-        }
     }
 }
