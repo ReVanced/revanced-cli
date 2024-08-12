@@ -1,17 +1,17 @@
 [versions]
 shadow = "8.1.1"
 kotlin = "2.0.0"
-kotlinx-coroutines-core = "1.8.0"
-picocli = "4.7.5"
-revanced-patcher = "19.3.1"
-revanced-library = "2.3.0"
+kotlinx = "1.8.1"
+picocli = "4.7.6"
+revanced-patcher = "20.0.0"
+revanced-library = "3.0.0"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
-kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines-core" }
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx" }
 picocli = { module = "info.picocli:picocli", version.ref = "picocli" }
 revanced-patcher = { module = "app.revanced:revanced-patcher", version.ref = "revanced-patcher" }
-revanced-library = { module = "app.revanced:revanced-library", version.ref = "revanced-library" }
+revanced-library = { module = "app.revanced:revanced-library-jvm", version.ref = "revanced-library" }
 
 [plugins]
 shadow = { id = "com.github.johnrengelman.shadow", version.ref = "shadow" }

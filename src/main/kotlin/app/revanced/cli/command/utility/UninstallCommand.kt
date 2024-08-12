@@ -1,6 +1,9 @@
 package app.revanced.cli.command.utility
 
-import app.revanced.library.adb.AdbManager
+import app.revanced.library.installation.installer.*
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.runBlocking
 import picocli.CommandLine.*
 import picocli.CommandLine.Help.Visibility.ALWAYS
 import java.util.logging.Logger
@@ -33,13 +36,28 @@ internal object UninstallCommand : Runnable {
     private var unmount: Boolean = false
 
     override fun run() {
-        fun uninstall(deviceSerial: String? = null) =
-            try {
-                AdbManager.getAdbManager(deviceSerial, unmount).uninstall(packageName)
-            } catch (e: AdbManager.DeviceNotFoundException) {
+        suspend fun uninstall(deviceSerial: String? = null) {
+            val result = try {
+                if (unmount) {
+                    AdbRootInstaller(deviceSerial)
+                } else {
+                    AdbInstaller(deviceSerial)
+                }.uninstall(packageName)
+            } catch (e: Exception) {
                 logger.severe(e.toString())
             }
 
-        deviceSerials?.forEach { uninstall(it) } ?: uninstall()
+            when (result) {
+                RootInstallerResult.FAILURE ->
+                    logger.severe("Failed to unmount the patched APK file")
+                is AdbInstallerResult.Failure ->
+                    logger.severe(result.exception.toString())
+                else -> logger.info("Uninstalled the patched APK file")
+            }
+        }
+
+        runBlocking {
+            deviceSerials?.map { async { uninstall(it) } }?.awaitAll() ?: uninstall()
+        }
     }
 }

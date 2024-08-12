@@ -3,7 +3,7 @@ package app.revanced.cli.command
 import app.revanced.library.PackageName
 import app.revanced.library.PatchUtils
 import app.revanced.library.VersionMap
-import app.revanced.patcher.PatchBundleLoader
+import app.revanced.patcher.patch.loadPatchesFromJar
 import picocli.CommandLine
 import java.io.File
 import java.util.logging.Logger
@@ -12,7 +12,7 @@ import java.util.logging.Logger
     name = "list-versions",
     description = [
         "List the most common compatible versions of apps that are compatible " +
-            "with the patches in the supplied patch bundles.",
+                "with the patches in the supplied patch bundles.",
     ],
 )
 internal class ListCompatibleVersions : Runnable {
@@ -22,7 +22,7 @@ internal class ListCompatibleVersions : Runnable {
         description = ["Paths to patch bundles."],
         arity = "1..*",
     )
-    private lateinit var patchBundles: Array<File>
+    private lateinit var patchBundles: Set<File>
 
     @CommandLine.Option(
         names = ["-f", "--filter-package-names"],
@@ -38,8 +38,6 @@ internal class ListCompatibleVersions : Runnable {
     private var countUnusedPatches: Boolean = false
 
     override fun run() {
-        val patches = PatchBundleLoader.Jar(*patchBundles)
-
         fun VersionMap.buildVersionsString(): String {
             if (isEmpty()) return "Any"
 
@@ -57,6 +55,8 @@ internal class ListCompatibleVersions : Runnable {
                 appendLine("Most common compatible versions:")
                 appendLine(versions.buildVersionsString().prependIndent("\t"))
             }
+
+        val patches = loadPatchesFromJar(patchBundles)
 
         PatchUtils.getMostCommonCompatibleVersions(
             patches,
