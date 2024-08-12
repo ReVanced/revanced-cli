@@ -1,3 +1,15 @@
+# [5.0.0-dev.1](https://github.com/ReVanced/revanced-cli/compare/v4.6.0...v5.0.0-dev.1) (2024-08-12)
+
+
+### Features
+
+* Set patch options via CLI ([#336](https://github.com/ReVanced/revanced-cli/issues/336)) ([2300243](https://github.com/ReVanced/revanced-cli/commit/23002434b2d51c2a3b30b33dd0526261432d90ce))
+
+
+### BREAKING CHANGES
+
+* This commit changes various CLI options and removes the `options.json` file. Instead, patch options can now be passed via CLI options
+
 # [4.6.0](https://github.com/ReVanced/revanced-cli/compare/v4.5.0...v4.6.0) (2024-04-01)
 
 
