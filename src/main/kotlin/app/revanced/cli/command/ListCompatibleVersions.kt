@@ -12,17 +12,17 @@ import java.util.logging.Logger
     name = "list-versions",
     description = [
         "List the most common compatible versions of apps that are compatible " +
-            "with the patches in the supplied patch bundles.",
+            "with the patches in the supplied files containing patches.",
     ],
 )
 internal class ListCompatibleVersions : Runnable {
     private val logger = Logger.getLogger(this::class.java.name)
 
     @CommandLine.Parameters(
-        description = ["Paths to patch bundles."],
+        description = ["One or more paths to files containing patches."],
         arity = "1..*",
     )
-    private lateinit var patchBundles: Set<File>
+    private lateinit var patchesFiles: Set<File>
 
     @CommandLine.Option(
         names = ["-f", "--filter-package-names"],
@@ -56,7 +56,7 @@ internal class ListCompatibleVersions : Runnable {
                 appendLine(versions.buildVersionsString().prependIndent("\t"))
             }
 
-        val patches = loadPatchesFromJar(patchBundles)
+        val patches = loadPatchesFromJar(patchesFiles)
 
         patches.mostCommonCompatibleVersions(
             packageNames,

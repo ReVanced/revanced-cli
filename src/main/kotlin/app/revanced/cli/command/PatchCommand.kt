@@ -34,23 +34,23 @@ internal object PatchCommand : Runnable {
 
     internal class Selection {
         @ArgGroup(exclusive = false, multiplicity = "1")
-        internal var include: IncludeSelection? = null
+        internal var enabled: EnableSelection? = null
 
-        internal class IncludeSelection {
+        internal class EnableSelection {
             @ArgGroup(multiplicity = "1")
-            internal lateinit var selector: IncludeSelector
+            internal lateinit var selector: EnableSelector
 
-            internal class IncludeSelector {
+            internal class EnableSelector {
                 @CommandLine.Option(
-                    names = ["-i", "--include"],
-                    description = ["The name of the patch."],
+                    names = ["-e", "--enable"],
+                    description = ["Name of the patch."],
                     required = true,
                 )
                 internal var name: String? = null
 
                 @CommandLine.Option(
-                    names = ["--ii"],
-                    description = ["The index of the patch in the combined list of all supplied patch bundles."],
+                    names = ["--ei"],
+                    description = ["Index of the patch in the combined list of all supplied files containing patches."],
                     required = true,
                 )
                 internal var index: Int? = null
@@ -58,7 +58,7 @@ internal object PatchCommand : Runnable {
 
             @CommandLine.Option(
                 names = ["-O", "--options"],
-                description = ["The option values keyed by the option keys."],
+                description = ["Option values keyed by option keys."],
                 mapFallbackValue = CommandLine.Option.NULL_VALUE,
                 converter = [OptionKeyConverter::class, OptionValueConverter::class],
             )
@@ -66,23 +66,23 @@ internal object PatchCommand : Runnable {
         }
 
         @ArgGroup(exclusive = false, multiplicity = "1")
-        internal var exclude: ExcludeSelection? = null
+        internal var disable: DisableSelection? = null
 
-        internal class ExcludeSelection {
+        internal class DisableSelection {
             @ArgGroup(multiplicity = "1")
-            internal lateinit var selector: ExcludeSelector
+            internal lateinit var selector: DisableSelector
 
-            internal class ExcludeSelector {
+            internal class DisableSelector {
                 @CommandLine.Option(
-                    names = ["-e", "--exclude"],
-                    description = ["The name of the patch."],
+                    names = ["-d", "--disable"],
+                    description = ["Name of the patch."],
                     required = true,
                 )
                 internal var name: String? = null
 
                 @CommandLine.Option(
-                    names = ["--ie"],
-                    description = ["The index of the patch in the combined list of all supplied patch bundles."],
+                    names = ["--di"],
+                    description = ["Index of the patch in the combined list of all supplied files containing patches."],
                     required = true,
                 )
                 internal var index: Int? = null
@@ -92,14 +92,14 @@ internal object PatchCommand : Runnable {
 
     @CommandLine.Option(
         names = ["--exclusive"],
-        description = ["Only include patches that are explicitly specified to be included."],
+        description = ["Disable all patches except the ones enabled."],
         showDefaultValue = ALWAYS,
     )
     private var exclusive = false
 
     @CommandLine.Option(
         names = ["-f", "--force"],
-        description = ["Bypass compatibility checks for the supplied APK's version."],
+        description = ["Don't check for compatibility with the supplied APK's version."],
         showDefaultValue = ALWAYS,
     )
     private var force: Boolean = false
@@ -108,7 +108,7 @@ internal object PatchCommand : Runnable {
 
     @CommandLine.Option(
         names = ["-o", "--out"],
-        description = ["Path to save the patched APK file to. Defaults to the same directory as the supplied APK file."],
+        description = ["Path to save the patched APK file to. Defaults to the same path as the supplied APK file."],
     )
     @Suppress("unused")
     private fun setOutputFilePath(outputFilePath: File?) {
@@ -116,8 +116,8 @@ internal object PatchCommand : Runnable {
     }
 
     @CommandLine.Option(
-        names = ["-d", "--device-serial"],
-        description = ["ADB device serial to install to. If not supplied, the first connected device will be used."],
+        names = ["-i", "--install"],
+        description = ["Serial of the ADB device to install to. If not specified, the first connected device will be used."],
         // Empty string to indicate that the first connected device should be used.
         fallbackValue = "",
         arity = "0..1",
@@ -126,7 +126,7 @@ internal object PatchCommand : Runnable {
 
     @CommandLine.Option(
         names = ["--mount"],
-        description = ["Install by mounting the patched APK file."],
+        description = ["Install the patched APK file by mounting."],
         showDefaultValue = ALWAYS,
     )
     private var mount: Boolean = false
@@ -134,28 +134,28 @@ internal object PatchCommand : Runnable {
     @CommandLine.Option(
         names = ["--keystore"],
         description = [
-            "Path to the keystore to sign the patched APK file with. " +
+            "Path to the keystore file containing a private key and certificate pair to sign the patched APK file with. " +
                 "Defaults to the same directory as the supplied APK file.",
         ],
     )
-    private var keystoreFilePath: File? = null
+    private var keyStoreFilePath: File? = null
 
     @CommandLine.Option(
         names = ["--keystore-password"],
-        description = ["The password of the keystore to sign the patched APK file with. Empty password by default."],
+        description = ["Password of the keystore. Empty password by default."],
     )
     private var keyStorePassword: String? = null // Empty password by default
 
     @CommandLine.Option(
         names = ["--keystore-entry-alias"],
-        description = ["The alias of the keystore entry to sign the patched APK file with."],
+        description = ["Alias of the private key and certificate pair keystore entry."],
         showDefaultValue = ALWAYS,
     )
     private var keyStoreEntryAlias = "ReVanced Key"
 
     @CommandLine.Option(
         names = ["--keystore-entry-password"],
-        description = ["The password of the entry from the keystore for the key to sign the patched APK file with."],
+        description = ["Password of the keystore entry."],
     )
     private var keyStoreEntryPassword = "" // Empty password by default
 
@@ -175,15 +175,15 @@ internal object PatchCommand : Runnable {
     private var aaptBinaryPath: File? = null
 
     @CommandLine.Option(
-        names = ["-p", "--purge"],
-        description = ["Purge the temporary resource cache directory after patching."],
+        names = ["--purge"],
+        description = ["Purge temporary files directory after patching."],
         showDefaultValue = ALWAYS,
     )
     private var purge: Boolean = false
 
     @CommandLine.Parameters(
-        description = ["APK file to be patched."],
-        arity = "1..1",
+        description = ["APK file to patch."],
+        arity = "1",
     )
     @Suppress("unused")
     private fun setApk(apk: File) {
@@ -199,19 +199,19 @@ internal object PatchCommand : Runnable {
     private lateinit var apk: File
 
     @CommandLine.Option(
-        names = ["-b", "--patch-bundle"],
-        description = ["One or more bundles of patches."],
+        names = ["-p", "--patches"],
+        description = ["One or more path to files containing patches."],
         required = true,
     )
     @Suppress("unused")
-    private fun setPatchBundles(patchBundles: Set<File>) {
-        patchBundles.firstOrNull { !it.exists() }?.let {
-            throw CommandLine.ParameterException(spec.commandLine(), "Patch bundle ${it.name} does not exist")
+    private fun setPatchesFile(patchesFiles: Set<File>) {
+        patchesFiles.firstOrNull { !it.exists() }?.let {
+            throw CommandLine.ParameterException(spec.commandLine(), "${it.name} can't be found")
         }
-        this.patchBundles = patchBundles
+        this.patchesFiles = patchesFiles
     }
 
-    private var patchBundles = emptySet<File>()
+    private var patchesFiles = emptySet<File>()
 
     @CommandLine.Option(
         names = ["--custom-aapt2-binary"],
@@ -242,7 +242,7 @@ internal object PatchCommand : Runnable {
             )
 
         val keystoreFilePath =
-            keystoreFilePath ?: outputFilePath.parentFile
+            keyStoreFilePath ?: outputFilePath.parentFile
                 .resolve("${outputFilePath.nameWithoutExtension}.keystore")
 
         // endregion
@@ -251,7 +251,7 @@ internal object PatchCommand : Runnable {
 
         logger.info("Loading patches")
 
-        val patches = loadPatchesFromJar(patchBundles)
+        val patches = loadPatchesFromJar(patchesFiles)
 
         // endregion
 
@@ -274,11 +274,11 @@ internal object PatchCommand : Runnable {
             logger.info("Setting patch options")
 
             val patchesList = patches.toList()
-            selection.filter { it.include != null }.associate {
-                val includeSelection = it.include!!
+            selection.filter { it.enabled != null }.associate {
+                val enabledSelection = it.enabled!!
 
-                (includeSelection.selector.name ?: patchesList[includeSelection.selector.index!!].name!!) to
-                    includeSelection.options
+                (enabledSelection.selector.name ?: patchesList[enabledSelection.selector.index!!].name!!) to
+                    enabledSelection.options
             }.let(filteredPatches::setOptions)
 
             patcher += filteredPatches
@@ -365,21 +365,21 @@ internal object PatchCommand : Runnable {
         packageName: String,
         packageVersion: String,
     ): Set<Patch<*>> = buildSet {
-        val includedPatchesByName =
-            selection.asSequence().mapNotNull { it.include?.selector?.name }.toSet()
-        val includedPatchesByIndex =
-            selection.asSequence().mapNotNull { it.include?.selector?.index }.toSet()
+        val enabledPatchesByName =
+            selection.asSequence().mapNotNull { it.enabled?.selector?.name }.toSet()
+        val enabledPatchesByIndex =
+            selection.asSequence().mapNotNull { it.enabled?.selector?.index }.toSet()
 
-        val excludedPatches =
-            selection.asSequence().mapNotNull { it.exclude?.selector?.name }.toSet()
-        val excludedPatchesByIndex =
-            selection.asSequence().mapNotNull { it.exclude?.selector?.index }.toSet()
+        val disabledPatches =
+            selection.asSequence().mapNotNull { it.disable?.selector?.name }.toSet()
+        val disabledPatchesByIndex =
+            selection.asSequence().mapNotNull { it.disable?.selector?.index }.toSet()
 
         this@filterPatchSelection.withIndex().forEach patchLoop@{ (i, patch) ->
             val patchName = patch.name!!
 
-            val isManuallyExcluded = patchName in excludedPatches || i in excludedPatchesByIndex
-            if (isManuallyExcluded) return@patchLoop logger.info("\"$patchName\" excluded manually")
+            val isManuallyDisabled = patchName in disabledPatches || i in disabledPatchesByIndex
+            if (isManuallyDisabled) return@patchLoop logger.info("\"$patchName\" disabled manually")
 
             // Make sure the patch is compatible with the supplied APK files package name and version.
             patch.compatiblePackages?.let { packages ->
@@ -409,11 +409,11 @@ internal object PatchCommand : Runnable {
                 return@let
             } ?: logger.fine("\"$patchName\" has no package constraints")
 
-            val isIncluded = !exclusive && patch.use
-            val isManuallyIncluded = patchName in includedPatchesByName || i in includedPatchesByIndex
+            val isEnabled = !exclusive && patch.use
+            val isManuallyEnabled = patchName in enabledPatchesByName || i in enabledPatchesByIndex
 
-            if (!(isIncluded || isManuallyIncluded)) {
-                return@patchLoop logger.info("\"$patchName\" excluded")
+            if (!(isEnabled || isManuallyEnabled)) {
+                return@patchLoop logger.info("\"$patchName\" disabled")
             }
 
             add(patch)

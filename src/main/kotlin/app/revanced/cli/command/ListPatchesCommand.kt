@@ -11,16 +11,16 @@ import app.revanced.patcher.patch.Option as PatchOption
 
 @Command(
     name = "list-patches",
-    description = ["List patches from supplied patch bundles."],
+    description = ["List patches from supplied files containing patches."],
 )
 internal object ListPatchesCommand : Runnable {
     private val logger = Logger.getLogger(this::class.java.name)
 
     @Parameters(
-        description = ["Paths to patch bundles."],
+        description = ["One or more paths to files containing patches."],
         arity = "1..*",
     )
-    private lateinit var patchBundles: Set<File>
+    private lateinit var patchesFiles: Set<File>
 
     @Option(
         names = ["-d", "--with-descriptions"],
@@ -59,7 +59,7 @@ internal object ListPatchesCommand : Runnable {
 
     @Option(
         names = ["-i", "--index"],
-        description = ["List the index of each patch in relation to the supplied patch bundles."],
+        description = ["List the index of each patch in relation to the supplied files containing patches."],
         showDefaultValue = ALWAYS,
     )
     private var withIndex: Boolean = true
@@ -111,6 +111,8 @@ internal object ListPatchesCommand : Runnable {
 
                     if (withDescriptions) append("\nDescription: ${patch.description}")
 
+                    append("Enabled: ${patch.use}")
+
                     if (withOptions && patch.options.isNotEmpty()) {
                         appendLine("\nOptions:")
                         append(
@@ -135,7 +137,7 @@ internal object ListPatchesCommand : Runnable {
             compatiblePackages?.any { (compatiblePackageName, _) -> compatiblePackageName == name }
                 ?: withUniversalPatches
 
-        val patches = loadPatchesFromJar(patchBundles).withIndex().toList()
+        val patches = loadPatchesFromJar(patchesFiles).withIndex().toList()
 
         val filtered =
             packageName?.let { patches.filter { (_, patch) -> patch.filterCompatiblePackages(it) } } ?: patches
