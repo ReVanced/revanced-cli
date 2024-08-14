@@ -13,7 +13,7 @@ java -jar revanced-cli.jar -h
 ## 📃 List patches
 
 ```bash
-java -jar revanced-cli.jar list-patches --with-packages --with-versions --with-options revanced-patches.rvp
+java -jar revanced-cli.jar list-patches --with-packages --with-versions --with-options patches.rvp
 ```
 
 ## 💉 Patch an app
@@ -21,48 +21,48 @@ java -jar revanced-cli.jar list-patches --with-packages --with-versions --with-o
 To patch an app using the default list of patches, use the `patch` command:
 
 ```bash
-java -jar revanced-cli.jar patch -b revanced-patches.rvp input.apk
+java -jar revanced-cli.jar patch -p patches.rvp input.apk
 ```
 
-You can also use multiple patch bundles:
+You can also use multiple files containing patches:
 
 ```bash
-java -jar revanced-cli.jar patch -b revanced-patches.rvp -b another-patches.rvp input.apk
+java -jar revanced-cli.jar patch -p patches.rvp -b another-patches.rvp input.apk
 ```
 
-To change the default set of used patches, use the option `-i` or `-e` to use or disuse specific patches.
-You can use the `list-patches` command to see which patches are used by default.
+To change the default set of enabled or disabled patches, use the option `-e` or `-d` to enable or disable specific patches.
+You can use the `list-patches` command to see which patches are enabled by default.
 
-To only use specific patches, you can use the option `--exclusive` combined with `-i`.
-Remember that the options `-i` and `-e` match the patch's name exactly. Here is an example:
+To only enable specific patches, you can use the option `--exclusive` combined with `-e`.
+Remember that the options `-e` and `-d` match the patch's name exactly. Here is an example:
 
 ```bash
-java -jar revanced-cli.jar patch -b revanced-patches.rvp --exclusive -i "Patch name" -i "Another patch name" input.apk
+java -jar revanced-cli.jar patch -p patches.rvp --exclusive -e "Patch name" -e "Another patch name" input.apk
 ```
 
-You can also use the options `--ii` and `--ie` to use or disuse patches by their index.
-This is useful, if two patches happen to have the same name.
+You can also use the options `--ei` or `--di` to enable or disable patches by their index.
+This is useful, if two patches happen to have the same name, or if typing the names is too cumbersome.
 To know the indices of patches, use the command `list-patches`:
 
 ```bash
-java -jar revanced-cli.jar list-patches revanced-patches.rvp
+java -jar revanced-cli.jar list-patches patches.rvp
 ```
 
-Then you can use the indices to use or disuse patches:
+Then you can use the indices to enable or disable patches:
 
 ```bash
-java -jar revanced-cli.jar patch -b revanced-patches.rvp --ii 123 --ie 456 input.apk
+java -jar revanced-cli.jar patch -b patches.rvp --ei 123 --di 456 input.apk
 ```
 
-You can combine the option `-i`, `-e`, `--ii`, `--ie` and `--exclusive`. Here is an example:
+You can combine the option `-e`, `-d`, `--ei`, `--di` and `--exclusive`. Here is an example:
 
 ```bash
-java -jar revanced-cli.jar patch -b revanced-patches.rvp --exclusive -i "Patch name" --ii 123 input.apk
+java -jar revanced-cli.jar patch -p patches.rvp --exclusive -i "Patch name" --ei 123 input.apk
 ```
 
 
 > [!TIP]
-> You can use the option `-d` to automatically install the patched app after patching.
+> You can use the option `-i` to automatically install the patched app after patching.
 > Make sure ADB is working:
 >
 > ```bash
@@ -83,7 +83,7 @@ Patches can have options you can set using the option `-O` alongside the option 
 To know the options of a patch, use the option `--with-options` when listing patches:
 
 ```bash
-java -jar revanced-cli.jar list-patches --with-options revanced-patches.rvp
+java -jar revanced-cli.jar list-patches --with-options patches.rvp
 ```
 
 Each patch can have multiple options. You can set them using the option `-O`.
@@ -91,10 +91,10 @@ For example, to set the options for the patch with the name `Patch name`
 with the key `key1` and `key2` to `value1` and `value2` respectively, use the following command:
 
 ```bash
-java -jar revanced-cli.jar patch -b revanced-patches.rvp -i "Patch name" -Okey1=value1 -Okey2=value2 input.apk
+java -jar revanced-cli.jar patch -b patches.rvp -e "Patch name" -Okey1=value1 -Okey2=value2 input.apk
 ```
 
-If you want to set a value to `null`, you can omit the value:
+If you want to set the option value to `null`, you can omit the value:
 
 ```bash
 java -jar revanced-cli.jar patch -b revanced-patches.rvp -i "Patch name" -Okey1 input.apk
@@ -102,7 +102,7 @@ java -jar revanced-cli.jar patch -b revanced-patches.rvp -i "Patch name" -Okey1 
 
 > [!WARNING]
 > Option values are usually typed. If you set a value with the wrong type, the patch can fail.
-> Option value types can be seen when listing patches with the option `--with-options`.
+> The value types can be seen when listing patches with the option `--with-options`.
 > 
 > Example option values:
 >
@@ -131,7 +131,7 @@ java -jar revanced-cli.jar patch -b revanced-patches.rvp -i "Patch name" -Okey1 
 > Example command with an escaped integer as a string:
 > 
 > ```bash
-> java -jar revanced-cli.jar -b revanced-patches.rvp -i "Patch name" -OstringKey=\'1\' input.apk
+> java -jar revanced-cli.jar -p patches.rvp -e "Patch name" -OstringKey=\'1\' input.apk
 > ```
 ## 📦 Install an app manually 
 
