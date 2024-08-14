@@ -11,13 +11,13 @@ import app.revanced.patcher.patch.Option as PatchOption
 
 @Command(
     name = "list-patches",
-    description = ["List patches from supplied files containing patches."],
+    description = ["List patches from supplied RVP files."],
 )
 internal object ListPatchesCommand : Runnable {
     private val logger = Logger.getLogger(this::class.java.name)
 
     @Parameters(
-        description = ["One or more paths to files containing patches."],
+        description = ["Paths to RVP files."],
         arity = "1..*",
     )
     private lateinit var patchesFiles: Set<File>
@@ -59,7 +59,7 @@ internal object ListPatchesCommand : Runnable {
 
     @Option(
         names = ["-i", "--index"],
-        description = ["List the index of each patch in relation to the supplied files containing patches."],
+        description = ["List the index of each patch in relation to the supplied RVP files."],
         showDefaultValue = ALWAYS,
     )
     private var withIndex: Boolean = true

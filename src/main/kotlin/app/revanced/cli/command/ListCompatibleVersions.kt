@@ -12,14 +12,14 @@ import java.util.logging.Logger
     name = "list-versions",
     description = [
         "List the most common compatible versions of apps that are compatible " +
-            "with the patches in the supplied files containing patches.",
+            "with the patches from RVP files.",
     ],
 )
 internal class ListCompatibleVersions : Runnable {
     private val logger = Logger.getLogger(this::class.java.name)
 
     @CommandLine.Parameters(
-        description = ["One or more paths to files containing patches."],
+        description = ["Paths to RVP files."],
         arity = "1..*",
     )
     private lateinit var patchesFiles: Set<File>

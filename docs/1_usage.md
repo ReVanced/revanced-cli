@@ -24,7 +24,7 @@ To patch an app using the default list of patches, use the `patch` command:
 java -jar revanced-cli.jar patch -p patches.rvp input.apk
 ```
 
-You can also use multiple files containing patches:
+You can also use multiple RVP files:
 
 ```bash
 java -jar revanced-cli.jar patch -p patches.rvp -b another-patches.rvp input.apk
@@ -91,13 +91,13 @@ For example, to set the options for the patch with the name `Patch name`
 with the key `key1` and `key2` to `value1` and `value2` respectively, use the following command:
 
 ```bash
-java -jar revanced-cli.jar patch -b patches.rvp -e "Patch name" -Okey1=value1 -Okey2=value2 input.apk
+java -jar revanced-cli.jar patch -p patches.rvp -e "Patch name" -Okey1=value1 -Okey2=value2 input.apk
 ```
 
 If you want to set the option value to `null`, you can omit the value:
 
 ```bash
-java -jar revanced-cli.jar patch -b revanced-patches.rvp -i "Patch name" -Okey1 input.apk
+java -jar revanced-cli.jar patch -p patches.rvp -i "Patch name" -Okey1 input.apk
 ```
 
 > [!WARNING]

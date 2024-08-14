@@ -50,7 +50,7 @@ internal object PatchCommand : Runnable {
 
                 @CommandLine.Option(
                     names = ["--ei"],
-                    description = ["Index of the patch in the combined list of all supplied files containing patches."],
+                    description = ["Index of the patch in the combined list of the supplied RVP files."],
                     required = true,
                 )
                 internal var index: Int? = null
@@ -82,7 +82,7 @@ internal object PatchCommand : Runnable {
 
                 @CommandLine.Option(
                     names = ["--di"],
-                    description = ["Index of the patch in the combined list of all supplied files containing patches."],
+                    description = ["Index of the patch in the combined list of the supplied RVP files."],
                     required = true,
                 )
                 internal var index: Int? = null
@@ -200,7 +200,7 @@ internal object PatchCommand : Runnable {
 
     @CommandLine.Option(
         names = ["-p", "--patches"],
-        description = ["One or more path to files containing patches."],
+        description = ["One or more path to RVP files."],
         required = true,
     )
     @Suppress("unused")
