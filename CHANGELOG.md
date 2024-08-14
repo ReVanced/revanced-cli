@@ -1,3 +1,10 @@
+# [5.0.0-dev.3](https://github.com/ReVanced/revanced-cli/compare/v5.0.0-dev.2...v5.0.0-dev.3) (2024-08-14)
+
+
+### Features
+
+* Simplify option descriptions ([45c998b](https://github.com/ReVanced/revanced-cli/commit/45c998b335b65ac233fece8b804dc7410142691c))
+
 # [5.0.0-dev.2](https://github.com/ReVanced/revanced-cli/compare/v5.0.0-dev.1...v5.0.0-dev.2) (2024-08-14)
 
 
