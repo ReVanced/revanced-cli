@@ -1,3 +1,15 @@
+# [5.0.0-dev.2](https://github.com/ReVanced/revanced-cli/compare/v5.0.0-dev.1...v5.0.0-dev.2) (2024-08-14)
+
+
+### Features
+
+* Simplify command and option names and descriptions ([#338](https://github.com/ReVanced/revanced-cli/issues/338)) ([6e7797a](https://github.com/ReVanced/revanced-cli/commit/6e7797a3f0525a8f48af7182157da0d045600ac2))
+
+
+### BREAKING CHANGES
+
+* Options have been renamed.
+
 # [5.0.0-dev.1](https://github.com/ReVanced/revanced-cli/compare/v4.6.0...v5.0.0-dev.1) (2024-08-12)
 
 
