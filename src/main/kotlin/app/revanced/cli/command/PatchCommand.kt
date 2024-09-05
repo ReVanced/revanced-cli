@@ -245,6 +245,32 @@ internal object PatchCommand : Runnable {
             keyStoreFilePath ?: outputFilePath.parentFile
                 .resolve("${outputFilePath.nameWithoutExtension}.keystore")
 
+        val installer = if (deviceSerial != null) {
+            try {
+                if (mount) {
+                    AdbRootInstaller(deviceSerial)
+                } else {
+                    AdbInstaller(deviceSerial)
+                }
+            } catch (e: DeviceNotFoundException) {
+                if (deviceSerial!!.isNotEmpty()) {
+                    logger.severe(
+                        "Device with serial $deviceSerial not found to install to. " +
+                            "Ensure the device is connected and the serial is correct when using the --install option.",
+                    )
+                } else {
+                    logger.severe(
+                        "No device has been found to install to. " +
+                            "Ensure a device is connected when using the --install option.",
+                    )
+                }
+
+                return
+            }
+        } else {
+            null
+        }
+
         // endregion
 
         // region Load patches
@@ -332,13 +358,7 @@ internal object PatchCommand : Runnable {
             val deviceSerial = it.ifEmpty { null }
 
             runBlocking {
-                val result = if (mount) {
-                    AdbRootInstaller(deviceSerial)
-                } else {
-                    AdbInstaller(deviceSerial)
-                }.install(Installer.Apk(outputFilePath, packageName))
-
-                when (result) {
+                when (val result = installer!!.install(Installer.Apk(outputFilePath, packageName))) {
                     RootInstallerResult.FAILURE -> logger.severe("Failed to mount the patched APK file")
                     is AdbInstallerResult.Failure -> logger.severe(result.exception.toString())
                     else -> logger.info("Installed the patched APK file")
