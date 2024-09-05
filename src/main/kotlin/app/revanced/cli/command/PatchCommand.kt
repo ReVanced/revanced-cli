@@ -30,7 +30,7 @@ internal object PatchCommand : Runnable {
     private lateinit var spec: CommandSpec
 
     @ArgGroup(multiplicity = "0..*")
-    private lateinit var selection: Set<Selection>
+    private var selection = emptySet<Selection>()
 
     internal class Selection {
         @ArgGroup(exclusive = false, multiplicity = "1")
@@ -366,14 +366,14 @@ internal object PatchCommand : Runnable {
         packageVersion: String,
     ): Set<Patch<*>> = buildSet {
         val enabledPatchesByName =
-            selection.asSequence().mapNotNull { it.enabled?.selector?.name }.toSet()
+            selection.mapNotNull { it.enabled?.selector?.name }.toSet()
         val enabledPatchesByIndex =
-            selection.asSequence().mapNotNull { it.enabled?.selector?.index }.toSet()
+            selection.mapNotNull { it.enabled?.selector?.index }.toSet()
 
         val disabledPatches =
-            selection.asSequence().mapNotNull { it.disable?.selector?.name }.toSet()
+            selection.mapNotNull { it.disable?.selector?.name }.toSet()
         val disabledPatchesByIndex =
-            selection.asSequence().mapNotNull { it.disable?.selector?.index }.toSet()
+            selection.mapNotNull { it.disable?.selector?.index }.toSet()
 
         this@filterPatchSelection.withIndex().forEach patchLoop@{ (i, patch) ->
             val patchName = patch.name!!
