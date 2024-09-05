@@ -30,7 +30,7 @@ internal object PatchCommand : Runnable {
     private lateinit var spec: CommandSpec
 
     @ArgGroup(multiplicity = "0..*")
-    private var selection = emptySet<Selection>()
+    private var selection = mutableSetOf<Selection>()
 
     internal class Selection {
         @ArgGroup(exclusive = false, multiplicity = "1")
