@@ -1,3 +1,16 @@
+# [5.0.0-dev.4](https://github.com/ReVanced/revanced-cli/compare/v5.0.0-dev.3...v5.0.0-dev.4) (2024-09-17)
+
+
+### Bug Fixes
+
+* Make patches selectable by using a mutable collection for the selection option ([751fa1d](https://github.com/ReVanced/revanced-cli/commit/751fa1d889f40c51b291116029fd84f2b051f2f0))
+* Make the patch command work without specifying any selection ([ba159a3](https://github.com/ReVanced/revanced-cli/commit/ba159a35a9a99d18a4c1e04128b08ae336a49b3e))
+
+
+### Features
+
+* Show error about no installation device found at the beginning ([3300e6b](https://github.com/ReVanced/revanced-cli/commit/3300e6b4333ed1c4e6785cb82eca9016fc6d4a20))
+
 # [5.0.0-dev.3](https://github.com/ReVanced/revanced-cli/compare/v5.0.0-dev.2...v5.0.0-dev.3) (2024-08-14)
 
 
