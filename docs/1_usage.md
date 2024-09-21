@@ -27,7 +27,7 @@ java -jar revanced-cli.jar patch -p patches.rvp input.apk
 You can also use multiple RVP files:
 
 ```bash
-java -jar revanced-cli.jar patch -p patches.rvp -b another-patches.rvp input.apk
+java -jar revanced-cli.jar patch -p patches.rvp -p another-patches.rvp input.apk
 ```
 
 To change the default set of enabled or disabled patches, use the option `-e` or `-d` to enable or disable specific patches.
@@ -51,7 +51,7 @@ java -jar revanced-cli.jar list-patches patches.rvp
 Then you can use the indices to enable or disable patches:
 
 ```bash
-java -jar revanced-cli.jar patch -b patches.rvp --ei 123 --di 456 input.apk
+java -jar revanced-cli.jar patch -p patches.rvp --ei 123 --di 456 input.apk
 ```
 
 You can combine the option `-e`, `-d`, `--ei`, `--di` and `--exclusive`. Here is an example:
