@@ -1,3 +1,5 @@
+# [5.0.0-dev.5](https://github.com/ReVanced/revanced-cli/compare/v5.0.0-dev.4...v5.0.0-dev.5) (2024-09-30)
+
 # [5.0.0-dev.4](https://github.com/ReVanced/revanced-cli/compare/v5.0.0-dev.3...v5.0.0-dev.4) (2024-09-17)
 
 
