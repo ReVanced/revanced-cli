@@ -1,3 +1,10 @@
+# [5.0.0-dev.6](https://github.com/ReVanced/revanced-cli/compare/v5.0.0-dev.5...v5.0.0-dev.6) (2024-10-10)
+
+
+### Bug Fixes
+
+* Use the first connected device when no ADB device is specified ([5f952f3](https://github.com/ReVanced/revanced-cli/commit/5f952f35f5cb388b6509b2b4d905b8143ebc7996))
+
 # [5.0.0-dev.5](https://github.com/ReVanced/revanced-cli/compare/v5.0.0-dev.4...v5.0.0-dev.5) (2024-09-30)
 
 # [5.0.0-dev.4](https://github.com/ReVanced/revanced-cli/compare/v5.0.0-dev.3...v5.0.0-dev.4) (2024-09-17)
