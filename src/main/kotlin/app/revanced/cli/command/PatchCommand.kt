@@ -246,6 +246,8 @@ internal object PatchCommand : Runnable {
                 .resolve("${outputFilePath.nameWithoutExtension}.keystore")
 
         val installer = if (deviceSerial != null) {
+            val deviceSerial = deviceSerial!!.ifEmpty { null }
+
             try {
                 if (mount) {
                     AdbRootInstaller(deviceSerial)
