@@ -255,7 +255,7 @@ internal object PatchCommand : Runnable {
                     AdbInstaller(deviceSerial)
                 }
             } catch (e: DeviceNotFoundException) {
-                if (deviceSerial!!.isNotEmpty()) {
+                if (deviceSerial?.isNotEmpty() == true) {
                     logger.severe(
                         "Device with serial $deviceSerial not found to install to. " +
                             "Ensure the device is connected and the serial is correct when using the --install option.",
