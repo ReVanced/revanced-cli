@@ -1,3 +1,10 @@
+# [5.0.0-dev.7](https://github.com/ReVanced/revanced-cli/compare/v5.0.0-dev.6...v5.0.0-dev.7) (2024-10-16)
+
+
+### Bug Fixes
+
+* Check for null when no device serial was specified ([1da8ae9](https://github.com/ReVanced/revanced-cli/commit/1da8ae9e46000dd3c4eecd793c559e75012cf535))
+
 # [5.0.0-dev.6](https://github.com/ReVanced/revanced-cli/compare/v5.0.0-dev.5...v5.0.0-dev.6) (2024-10-10)
 
 
