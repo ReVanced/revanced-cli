@@ -57,7 +57,7 @@ java -jar revanced-cli.jar patch -p patches.rvp --ei 123 --di 456 input.apk
 You can combine the option `-e`, `-d`, `--ei`, `--di` and `--exclusive`. Here is an example:
 
 ```bash
-java -jar revanced-cli.jar patch -p patches.rvp --exclusive -i "Patch name" --ei 123 input.apk
+java -jar revanced-cli.jar patch -p patches.rvp --exclusive -e "Patch name" --ei 123 input.apk
 ```
 
 
