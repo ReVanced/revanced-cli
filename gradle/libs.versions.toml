@@ -1,9 +1,9 @@
 [versions]
 shadow = "8.1.1"
-kotlin = "2.0.0"
+kotlin = "2.0.20"
 kotlinx = "1.8.1"
 picocli = "4.7.6"
-revanced-patcher = "20.0.0"
+revanced-patcher = "20.0.2"
 revanced-library = "3.0.0"
 
 [libraries]
