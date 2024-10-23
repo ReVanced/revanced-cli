@@ -4,9 +4,9 @@ To use ReVanced CLI, you will need to fulfill specific requirements.
 
 ## 🤝 Requirements
 
-- Java Runtime Environment 11 ([Azul Zulu JRE](https://www.azul.com/downloads/?version=java-11-lts&package=jdk#zulu) or [OpenJDK](https://jdk.java.net/archive/))
+- Java Runtime Environment 11 ([Azul Zulu JRE](https://www.azul.com/downloads/?version=java-11-lts&package=jre#zulu) or [OpenJDK](https://jdk.java.net/archive/))
 - [Android Debug Bridge (ADB)](https://developer.android.com/studio/command-line/adb) if you want to install the patched APK file on your device
-- An ABI other than ARMv7 such as x86 or x86-64 (or a custom AAPT binary that supports ARMv7)
+- x86 or x86-64 (For [other architectures](https://github.com/ReVanced/revanced-manager/tree/main/android/app/src/main/jniLibs) use the `--custom-aapt2-binary` option)
 
 ## ⏭️ Whats next
 
