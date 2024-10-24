@@ -59,10 +59,10 @@ tasks {
     }
 
     shadowJar {
+        exclude("/prebuilt/linux/aapt", "/prebuilt/windows/aapt.exe", "/prebuilt/*/aapt_*")
         minimize {
-            exclude(dependency("org.jetbrains.kotlin:.*"))
             exclude(dependency("org.bouncycastle:.*"))
-            exclude(dependency("app.revanced:.*"))
+            exclude(dependency("app.revanced:revanced-patcher"))
         }
     }
 
