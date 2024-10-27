@@ -357,8 +357,6 @@ internal object PatchCommand : Runnable {
         // region Install.
 
         deviceSerial?.let {
-            val deviceSerial = it.ifEmpty { null }
-
             runBlocking {
                 when (val result = installer!!.install(Installer.Apk(outputFilePath, packageName))) {
                     RootInstallerResult.FAILURE -> logger.severe("Failed to mount the patched APK file")
