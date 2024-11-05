@@ -111,7 +111,7 @@ internal object ListPatchesCommand : Runnable {
 
                     if (withDescriptions) append("\nDescription: ${patch.description}")
 
-                    append("Enabled: ${patch.use}")
+                    append("\nEnabled: ${patch.use}")
 
                     if (withOptions && patch.options.isNotEmpty()) {
                         appendLine("\nOptions:")
