@@ -1,3 +1,10 @@
+# [5.0.0-dev.9](https://github.com/ReVanced/revanced-cli/compare/v5.0.0-dev.8...v5.0.0-dev.9) (2024-11-05)
+
+
+### Bug Fixes
+
+* Print in new line correctly ([c2dc9d7](https://github.com/ReVanced/revanced-cli/commit/c2dc9d76be33c98284741e23c406500483c47753))
+
 # [5.0.0-dev.8](https://github.com/ReVanced/revanced-cli/compare/v5.0.0-dev.7...v5.0.0-dev.8) (2024-10-17)
 
 # [5.0.0-dev.7](https://github.com/ReVanced/revanced-cli/compare/v5.0.0-dev.6...v5.0.0-dev.7) (2024-10-16)
