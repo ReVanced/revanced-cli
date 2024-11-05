@@ -1,3 +1,10 @@
+# [5.0.0-dev.10](https://github.com/ReVanced/revanced-cli/compare/v5.0.0-dev.9...v5.0.0-dev.10) (2024-11-05)
+
+
+### Bug Fixes
+
+* Make CLI ArgGroup non-exclusive to be able to disable and enable patches at the same time ([1bb0d13](https://github.com/ReVanced/revanced-cli/commit/1bb0d13726fd5790c59cb6d28df3618c7606710d))
+
 # [5.0.0-dev.9](https://github.com/ReVanced/revanced-cli/compare/v5.0.0-dev.8...v5.0.0-dev.9) (2024-11-05)
 
 
