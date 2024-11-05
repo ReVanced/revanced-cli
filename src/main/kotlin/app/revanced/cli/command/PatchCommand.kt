@@ -29,11 +29,11 @@ internal object PatchCommand : Runnable {
     @Spec
     private lateinit var spec: CommandSpec
 
-    @ArgGroup(multiplicity = "0..*")
+    @ArgGroup(exclusive = false, multiplicity = "0..*")
     private var selection = mutableSetOf<Selection>()
 
     internal class Selection {
-        @ArgGroup(exclusive = false, multiplicity = "1")
+        @ArgGroup(exclusive = false)
         internal var enabled: EnableSelection? = null
 
         internal class EnableSelection {
@@ -65,7 +65,7 @@ internal object PatchCommand : Runnable {
             internal var options = mutableMapOf<String, Any?>()
         }
 
-        @ArgGroup(exclusive = false, multiplicity = "1")
+        @ArgGroup(exclusive = false)
         internal var disable: DisableSelection? = null
 
         internal class DisableSelection {
@@ -291,7 +291,6 @@ internal object PatchCommand : Runnable {
                 patcherTemporaryFilesPath,
                 aaptBinaryPath?.path,
                 patcherTemporaryFilesPath.absolutePath,
-                true,
             ),
         ).use { patcher ->
             val packageName = patcher.context.packageMetadata.packageName
