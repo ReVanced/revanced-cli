@@ -1,3 +1,10 @@
+# [5.0.0-dev.11](https://github.com/ReVanced/revanced-cli/compare/v5.0.0-dev.10...v5.0.0-dev.11) (2024-11-10)
+
+
+### Bug Fixes
+
+* List if patch option is required ([#346](https://github.com/ReVanced/revanced-cli/issues/346)) ([98ff0c3](https://github.com/ReVanced/revanced-cli/commit/98ff0c34fa71c3b3ecd96157d45a30ee2b8979c6))
+
 # [5.0.0-dev.10](https://github.com/ReVanced/revanced-cli/compare/v5.0.0-dev.9...v5.0.0-dev.10) (2024-11-05)
 
 
