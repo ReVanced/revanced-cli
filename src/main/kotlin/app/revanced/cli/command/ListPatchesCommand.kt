@@ -89,6 +89,7 @@ internal object ListPatchesCommand : Runnable {
             buildString {
                 appendLine("Title: $title")
                 description?.let { appendLine("Description: $it") }
+                appendLine("Required: $required")
                 default?.let {
                     appendLine("Key: $key")
                     append("Default: $it")
