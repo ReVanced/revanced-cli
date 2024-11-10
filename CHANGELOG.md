@@ -1,3 +1,30 @@
+# [5.0.0](https://github.com/ReVanced/revanced-cli/compare/v4.6.0...v5.0.0) (2024-11-10)
+
+
+### Bug Fixes
+
+* Check for null when no device serial was specified ([1da8ae9](https://github.com/ReVanced/revanced-cli/commit/1da8ae9e46000dd3c4eecd793c559e75012cf535))
+* List if patch option is required ([#346](https://github.com/ReVanced/revanced-cli/issues/346)) ([98ff0c3](https://github.com/ReVanced/revanced-cli/commit/98ff0c34fa71c3b3ecd96157d45a30ee2b8979c6))
+* Make CLI ArgGroup non-exclusive to be able to disable and enable patches at the same time ([1bb0d13](https://github.com/ReVanced/revanced-cli/commit/1bb0d13726fd5790c59cb6d28df3618c7606710d))
+* Make patches selectable by using a mutable collection for the selection option ([751fa1d](https://github.com/ReVanced/revanced-cli/commit/751fa1d889f40c51b291116029fd84f2b051f2f0))
+* Make the patch command work without specifying any selection ([ba159a3](https://github.com/ReVanced/revanced-cli/commit/ba159a35a9a99d18a4c1e04128b08ae336a49b3e))
+* Print in new line correctly ([c2dc9d7](https://github.com/ReVanced/revanced-cli/commit/c2dc9d76be33c98284741e23c406500483c47753))
+* Use the first connected device when no ADB device is specified ([5f952f3](https://github.com/ReVanced/revanced-cli/commit/5f952f35f5cb388b6509b2b4d905b8143ebc7996))
+
+
+### Features
+
+* Set patch options via CLI ([#336](https://github.com/ReVanced/revanced-cli/issues/336)) ([2300243](https://github.com/ReVanced/revanced-cli/commit/23002434b2d51c2a3b30b33dd0526261432d90ce))
+* Show error about no installation device found at the beginning ([3300e6b](https://github.com/ReVanced/revanced-cli/commit/3300e6b4333ed1c4e6785cb82eca9016fc6d4a20))
+* Simplify command and option names and descriptions ([#338](https://github.com/ReVanced/revanced-cli/issues/338)) ([6e7797a](https://github.com/ReVanced/revanced-cli/commit/6e7797a3f0525a8f48af7182157da0d045600ac2))
+* Simplify option descriptions ([45c998b](https://github.com/ReVanced/revanced-cli/commit/45c998b335b65ac233fece8b804dc7410142691c))
+
+
+### BREAKING CHANGES
+
+* Options have been renamed.
+* This commit changes various CLI options and removes the `options.json` file. Instead, patch options can now be passed via CLI options
+
 # [5.0.0-dev.11](https://github.com/ReVanced/revanced-cli/compare/v5.0.0-dev.10...v5.0.0-dev.11) (2024-11-10)
 
 
