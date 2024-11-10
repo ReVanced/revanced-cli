@@ -1,25 +1,26 @@
 package app.revanced.cli.command
 
-import app.revanced.patcher.PatchBundleLoader
+import app.revanced.patcher.patch.Package
 import app.revanced.patcher.patch.Patch
-import app.revanced.patcher.patch.options.PatchOption
+import app.revanced.patcher.patch.loadPatchesFromJar
 import picocli.CommandLine.*
 import picocli.CommandLine.Help.Visibility.ALWAYS
 import java.io.File
 import java.util.logging.Logger
+import app.revanced.patcher.patch.Option as PatchOption
 
 @Command(
     name = "list-patches",
-    description = ["List patches from supplied patch bundles."],
+    description = ["List patches from supplied RVP files."],
 )
 internal object ListPatchesCommand : Runnable {
-    private val logger = Logger.getLogger(ListPatchesCommand::class.java.name)
+    private val logger = Logger.getLogger(this::class.java.name)
 
     @Parameters(
-        description = ["Paths to patch bundles."],
+        description = ["Paths to RVP files."],
         arity = "1..*",
     )
-    private lateinit var patchBundles: Array<File>
+    private lateinit var patchesFiles: Set<File>
 
     @Option(
         names = ["-d", "--with-descriptions"],
@@ -58,7 +59,7 @@ internal object ListPatchesCommand : Runnable {
 
     @Option(
         names = ["-i", "--index"],
-        description = ["List the index of each patch in relation to the supplied patch bundles."],
+        description = ["List the index of each patch in relation to the supplied RVP files."],
         showDefaultValue = ALWAYS,
     )
     private var withIndex: Boolean = true
@@ -70,30 +71,36 @@ internal object ListPatchesCommand : Runnable {
     private var packageName: String? = null
 
     override fun run() {
-        fun Patch.CompatiblePackage.buildString() =
-            buildString {
+        fun Package.buildString(): String {
+            val (name, versions) = this
+
+            return buildString {
                 if (withVersions && versions != null) {
                     appendLine("Package name: $name")
                     appendLine("Compatible versions:")
-                    append(versions!!.joinToString("\n") { version -> version }.prependIndent("\t"))
+                    append(versions.joinToString("\n") { version -> version }.prependIndent("\t"))
                 } else {
                     append("Package name: $name")
                 }
             }
+        }
 
         fun PatchOption<*>.buildString() =
             buildString {
                 appendLine("Title: $title")
                 description?.let { appendLine("Description: $it") }
+                appendLine("Required: $required")
                 default?.let {
                     appendLine("Key: $key")
                     append("Default: $it")
                 } ?: append("Key: $key")
 
                 values?.let { values ->
-                    appendLine("\nValid values:")
+                    appendLine("\nPossible values:")
                     append(values.map { "${it.value} (${it.key})" }.joinToString("\n").prependIndent("\t"))
                 }
+
+                append("\nType: $type")
             }
 
         fun IndexedValue<Patch<*>>.buildString() =
@@ -104,6 +111,8 @@ internal object ListPatchesCommand : Runnable {
                     append("Name: ${patch.name}")
 
                     if (withDescriptions) append("\nDescription: ${patch.description}")
+
+                    append("\nEnabled: ${patch.use}")
 
                     if (withOptions && patch.options.isNotEmpty()) {
                         appendLine("\nOptions:")
@@ -126,10 +135,10 @@ internal object ListPatchesCommand : Runnable {
             }
 
         fun Patch<*>.filterCompatiblePackages(name: String) =
-            compatiblePackages?.any { it.name == name }
+            compatiblePackages?.any { (compatiblePackageName, _) -> compatiblePackageName == name }
                 ?: withUniversalPatches
 
-        val patches = PatchBundleLoader.Jar(*patchBundles).withIndex().toList()
+        val patches = loadPatchesFromJar(patchesFiles).withIndex().toList()
 
         val filtered =
             packageName?.let { patches.filter { (_, patch) -> patch.filterCompatiblePackages(it) } } ?: patches
