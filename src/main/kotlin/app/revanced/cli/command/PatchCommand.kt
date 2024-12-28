@@ -12,6 +12,7 @@ import kotlinx.coroutines.runBlocking
 import picocli.CommandLine
 import picocli.CommandLine.ArgGroup
 import picocli.CommandLine.Help.Visibility.ALWAYS
+import picocli.CommandLine.ITypeConverter
 import picocli.CommandLine.Model.CommandSpec
 import picocli.CommandLine.Spec
 import java.io.File
@@ -228,6 +229,14 @@ internal object PatchCommand : Runnable {
         this.aaptBinaryPath = aaptBinaryPath
     }
 
+    @CommandLine.Option(
+        names = ["--signing-levels"],
+        description = ["Output apk signing levels, eg. \"1,2,3\", empty as default."],
+        converter = [SigningLevelsConverter::class],
+        arity = "0..1",
+    )
+    private var signingLevels = setOf<Int>()
+
     override fun run() {
         // region Setup
 
@@ -333,6 +342,9 @@ internal object PatchCommand : Runnable {
             patcherResult.applyTo(this)
         }.let { patchedApkFile ->
             if (!mount) {
+                val signingLevels = signingLevels.ifEmpty {
+                    ApkUtils.readSigningLevels(apk)
+                }
                 ApkUtils.signApk(
                     patchedApkFile,
                     outputFilePath,
@@ -343,6 +355,7 @@ internal object PatchCommand : Runnable {
                         keyStoreEntryAlias,
                         keyStoreEntryPassword,
                     ),
+                    signingLevels,
                 )
             } else {
                 patchedApkFile.copyTo(outputFilePath, overwrite = true)
@@ -449,5 +462,11 @@ internal object PatchCommand : Runnable {
                 "Failed to purge resource cache directory"
             }
         logger.info(result)
+    }
+
+    private class SigningLevelsConverter : ITypeConverter<Set<Int>> {
+        override fun convert(value: String): Set<Int> {
+            return value.split(',').map { it.trim().toInt() }.toSet()
+        }
     }
 }
