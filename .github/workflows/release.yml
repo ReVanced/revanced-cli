@@ -59,4 +59,4 @@ jobs:
         uses: actions/attest-build-provenance@v2
         with:
           subject-name: 'ReVanced CLI ${{ steps.release.outputs.new_release_git_tag }}'
-          subject-path: build/libs/*-all.jar
+          subject-path: build/libs/revanced-cli*.jar
