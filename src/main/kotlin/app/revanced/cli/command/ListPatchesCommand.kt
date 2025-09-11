@@ -1,10 +1,12 @@
 package app.revanced.cli.command
 
+import app.revanced.library.serializeTo
 import app.revanced.patcher.patch.Package
 import app.revanced.patcher.patch.Patch
 import app.revanced.patcher.patch.loadPatchesFromJar
 import picocli.CommandLine.*
 import picocli.CommandLine.Help.Visibility.ALWAYS
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.util.logging.Logger
 import app.revanced.patcher.patch.Option as PatchOption
@@ -69,6 +71,13 @@ internal object ListPatchesCommand : Runnable {
         description = ["Filter patches by package name."],
     )
     private var packageName: String? = null
+
+    @Option(
+        names = ["-j", "--json"],
+        description = ["Output in machine-readable format. Implies -diopv"],
+        showDefaultValue = ALWAYS,
+    )
+    private var asJson: Boolean = false
 
     override fun run() {
         fun Package.buildString(): String {
@@ -135,11 +144,21 @@ internal object ListPatchesCommand : Runnable {
         fun Patch<*>.filterCompatiblePackages(name: String) = compatiblePackages?.any { (compatiblePackageName, _) -> compatiblePackageName == name }
             ?: withUniversalPatches
 
+        fun formatHuman(patches: List<IndexedValue<Patch<*>>>): String {
+            return patches.joinToString("\n\n") { it.buildString() }
+        }
+
+        fun formatJson(patches: List<IndexedValue<Patch<*>>>): String {
+            val stream = ByteArrayOutputStream()
+            patches.map { (_, patch) -> patch }.toSet().serializeTo(stream, false)
+            return stream.toString ()
+        }
+
         val patches = loadPatchesFromJar(patchesFiles).withIndex().toList()
 
         val filtered =
             packageName?.let { patches.filter { (_, patch) -> patch.filterCompatiblePackages(it) } } ?: patches
 
-        if (filtered.isNotEmpty()) logger.info(filtered.joinToString("\n\n") { it.buildString() })
+        if (filtered.isNotEmpty()) logger.info(if (asJson) formatJson(filtered) else formatHuman(filtered))
     }
 }
