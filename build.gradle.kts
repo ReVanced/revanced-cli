@@ -15,6 +15,7 @@ application {
 }
 
 repositories {
+    mavenLocal()
     mavenCentral()
     google()
     maven {
@@ -28,6 +29,8 @@ repositories {
 }
 
 dependencies {
+    implementation(libs.bcpg.jdk18on)
+    implementation(libs.sigstore.java)
     implementation(libs.revanced.patcher)
     implementation(libs.revanced.library)
     implementation(libs.kotlinx.coroutines.core)
