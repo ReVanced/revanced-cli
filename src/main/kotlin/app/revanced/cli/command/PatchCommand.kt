@@ -292,7 +292,7 @@ internal object PatchCommand : Runnable {
 
         val patcherTemporaryFilesPath = temporaryFilesPath.resolve("patcher")
 
-        lateinit var capturedPackageName: String
+        lateinit var _packageName: String
 
         val patch = patcher(
             apk,
@@ -300,7 +300,7 @@ internal object PatchCommand : Runnable {
             aaptBinaryPath,
             patcherTemporaryFilesPath.absolutePath,
         ) { packageName, versionName ->
-            capturedPackageName = packageName
+            _packageName = packageName
 
             val filteredPatches = patches.filterPatchSelection(packageName, versionName)
 
@@ -359,7 +359,7 @@ internal object PatchCommand : Runnable {
 
         installation?.deviceSerial?.let {
             runBlocking {
-                when (val result = installer!!.install(Installer.Apk(outputFilePath, capturedPackageName))) {
+                when (val result = installer!!.install(Installer.Apk(outputFilePath, _packageName))) {
                     RootInstallerResult.FAILURE -> logger.severe("Failed to mount the patched APK file")
                     is AdbInstallerResult.Failure -> logger.severe(result.exception.toString())
                     else -> logger.info("Installed the patched APK file")
