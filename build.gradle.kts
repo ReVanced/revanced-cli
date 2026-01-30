@@ -70,7 +70,7 @@ tasks {
         exclude("/prebuilt/linux/aapt", "/prebuilt/windows/aapt.exe", "/prebuilt/*/aapt_*")
         minimize {
             exclude(dependency("org.bouncycastle:.*"))
-            exclude(dependency("app.revanced:revanced-patcher"))
+            exclude(dependency("app.revanced:patcher"))
         }
     }
 
