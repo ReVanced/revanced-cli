@@ -41,7 +41,7 @@ dependencies {
 
 kotlin {
     compilerOptions {
-        jvmTarget.set(JvmTarget.JVM_11)
+        jvmToolchain(17)
 
         freeCompilerArgs.addAll(
             "-Xexplicit-backing-fields",
@@ -51,7 +51,7 @@ kotlin {
 }
 
 java {
-    targetCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_17
 }
 
 tasks {
