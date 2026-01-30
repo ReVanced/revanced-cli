@@ -285,7 +285,7 @@ internal object PatchCommand : Runnable {
         logger.info("Loading patches")
 
         val patches = loadPatches(patchesFiles = patchesFiles.toTypedArray()) { file, throwable ->
-            logger.severe("Failed to load patches from ${file.path}:\n$throwable")
+            logger.severe("Failed to load patches from ${file.path}:\n${throwable.stackTraceToString()}")
         }
 
         // endregion
