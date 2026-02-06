@@ -14,20 +14,6 @@ application {
     mainClass = "app.revanced.cli.command.MainCommandKt"
 }
 
-repositories {
-    mavenLocal()
-    mavenCentral()
-    google()
-    maven {
-        // A repository must be specified for some reason. "registry" is a dummy.
-        url = uri("https://maven.pkg.github.com/revanced/registry")
-        credentials {
-            username = project.findProperty("gpr.user") as String? ?: System.getenv("GITHUB_ACTOR")
-            password = project.findProperty("gpr.key") as String? ?: System.getenv("GITHUB_TOKEN")
-        }
-    }
-}
-
 dependencies {
     implementation(libs.bcpg.jdk18on)
     implementation(libs.sigstore.java)
@@ -48,10 +34,6 @@ kotlin {
             "-Xcontext-parameters",
         )
     }
-}
-
-java {
-    targetCompatibility = JavaVersion.VERSION_17
 }
 
 tasks {
