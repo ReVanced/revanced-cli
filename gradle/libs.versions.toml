@@ -4,8 +4,8 @@ shadow = "9.3.1"
 kotlin = "2.3.0"
 kotlinx = "1.10.2"
 picocli = "4.7.7"
-revanced-patcher = "22.0.0-local"
-revanced-library = "3.2.0-dev.2-local"
+revanced-patcher = "21.1.0-dev.5-local"
+revanced-library = "3.2.0-dev.1-local"
 sigstore = "2.0.0"
 
 [libraries]
