@@ -2,7 +2,7 @@ rootProject.name = "revanced-cli"
 
 dependencyResolutionManagement {
     repositories {
-        gradlePluginPortal()
+        mavenCentral()
         google()
         maven {
             name = "githubPackages"
