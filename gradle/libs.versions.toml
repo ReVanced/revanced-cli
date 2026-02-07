@@ -14,7 +14,7 @@ kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotl
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx" }
 picocli = { module = "info.picocli:picocli", version.ref = "picocli" }
 revanced-patcher = { module = "app.revanced:patcher", version.ref = "revanced-patcher" }
-revanced-library = { module = "app.revanced:revanced-library-jvm", version.ref = "revanced-library" }
+revanced-library = { module = "app.revanced:library", version.ref = "revanced-library" }
 sigstore-java = { module = "dev.sigstore:sigstore-java", version.ref = "sigstore" }
 
 [plugins]
