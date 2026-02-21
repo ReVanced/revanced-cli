@@ -1,3 +1,13 @@
+# [6.0.0-dev.1](https://github.com/ReVanced/revanced-cli/compare/v5.0.2-dev.2...v6.0.0-dev.1) (2026-02-21)
+
+
+* build(Needs bump)!: Update to ReVanced Patcher v22 ([#385](https://github.com/ReVanced/revanced-cli/issues/385)) ([30f36ee](https://github.com/ReVanced/revanced-cli/commit/30f36ee270d4b63b69bf7949c7968f2827c395ce))
+
+
+### BREAKING CHANGES
+
+* ReVanced CLI switches to ReVanced Patcher v22 and will therefore be incompatible with patches from older versions of ReVanced Patcher.
+
 ## [5.0.2-dev.2](https://github.com/ReVanced/revanced-cli/compare/v5.0.2-dev.1...v5.0.2-dev.2) (2025-04-25)
 
 
