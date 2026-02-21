@@ -66,10 +66,6 @@ tasks {
 
 // The maven-publish is also necessary to make the signing plugin work.
 publishing {
-    repositories {
-        mavenLocal()
-    }
-
     publications {
         create<MavenPublication>("revanced-cli-publication") {
             from(components["java"])
