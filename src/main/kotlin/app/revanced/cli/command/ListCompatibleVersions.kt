@@ -3,7 +3,7 @@ package app.revanced.cli.command
 import app.revanced.library.PackageName
 import app.revanced.library.VersionMap
 import app.revanced.library.mostCommonCompatibleVersions
-import app.revanced.patcher.patch.loadPatchesFromJar
+import app.revanced.patcher.patch.loadPatches
 import picocli.CommandLine
 import java.io.File
 import java.util.logging.Logger
@@ -48,15 +48,14 @@ internal class ListCompatibleVersions : Runnable {
             }
         }
 
-        fun buildString(entry: Map.Entry<PackageName, VersionMap>) =
-            buildString {
-                val (name, versions) = entry
-                appendLine("Package name: $name")
-                appendLine("Most common compatible versions:")
-                appendLine(versions.buildVersionsString().prependIndent("\t"))
-            }
+        fun buildString(entry: Map.Entry<PackageName, VersionMap>) = buildString {
+            val (name, versions) = entry
+            appendLine("Package name: $name")
+            appendLine("Most common compatible versions:")
+            appendLine(versions.buildVersionsString().prependIndent("\t"))
+        }
 
-        val patches = loadPatchesFromJar(patchesFiles)
+        val patches = loadPatches(patchesFiles = patchesFiles.toTypedArray())
 
         patches.mostCommonCompatibleVersions(
             packageNames,

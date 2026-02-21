@@ -4,10 +4,9 @@ import app.revanced.library.ApkUtils
 import app.revanced.library.ApkUtils.applyTo
 import app.revanced.library.installation.installer.*
 import app.revanced.library.setOptions
-import app.revanced.patcher.Patcher
-import app.revanced.patcher.PatcherConfig
 import app.revanced.patcher.patch.Patch
-import app.revanced.patcher.patch.loadPatchesFromJar
+import app.revanced.patcher.patch.loadPatches
+import app.revanced.patcher.patcher
 import kotlinx.coroutines.runBlocking
 import picocli.CommandLine
 import picocli.CommandLine.ArgGroup
@@ -123,7 +122,7 @@ internal object PatchCommand : Runnable {
             names = ["-i", "--install"],
             required = true,
             description = ["Serial of the ADB device to install to. If not specified, the first connected device will be used."],
-            fallbackValue = "",  // Empty string is used to select the first of connected devices.
+            fallbackValue = "", // Empty string is used to select the first of connected devices.
             arity = "0..1",
         )
         internal var deviceSerial: String? = null
@@ -260,7 +259,7 @@ internal object PatchCommand : Runnable {
                 } else {
                     AdbInstaller(deviceSerial)
                 }
-            } catch (e: DeviceNotFoundException) {
+            } catch (_: DeviceNotFoundException) {
                 if (deviceSerial?.isNotEmpty() == true) {
                     logger.severe(
                         "Device with serial $deviceSerial not found to install to. " +
@@ -285,62 +284,59 @@ internal object PatchCommand : Runnable {
 
         logger.info("Loading patches")
 
-        val patches = loadPatchesFromJar(patchesFiles)
+        val patches = loadPatches(patchesFiles = patchesFiles.toTypedArray()) { file, throwable ->
+            logger.severe("Failed to load patches from ${file.path}:\n${throwable.stackTraceToString()}")
+        }
 
         // endregion
 
         val patcherTemporaryFilesPath = temporaryFilesPath.resolve("patcher")
 
-        val (packageName, patcherResult) = Patcher(
-            PatcherConfig(
-                apk,
-                patcherTemporaryFilesPath,
-                aaptBinaryPath?.path,
-                patcherTemporaryFilesPath.absolutePath,
-            ),
-        ).use { patcher ->
-            val packageName = patcher.context.packageMetadata.packageName
-            val packageVersion = patcher.context.packageMetadata.packageVersion
+        lateinit var _packageName: String
 
-            val filteredPatches = patches.filterPatchSelection(packageName, packageVersion)
+        val patch = patcher(
+            apk,
+            patcherTemporaryFilesPath,
+            aaptBinaryPath,
+            patcherTemporaryFilesPath.absolutePath,
+        ) { packageName, versionName ->
+            _packageName = packageName
+
+            val filteredPatches = patches.filterPatchSelection(packageName, versionName)
 
             logger.info("Setting patch options")
 
             val patchesList = patches.toList()
+
             selection.filter { it.enabled != null }.associate {
                 val enabledSelection = it.enabled!!
+                val name = enabledSelection.selector.name ?: patchesList[enabledSelection.selector.index!!].name!!
 
-                (enabledSelection.selector.name ?: patchesList[enabledSelection.selector.index!!].name!!) to
-                    enabledSelection.options
+                name to enabledSelection.options
             }.let(filteredPatches::setOptions)
 
-            patcher += filteredPatches
+            filteredPatches
+        }
 
-            // Execute patches.
-            runBlocking {
-                patcher().collect { patchResult ->
-                    val exception = patchResult.exception
-                        ?: return@collect logger.info("\"${patchResult.patch}\" succeeded")
+        val patchesResult = patch { patchResult ->
+            val exception = patchResult.exception
+                ?: return@patch logger.info("\"${patchResult.patch}\" succeeded")
 
-                    StringWriter().use { writer ->
-                        exception.printStackTrace(PrintWriter(writer))
+            StringWriter().use { writer ->
+                exception.printStackTrace(PrintWriter(writer))
 
-                        logger.severe("\"${patchResult.patch}\" failed:\n$writer")
-                    }
-                }
+                logger.severe("\"${patchResult.patch}\" failed:\n$writer")
             }
-
-            patcher.context.packageMetadata.packageName to patcher.get()
         }
 
         // region Save.
 
-        apk.copyTo(temporaryFilesPath.resolve(apk.name), overwrite = true).apply {
-            patcherResult.applyTo(this)
-        }.let { patchedApkFile ->
+        apk.copyTo(temporaryFilesPath.resolve(apk.name), overwrite = true).let {
+            patchesResult.applyTo(it)
+
             if (installation?.mount != true) {
                 ApkUtils.signApk(
-                    patchedApkFile,
+                    it,
                     outputFilePath,
                     signer,
                     ApkUtils.KeyStoreDetails(
@@ -351,7 +347,7 @@ internal object PatchCommand : Runnable {
                     ),
                 )
             } else {
-                patchedApkFile.copyTo(outputFilePath, overwrite = true)
+                it.copyTo(outputFilePath, overwrite = true)
             }
         }
 
@@ -363,7 +359,7 @@ internal object PatchCommand : Runnable {
 
         installation?.deviceSerial?.let {
             runBlocking {
-                when (val result = installer!!.install(Installer.Apk(outputFilePath, packageName))) {
+                when (val result = installer!!.install(Installer.Apk(outputFilePath, _packageName))) {
                     RootInstallerResult.FAILURE -> logger.severe("Failed to mount the patched APK file")
                     is AdbInstallerResult.Failure -> logger.severe(result.exception.toString())
                     else -> logger.info("Installed the patched APK file")
@@ -386,10 +382,10 @@ internal object PatchCommand : Runnable {
      * @param packageVersion The version of the APK file to be patched.
      * @return The filtered patches.
      */
-    private fun Set<Patch<*>>.filterPatchSelection(
+    private fun Set<Patch>.filterPatchSelection(
         packageName: String,
         packageVersion: String,
-    ): Set<Patch<*>> = buildSet {
+    ) = buildSet {
         val enabledPatchesByName =
             selection.mapNotNull { it.enabled?.selector?.name }.toSet()
         val enabledPatchesByIndex =

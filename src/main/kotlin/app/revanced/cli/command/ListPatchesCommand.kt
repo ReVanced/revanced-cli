@@ -2,7 +2,7 @@ package app.revanced.cli.command
 
 import app.revanced.patcher.patch.Package
 import app.revanced.patcher.patch.Patch
-import app.revanced.patcher.patch.loadPatchesFromJar
+import app.revanced.patcher.patch.loadPatches
 import picocli.CommandLine.*
 import picocli.CommandLine.Help.Visibility.ALWAYS
 import java.io.File
@@ -86,13 +86,10 @@ internal object ListPatchesCommand : Runnable {
         }
 
         fun PatchOption<*>.buildString() = buildString {
-            appendLine("Title: $title")
+            appendLine("Name: $name")
             description?.let { appendLine("Description: $it") }
             appendLine("Required: $required")
-            default?.let {
-                appendLine("Key: $key")
-                append("Default: $it")
-            } ?: append("Key: $key")
+            default?.let { append("Default: $it") }
 
             values?.let { values ->
                 appendLine("\nPossible values:")
@@ -102,7 +99,7 @@ internal object ListPatchesCommand : Runnable {
             append("\nType: $type")
         }
 
-        fun IndexedValue<Patch<*>>.buildString() = let { (index, patch) ->
+        fun IndexedValue<Patch>.buildString() = let { (index, patch) ->
             buildString {
                 if (withIndex) appendLine("Index: $index")
 
@@ -132,10 +129,10 @@ internal object ListPatchesCommand : Runnable {
             }
         }
 
-        fun Patch<*>.filterCompatiblePackages(name: String) = compatiblePackages?.any { (compatiblePackageName, _) -> compatiblePackageName == name }
+        fun Patch.filterCompatiblePackages(name: String) = compatiblePackages?.any { (compatiblePackageName, _) -> compatiblePackageName == name }
             ?: withUniversalPatches
 
-        val patches = loadPatchesFromJar(patchesFiles).withIndex().toList()
+        val patches = loadPatches(patchesFiles = patchesFiles.toTypedArray()).withIndex().toList()
 
         val filtered =
             packageName?.let { patches.filter { (_, patch) -> patch.filterCompatiblePackages(it) } } ?: patches
