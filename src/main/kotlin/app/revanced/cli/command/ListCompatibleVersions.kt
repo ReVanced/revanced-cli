@@ -1,28 +1,26 @@
 package app.revanced.cli.command
 
+import app.revanced.cli.command.PatchesFileInput.Companion.loadPatches
 import app.revanced.library.PackageName
 import app.revanced.library.VersionMap
 import app.revanced.library.mostCommonCompatibleVersions
-import app.revanced.patcher.patch.loadPatches
 import picocli.CommandLine
-import java.io.File
+import java.util.concurrent.Callable
 import java.util.logging.Logger
 
 @CommandLine.Command(
     name = "list-versions",
     description = [
         "List the most common compatible versions of apps that are compatible " +
-            "with the patches from RVP files.",
+                "with the patches from RVP files.",
     ],
+    sortOptions = false,
 )
-internal class ListCompatibleVersions : Runnable {
+internal class ListCompatibleVersions : Callable<Int> {
     private val logger = Logger.getLogger(this::class.java.name)
 
-    @CommandLine.Parameters(
-        description = ["Paths to RVP files."],
-        arity = "1..*",
-    )
-    private lateinit var patchesFiles: Set<File>
+    @CommandLine.ArgGroup(exclusive = false, multiplicity = "1..*")
+    private lateinit var patchesFileInputs: List<PatchesFileInput>
 
     @CommandLine.Option(
         names = ["-f", "--filter-package-names"],
@@ -37,11 +35,12 @@ internal class ListCompatibleVersions : Runnable {
     )
     private var countUnusedPatches: Boolean = false
 
-    override fun run() {
+    override fun call(): Int {
         fun VersionMap.buildVersionsString(): String {
             if (isEmpty()) return "Any"
 
-            fun buildPatchesCountString(count: Int) = if (count == 1) "1 patch" else "$count patches"
+            fun buildPatchesCountString(count: Int) =
+                if (count == 1) "1 patch" else "$count patches"
 
             return entries.joinToString("\n") { (version, count) ->
                 "$version (${buildPatchesCountString(count)})"
@@ -55,11 +54,13 @@ internal class ListCompatibleVersions : Runnable {
             appendLine(versions.buildVersionsString().prependIndent("\t"))
         }
 
-        val patches = loadPatches(patchesFiles = patchesFiles.toTypedArray())
+        val patches = loadPatches(patchesFileInputs) ?: return -1
 
         patches.mostCommonCompatibleVersions(
             packageNames,
             countUnusedPatches,
         ).entries.joinToString("\n", transform = ::buildString).let(logger::info)
+
+        return 0
     }
 }

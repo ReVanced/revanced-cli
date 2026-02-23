@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-
 plugins {
     alias(libs.plugins.kotlin)
     alias(libs.plugins.shadow)
@@ -53,6 +51,7 @@ tasks {
         minimize {
             exclude(dependency("org.bouncycastle:.*"))
             exclude(dependency("app.revanced:patcher"))
+            exclude(dependency("commons-logging:commons-logging"))
         }
     }
 

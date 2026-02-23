@@ -1,11 +1,11 @@
 package app.revanced.cli.command
 
+import app.revanced.cli.command.PatchesFileInput.Companion.loadPatches
 import app.revanced.library.ApkUtils
 import app.revanced.library.ApkUtils.applyTo
 import app.revanced.library.installation.installer.*
 import app.revanced.library.setOptions
 import app.revanced.patcher.patch.Patch
-import app.revanced.patcher.patch.loadPatches
 import app.revanced.patcher.patcher
 import kotlinx.coroutines.runBlocking
 import picocli.CommandLine
@@ -16,175 +16,21 @@ import picocli.CommandLine.Spec
 import java.io.File
 import java.io.PrintWriter
 import java.io.StringWriter
+import java.util.concurrent.Callable
 import java.util.logging.Logger
 
 @CommandLine.Command(
     name = "patch",
     description = ["Patch an APK file."],
+    sortOptions = false,
 )
-internal object PatchCommand : Runnable {
+internal object PatchCommand : Callable<Int> {
     private val logger = Logger.getLogger(this::class.java.name)
 
     @Spec
     private lateinit var spec: CommandSpec
 
-    @ArgGroup(exclusive = false, multiplicity = "0..*")
-    private var selection = mutableSetOf<Selection>()
-
-    internal class Selection {
-        @ArgGroup(exclusive = false)
-        internal var enabled: EnableSelection? = null
-
-        internal class EnableSelection {
-            @ArgGroup(multiplicity = "1")
-            internal lateinit var selector: EnableSelector
-
-            internal class EnableSelector {
-                @CommandLine.Option(
-                    names = ["-e", "--enable"],
-                    description = ["Name of the patch."],
-                    required = true,
-                )
-                internal var name: String? = null
-
-                @CommandLine.Option(
-                    names = ["--ei"],
-                    description = ["Index of the patch in the combined list of the supplied RVP files."],
-                    required = true,
-                )
-                internal var index: Int? = null
-            }
-
-            @CommandLine.Option(
-                names = ["-O", "--options"],
-                description = ["Option values keyed by option keys."],
-                mapFallbackValue = CommandLine.Option.NULL_VALUE,
-                converter = [OptionKeyConverter::class, OptionValueConverter::class],
-            )
-            internal var options = mutableMapOf<String, Any?>()
-        }
-
-        @ArgGroup(exclusive = false)
-        internal var disable: DisableSelection? = null
-
-        internal class DisableSelection {
-            @ArgGroup(multiplicity = "1")
-            internal lateinit var selector: DisableSelector
-
-            internal class DisableSelector {
-                @CommandLine.Option(
-                    names = ["-d", "--disable"],
-                    description = ["Name of the patch."],
-                    required = true,
-                )
-                internal var name: String? = null
-
-                @CommandLine.Option(
-                    names = ["--di"],
-                    description = ["Index of the patch in the combined list of the supplied RVP files."],
-                    required = true,
-                )
-                internal var index: Int? = null
-            }
-        }
-    }
-
-    @CommandLine.Option(
-        names = ["--exclusive"],
-        description = ["Disable all patches except the ones enabled."],
-        showDefaultValue = ALWAYS,
-    )
-    private var exclusive = false
-
-    @CommandLine.Option(
-        names = ["-f", "--force"],
-        description = ["Don't check for compatibility with the supplied APK's version."],
-        showDefaultValue = ALWAYS,
-    )
-    private var force: Boolean = false
-
-    private var outputFilePath: File? = null
-
-    @CommandLine.Option(
-        names = ["-o", "--out"],
-        description = ["Path to save the patched APK file to. Defaults to the same path as the supplied APK file."],
-    )
-    @Suppress("unused")
-    private fun setOutputFilePath(outputFilePath: File?) {
-        this.outputFilePath = outputFilePath?.absoluteFile
-    }
-
-    @ArgGroup(exclusive = false, multiplicity = "0..1")
-    internal var installation: Installation? = null
-
-    internal class Installation {
-        @CommandLine.Option(
-            names = ["-i", "--install"],
-            required = true,
-            description = ["Serial of the ADB device to install to. If not specified, the first connected device will be used."],
-            fallbackValue = "", // Empty string is used to select the first of connected devices.
-            arity = "0..1",
-        )
-        internal var deviceSerial: String? = null
-
-        @CommandLine.Option(
-            names = ["--mount"],
-            required = false,
-            description = ["Install the patched APK file by mounting."],
-            showDefaultValue = ALWAYS,
-        )
-        internal var mount: Boolean = false
-    }
-
-    @CommandLine.Option(
-        names = ["--keystore"],
-        description = [
-            "Path to the keystore file containing a private key and certificate pair to sign the patched APK file with. " +
-                "Defaults to the same directory as the supplied APK file.",
-        ],
-    )
-    private var keyStoreFilePath: File? = null
-
-    @CommandLine.Option(
-        names = ["--keystore-password"],
-        description = ["Password of the keystore. Empty password by default."],
-    )
-    private var keyStorePassword: String? = null // Empty password by default
-
-    @CommandLine.Option(
-        names = ["--keystore-entry-alias"],
-        description = ["Alias of the private key and certificate pair keystore entry."],
-        showDefaultValue = ALWAYS,
-    )
-    private var keyStoreEntryAlias = "ReVanced Key"
-
-    @CommandLine.Option(
-        names = ["--keystore-entry-password"],
-        description = ["Password of the keystore entry."],
-    )
-    private var keyStoreEntryPassword = "" // Empty password by default
-
-    @CommandLine.Option(
-        names = ["--signer"],
-        description = ["The name of the signer to sign the patched APK file with."],
-        showDefaultValue = ALWAYS,
-    )
-    private var signer = "ReVanced"
-
-    @CommandLine.Option(
-        names = ["-t", "--temporary-files-path"],
-        description = ["Path to store temporary files."],
-    )
-    private var temporaryFilesPath: File? = null
-
-    private var aaptBinaryPath: File? = null
-
-    @CommandLine.Option(
-        names = ["--purge"],
-        description = ["Purge temporary files directory after patching."],
-        showDefaultValue = ALWAYS,
-    )
-    private var purge: Boolean = false
+    // region Required parameters
 
     @CommandLine.Parameters(
         description = ["APK file to patch."],
@@ -203,20 +49,176 @@ internal object PatchCommand : Runnable {
 
     private lateinit var apk: File
 
-    @CommandLine.Option(
-        names = ["-p", "--patches"],
-        description = ["One or more path to RVP files."],
-        required = true,
-    )
-    @Suppress("unused")
-    private fun setPatchesFile(patchesFiles: Set<File>) {
-        patchesFiles.firstOrNull { !it.exists() }?.let {
-            throw CommandLine.ParameterException(spec.commandLine(), "${it.name} can't be found")
+    @ArgGroup(exclusive = false, multiplicity = "1..*")
+    private lateinit var patchesFileInputs: List<PatchesFileInput>
+
+    // endregion
+
+    // region Patch selection
+
+    @ArgGroup(exclusive = false, multiplicity = "0..*")
+    private var selection = mutableSetOf<Selection>()
+
+    internal class Selection {
+        @ArgGroup(exclusive = false)
+        var enabled: EnableSelection? = null
+
+        internal class EnableSelection {
+            @ArgGroup(multiplicity = "1")
+            lateinit var selector: EnableSelector
+
+            internal class EnableSelector {
+                @CommandLine.Option(
+                    names = ["-e", "--enable"],
+                    description = ["Name of the patch."],
+                    required = true,
+                )
+                var name: String? = null
+
+                @CommandLine.Option(
+                    names = ["--ei"],
+                    description = ["Index of the patch in the combined list of the supplied RVP files."],
+                    required = true,
+                )
+                var index: Int? = null
+            }
+
+            @CommandLine.Option(
+                names = ["-O", "--options"],
+                description = ["Option values keyed by option keys."],
+                mapFallbackValue = CommandLine.Option.NULL_VALUE,
+                converter = [OptionKeyConverter::class, OptionValueConverter::class],
+            )
+            var options = mutableMapOf<String, Any?>()
         }
-        this.patchesFiles = patchesFiles
+
+        @ArgGroup(exclusive = false)
+        var disable: DisableSelection? = null
+
+        internal class DisableSelection {
+            @ArgGroup(multiplicity = "1")
+            lateinit var selector: DisableSelector
+
+            internal class DisableSelector {
+                @CommandLine.Option(
+                    names = ["-d", "--disable"],
+                    description = ["Name of the patch."],
+                    required = true,
+                )
+                var name: String? = null
+
+                @CommandLine.Option(
+                    names = ["--di"],
+                    description = ["Index of the patch in the combined list of the supplied RVP files."],
+                    required = true,
+                )
+                var index: Int? = null
+            }
+        }
     }
 
-    private var patchesFiles = emptySet<File>()
+    @CommandLine.Option(
+        names = ["--exclusive"],
+        description = ["Disable all patches except the ones enabled."],
+        showDefaultValue = ALWAYS,
+    )
+    private var exclusive = false
+
+    @CommandLine.Option(
+        names = ["-f", "--force"],
+        description = ["Don't check for compatibility with the supplied APK's version."],
+        showDefaultValue = ALWAYS,
+    )
+    private var force = false
+
+    // endregion
+
+    // region Output
+
+    @CommandLine.Option(
+        names = ["-o", "--out"],
+        description = ["Path to save the patched APK file to. Defaults to the same path as the supplied APK file."],
+    )
+    @Suppress("unused")
+    private fun setOutputFilePath(outputFilePath: File?) {
+        this.outputFilePath = outputFilePath?.absoluteFile
+    }
+
+    private var outputFilePath: File? = null
+
+    // endregion
+
+    // region Installation
+
+    @ArgGroup(exclusive = false, multiplicity = "0..1")
+    private var installation: Installation? = null
+
+    private class Installation {
+        @CommandLine.Option(
+            names = ["-i", "--install"],
+            required = true,
+            description = ["Serial of the ADB device to install to. If not specified, the first connected device will be used."],
+            fallbackValue = "",
+            arity = "0..1",
+        )
+        var deviceSerial: String? = null
+
+        @CommandLine.Option(
+            names = ["--mount"],
+            description = ["Install the patched APK file by mounting."],
+            showDefaultValue = ALWAYS,
+        )
+        var mount = false
+    }
+
+    // endregion
+
+    // region Signing
+
+    @ArgGroup(exclusive = false, multiplicity = "0..1")
+    private var signing: Signing? = null
+
+    private class Signing {
+        @CommandLine.Option(
+            names = ["--keystore"],
+            description = [
+                "Path to the keystore file containing a private key and certificate pair to sign the patched APK file with. " +
+                        "Defaults to the same directory as the supplied APK file.",
+            ],
+        )
+        var keystoreFilePath: File? = null
+
+        @CommandLine.Option(
+            names = ["--keystore-password"],
+            description = ["Password of the keystore. Empty password by default."],
+        )
+        var keystorePassword: String? = null
+
+        @CommandLine.Option(
+            names = ["--keystore-entry-alias"],
+            description = ["Alias of the private key and certificate pair keystore entry."],
+            showDefaultValue = ALWAYS,
+        )
+        var keystoreEntryAlias = "ReVanced Key"
+
+        @CommandLine.Option(
+            names = ["--keystore-entry-password"],
+            description = ["Password of the keystore entry."],
+            showDefaultValue = ALWAYS,
+        )
+        var keystoreEntryPassword = ""
+
+        @CommandLine.Option(
+            names = ["--signer"],
+            description = ["The name of the signer to sign the patched APK file with."],
+            showDefaultValue = ALWAYS,
+        )
+        var signer = "ReVanced"
+    }
+
+    // endregion
+
+    // region Resource compilation
 
     @CommandLine.Option(
         names = ["--custom-aapt2-binary"],
@@ -233,7 +235,28 @@ internal object PatchCommand : Runnable {
         this.aaptBinaryPath = aaptBinaryPath
     }
 
-    override fun run() {
+    private var aaptBinaryPath: File? = null
+
+    // endregion
+
+    // region Temporary files
+
+    @CommandLine.Option(
+        names = ["-t", "--temporary-files-path"],
+        description = ["Path to store temporary files."],
+    )
+    private var temporaryFilesPath: File? = null
+
+    @CommandLine.Option(
+        names = ["--purge"],
+        description = ["Purge temporary files directory after patching."],
+        showDefaultValue = ALWAYS,
+    )
+    private var purge = false
+
+    // endregion
+
+    override fun call(): Int {
         // region Setup
 
         val outputFilePath =
@@ -247,7 +270,7 @@ internal object PatchCommand : Runnable {
             )
 
         val keystoreFilePath =
-            keyStoreFilePath ?: outputFilePath.parentFile
+            signing?.keystoreFilePath ?: outputFilePath.parentFile
                 .resolve("${outputFilePath.nameWithoutExtension}.keystore")
 
         val installer = if (installation?.deviceSerial != null) {
@@ -263,16 +286,16 @@ internal object PatchCommand : Runnable {
                 if (deviceSerial?.isNotEmpty() == true) {
                     logger.severe(
                         "Device with serial $deviceSerial not found to install to. " +
-                            "Ensure the device is connected and the serial is correct when using the --install option.",
+                                "Ensure the device is connected and the serial is correct when using the --install option.",
                     )
                 } else {
                     logger.severe(
                         "No device has been found to install to. " +
-                            "Ensure a device is connected when using the --install option.",
+                                "Ensure a device is connected when using the --install option.",
                     )
                 }
 
-                return
+                return -1
             }
         } else {
             null
@@ -284,25 +307,23 @@ internal object PatchCommand : Runnable {
 
         logger.info("Loading patches")
 
-        val patches = loadPatches(patchesFiles = patchesFiles.toTypedArray()) { file, throwable ->
-            logger.severe("Failed to load patches from ${file.path}:\n${throwable.stackTraceToString()}")
-        }
+
+        val patches = loadPatches(patchesFileInputs) ?: return -1
 
         // endregion
-
         val patcherTemporaryFilesPath = temporaryFilesPath.resolve("patcher")
 
-        lateinit var _packageName: String
+        lateinit var packageName: String
 
         val patch = patcher(
             apk,
             patcherTemporaryFilesPath,
             aaptBinaryPath,
             patcherTemporaryFilesPath.absolutePath,
-        ) { packageName, versionName ->
-            _packageName = packageName
+        ) { appPackageName, versionName ->
+            packageName = appPackageName
 
-            val filteredPatches = patches.filterPatchSelection(packageName, versionName)
+            val filteredPatches = patches.filterPatchSelection(appPackageName, versionName)
 
             logger.info("Setting patch options")
 
@@ -310,7 +331,8 @@ internal object PatchCommand : Runnable {
 
             selection.filter { it.enabled != null }.associate {
                 val enabledSelection = it.enabled!!
-                val name = enabledSelection.selector.name ?: patchesList[enabledSelection.selector.index!!].name!!
+                val name = enabledSelection.selector.name
+                    ?: patchesList[enabledSelection.selector.index!!].name!!
 
                 name to enabledSelection.options
             }.let(filteredPatches::setOptions)
@@ -338,12 +360,12 @@ internal object PatchCommand : Runnable {
                 ApkUtils.signApk(
                     it,
                     outputFilePath,
-                    signer,
+                    signing?.signer ?: "ReVanced",
                     ApkUtils.KeyStoreDetails(
                         keystoreFilePath,
-                        keyStorePassword,
-                        keyStoreEntryAlias,
-                        keyStoreEntryPassword,
+                        signing?.keystorePassword,
+                        signing?.keystoreEntryAlias ?: "ReVanced Key",
+                        signing?.keystoreEntryPassword ?: "",
                     ),
                 )
             } else {
@@ -359,7 +381,8 @@ internal object PatchCommand : Runnable {
 
         installation?.deviceSerial?.let {
             runBlocking {
-                when (val result = installer!!.install(Installer.Apk(outputFilePath, _packageName))) {
+                when (val result =
+                    installer!!.install(Installer.Apk(outputFilePath, packageName))) {
                     RootInstallerResult.FAILURE -> logger.severe("Failed to mount the patched APK file")
                     is AdbInstallerResult.Failure -> logger.severe(result.exception.toString())
                     else -> logger.info("Installed the patched APK file")
@@ -373,6 +396,8 @@ internal object PatchCommand : Runnable {
             logger.info("Purging temporary files")
             purge(temporaryFilesPath)
         }
+
+        return 0
     }
 
     /**
@@ -415,16 +440,16 @@ internal object PatchCommand : Runnable {
                     if (!matchesVersion) {
                         return@patchLoop logger.warning(
                             "\"$patchName\" incompatible with $packageName $packageVersion " +
-                                "but compatible with " +
-                                packages.joinToString("; ") { (packageName, versions) ->
-                                    packageName + " " + versions!!.joinToString(", ")
-                                },
+                                    "but compatible with " +
+                                    packages.joinToString("; ") { (packageName, versions) ->
+                                        packageName + " " + versions!!.joinToString(", ")
+                                    },
                         )
                     }
                 } ?: return@patchLoop logger.fine(
                     "\"$patchName\" incompatible with $packageName. " +
-                        "It is only compatible with " +
-                        packages.joinToString(", ") { (name, _) -> name },
+                            "It is only compatible with " +
+                            packages.joinToString(", ") { (name, _) -> name },
                 )
 
                 return@let

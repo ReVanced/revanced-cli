@@ -1,15 +1,15 @@
 [versions]
-bcpg-jdk18on = "1.83"
+bouncy-castle = "1.83"
 shadow = "9.3.1"
 kotlin = "2.3.10"
 kotlinx = "1.10.2"
 picocli = "4.7.7"
 revanced-patcher = "22.0.0"
-revanced-library = "4.0.0"
+revanced-library = "4.0.1"
 sigstore = "2.0.0"
 
 [libraries]
-bcpg-jdk18on = { module = "org.bouncycastle:bcpg-jdk18on", version.ref = "bcpg-jdk18on" }
+bcpg-jdk18on = { module = "org.bouncycastle:bcpg-jdk18on", version.ref = "bouncy-castle" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx" }
 picocli = { module = "info.picocli:picocli", version.ref = "picocli" }
