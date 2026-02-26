@@ -1,3 +1,10 @@
+# [6.0.0-dev.2](https://github.com/ReVanced/revanced-cli/compare/v6.0.0-dev.1...v6.0.0-dev.2) (2026-02-26)
+
+
+### Features
+
+* Add signature and build provenance verification ([f481462](https://github.com/ReVanced/revanced-cli/commit/f481462ccf2eb55d1f964c0f3934bf2b29f4b0ef))
+
 # [6.0.0-dev.1](https://github.com/ReVanced/revanced-cli/compare/v5.0.2-dev.2...v6.0.0-dev.1) (2026-02-21)
 
 
