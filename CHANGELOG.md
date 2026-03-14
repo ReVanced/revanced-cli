@@ -1,3 +1,34 @@
+# [6.0.0-dev.2](https://github.com/ReVanced/revanced-cli/compare/v6.0.0-dev.1...v6.0.0-dev.2) (2026-02-26)
+
+
+### Features
+
+* Add signature and build provenance verification ([f481462](https://github.com/ReVanced/revanced-cli/commit/f481462ccf2eb55d1f964c0f3934bf2b29f4b0ef))
+
+# [6.0.0-dev.1](https://github.com/ReVanced/revanced-cli/compare/v5.0.2-dev.2...v6.0.0-dev.1) (2026-02-21)
+
+
+* build(Needs bump)!: Update to ReVanced Patcher v22 ([#385](https://github.com/ReVanced/revanced-cli/issues/385)) ([30f36ee](https://github.com/ReVanced/revanced-cli/commit/30f36ee270d4b63b69bf7949c7968f2827c395ce))
+
+
+### BREAKING CHANGES
+
+* ReVanced CLI switches to ReVanced Patcher v22 and will therefore be incompatible with patches from older versions of ReVanced Patcher.
+
+## [5.0.2-dev.2](https://github.com/ReVanced/revanced-cli/compare/v5.0.2-dev.1...v5.0.2-dev.2) (2025-04-25)
+
+
+### Bug Fixes
+
+* Do not print patch description if null ([bba90fe](https://github.com/ReVanced/revanced-cli/commit/bba90fede85e4632efb9509e5bcf9091a9435549))
+
+## [5.0.2-dev.1](https://github.com/ReVanced/revanced-cli/compare/v5.0.1...v5.0.2-dev.1) (2025-04-20)
+
+
+### Bug Fixes
+
+* Group `mount` and `install` options into an argument group  ([#364](https://github.com/ReVanced/revanced-cli/issues/364)) ([0c53a2d](https://github.com/ReVanced/revanced-cli/commit/0c53a2d1d75d3d934d134594751fe6cd0b000d1a))
+
 ## [5.0.1](https://github.com/ReVanced/revanced-cli/compare/v5.0.0...v5.0.1) (2025-04-14)
 
 

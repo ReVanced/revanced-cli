@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-
 plugins {
     alias(libs.plugins.kotlin)
     alias(libs.plugins.shadow)
@@ -14,20 +12,9 @@ application {
     mainClass = "app.revanced.cli.command.MainCommandKt"
 }
 
-repositories {
-    mavenCentral()
-    google()
-    maven {
-        // A repository must be specified for some reason. "registry" is a dummy.
-        url = uri("https://maven.pkg.github.com/revanced/registry")
-        credentials {
-            username = project.findProperty("gpr.user") as String? ?: System.getenv("GITHUB_ACTOR")
-            password = project.findProperty("gpr.key") as String? ?: System.getenv("GITHUB_TOKEN")
-        }
-    }
-}
-
 dependencies {
+    implementation(libs.bcpg.jdk18on)
+    implementation(libs.sigstore.java)
     implementation(libs.revanced.patcher)
     implementation(libs.revanced.library)
     implementation(libs.kotlinx.coroutines.core)
@@ -38,12 +25,13 @@ dependencies {
 
 kotlin {
     compilerOptions {
-        jvmTarget.set(JvmTarget.JVM_11)
-    }
-}
+        jvmToolchain(17)
 
-java {
-    targetCompatibility = JavaVersion.VERSION_11
+        freeCompilerArgs.addAll(
+            "-Xexplicit-backing-fields",
+            "-Xcontext-parameters",
+        )
+    }
 }
 
 tasks {
@@ -62,7 +50,8 @@ tasks {
         exclude("/prebuilt/linux/aapt", "/prebuilt/windows/aapt.exe", "/prebuilt/*/aapt_*")
         minimize {
             exclude(dependency("org.bouncycastle:.*"))
-            exclude(dependency("app.revanced:revanced-patcher"))
+            exclude(dependency("app.revanced:patcher"))
+            exclude(dependency("commons-logging:commons-logging"))
         }
     }
 
@@ -76,10 +65,6 @@ tasks {
 
 // The maven-publish is also necessary to make the signing plugin work.
 publishing {
-    repositories {
-        mavenLocal()
-    }
-
     publications {
         create<MavenPublication>("revanced-cli-publication") {
             from(components["java"])

@@ -13,18 +13,17 @@ fun main(args: Array<String>) {
 }
 
 private object CLIVersionProvider : IVersionProvider {
-    override fun getVersion() =
-        arrayOf(
-            MainCommand::class.java.getResourceAsStream(
-                "/app/revanced/cli/version.properties",
-            )?.use { stream ->
-                Properties().apply {
-                    load(stream)
-                }.let {
-                    "ReVanced CLI v${it.getProperty("version")}"
-                }
-            } ?: "ReVanced CLI",
-        )
+    override fun getVersion() = arrayOf(
+        MainCommand::class.java.getResourceAsStream(
+            "/app/revanced/cli/version.properties",
+        )?.use { stream ->
+            Properties().apply {
+                load(stream)
+            }.let {
+                "ReVanced CLI v${it.getProperty("version")}"
+            }
+        } ?: "ReVanced CLI",
+    )
 }
 
 @Command(

@@ -1,18 +1,22 @@
 [versions]
-shadow = "8.1.1"
-kotlin = "2.0.20"
-kotlinx = "1.8.1"
-picocli = "4.7.6"
-revanced-patcher = "21.0.0"
-revanced-library = "3.1.0"
+bouncy-castle = "1.83"
+shadow = "9.3.1"
+kotlin = "2.3.10"
+kotlinx = "1.10.2"
+picocli = "4.7.7"
+revanced-patcher = "22.0.0"
+revanced-library = "4.0.1"
+sigstore = "2.0.0"
 
 [libraries]
+bcpg-jdk18on = { module = "org.bouncycastle:bcpg-jdk18on", version.ref = "bouncy-castle" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx" }
 picocli = { module = "info.picocli:picocli", version.ref = "picocli" }
-revanced-patcher = { module = "app.revanced:revanced-patcher", version.ref = "revanced-patcher" }
-revanced-library = { module = "app.revanced:revanced-library-jvm", version.ref = "revanced-library" }
+revanced-patcher = { module = "app.revanced:patcher", version.ref = "revanced-patcher" }
+revanced-library = { module = "app.revanced:library", version.ref = "revanced-library" }
+sigstore-java = { module = "dev.sigstore:sigstore-java", version.ref = "sigstore" }
 
 [plugins]
-shadow = { id = "com.github.johnrengelman.shadow", version.ref = "shadow" }
+shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }
 kotlin = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }

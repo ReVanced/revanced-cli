@@ -4,6 +4,10 @@ Learn how to use ReVanced CLI.
 The following examples will show you how to perform basic operations.
 You can list patches, patch an app, uninstall, and install an app.
 
+> [!NOTE]
+> For demonstrative purposes, `-b` is used to
+> bypass patches signature and build provenance verification for some commands.
+
 ## 🚀 Show all commands
 
 ```bash
@@ -13,53 +17,54 @@ java -jar revanced-cli.jar -h
 ## 📃 List patches
 
 ```bash
-java -jar revanced-cli.jar list-patches --with-packages --with-versions --with-options patches.rvp
+java -jar revanced-cli.jar list-patches --packages --versions --options -bp patches.rvp
 ```
 
 ## 💉 Patch an app
 
-To patch an app using the default list of patches, use the `patch` command:
+To patch an app using the default list of patches, use the `patch` command.
 
 ```bash
-java -jar revanced-cli.jar patch -p patches.rvp input.apk
+java -jar revanced-cli.jar patch -bp patches.rvp input.apk
 ```
 
 You can also use multiple RVP files:
 
 ```bash
-java -jar revanced-cli.jar patch -p patches.rvp -p another-patches.rvp input.apk
+java -jar revanced-cli.jar patch -bp patches.rvp -bp another-patches.rvp input.apk
 ```
 
-To change the default set of enabled or disabled patches, use the option `-e` or `-d` to enable or disable specific patches.
+To change the default set of enabled or disabled patches, use the option `-e` or `-d` to enable or
+disable specific patches.
 You can use the `list-patches` command to see which patches are enabled by default.
 
 To only enable specific patches, you can use the option `--exclusive` combined with `-e`.
 Remember that the options `-e` and `-d` match the patch's name exactly. Here is an example:
 
 ```bash
-java -jar revanced-cli.jar patch -p patches.rvp --exclusive -e "Patch name" -e "Another patch name" input.apk
+java -jar revanced-cli.jar patch -bp patches.rvp --exclusive -e "Patch name" -e "Another patch name" input.apk
 ```
 
 You can also use the options `--ei` or `--di` to enable or disable patches by their index.
-This is useful, if two patches happen to have the same name, or if typing the names is too cumbersome.
+This is useful, if two patches happen to have the same name, or if typing the names is too
+cumbersome.
 To know the indices of patches, use the command `list-patches`:
 
 ```bash
-java -jar revanced-cli.jar list-patches patches.rvp
+java -jar revanced-cli.jar list-patches -bp patches.rvp
 ```
 
 Then you can use the indices to enable or disable patches:
 
 ```bash
-java -jar revanced-cli.jar patch -p patches.rvp --ei 123 --di 456 input.apk
+java -jar revanced-cli.jar patch -bp patches.rvp --ei 123 --di 456 input.apk
 ```
 
 You can combine the option `-e`, `-d`, `--ei`, `--di` and `--exclusive`. Here is an example:
 
 ```bash
-java -jar revanced-cli.jar patch -p patches.rvp --exclusive -e "Patch name" --ei 123 input.apk
+java -jar revanced-cli.jar patch -bp patches.rvp --exclusive -e "Patch name" --ei 123 input.apk
 ```
-
 
 > [!TIP]
 > You can use the option `-i` to automatically install the patched app after patching.
@@ -72,18 +77,20 @@ java -jar revanced-cli.jar patch -p patches.rvp --exclusive -e "Patch name" --ei
 
 > [!TIP]
 > You can use the option `--mount` to mount the patched app on top of the un-patched app.
-> Make sure you have root permissions and the same app you are patching and mounting over is installed on your device:
+> Make sure you have root permissions and the same app you are patching and mounting over is
+> installed on your device:
 >
 > ```bash
 > adb shell su -c exit
 > adb install input.apk
 > ```
 
-Patches can have options you can set using the option `-O` alongside the option to include the patch by name or index.
-To know the options of a patch, use the option `--with-options` when listing patches:
+Patches can have options you can set using the option `-O` alongside the option to include the patch
+by name or index.
+To know the options of a patch, use the option `--options` when listing patches:
 
 ```bash
-java -jar revanced-cli.jar list-patches --with-options patches.rvp
+java -jar revanced-cli.jar list-patches --options -bp patches.rvp
 ```
 
 Each patch can have multiple options. You can set them using the option `-O`.
@@ -91,19 +98,19 @@ For example, to set the options for the patch with the name `Patch name`
 with the key `key1` and `key2` to `value1` and `value2` respectively, use the following command:
 
 ```bash
-java -jar revanced-cli.jar patch -p patches.rvp -e "Patch name" -Okey1=value1 -Okey2=value2 input.apk
+java -jar revanced-cli.jar patch -bp patches.rvp -e "Patch name" -Okey1=value1 -Okey2=value2 input.apk
 ```
 
 If you want to set the option value to `null`, you can omit the value:
 
 ```bash
-java -jar revanced-cli.jar patch -p patches.rvp -i "Patch name" -Okey1 input.apk
+java -jar revanced-cli.jar patch -bp patches.rvp -i "Patch name" -Okey1 input.apk
 ```
 
 > [!WARNING]
 > Option values are usually typed. If you set a value with the wrong type, the patch can fail.
-> The value types can be seen when listing patches with the option `--with-options`.
-> 
+> The value types can be seen when listing patches with the option `--options`.
+>
 > Example option values:
 >
 > - String: `string`
@@ -121,19 +128,21 @@ java -jar revanced-cli.jar patch -p patches.rvp -i "Patch name" -Okey1 input.apk
 >
 > Quotes and commas escaped in strings (`\"`, `\'`, `\,`) are parsed as part of the string.
 > List items are recursively parsed, so you can escape values in lists:
-> 
+>
 > - Escaped integer as a string: `[\'123\']`
 > - Escaped boolean as a string: `[\'true\']`
 > - Escaped list as a string: `[\'[item1,item2]\']`
 > - Escaped null value as a string: `[\'null\']`
-> - List with an integer, an integer as a string and a string with a comma, and an escaped list: [`123,\'123\',str\,ing`,`\'[]\'`]
-> 
+> - List with an integer, an integer as a string and a string with a comma, and an escaped list: [
+    `123,\'123\',str\,ing`,`\'[]\'`]
+>
 > Example command with an escaped integer as a string:
-> 
+>
 > ```bash
-> java -jar revanced-cli.jar -p patches.rvp -e "Patch name" -OstringKey=\'1\' input.apk
+> java -jar revanced-cli.jar -bp patches.rvp -e "Patch name" -OstringKey=\'1\' input.apk
 > ```
-## 📦 Install an app manually 
+
+## 📦 Install an app manually
 
 ```bash
 java -jar revanced-cli.jar utility install -a input.apk
@@ -141,7 +150,8 @@ java -jar revanced-cli.jar utility install -a input.apk
 
 > [!TIP]
 > You can use the option `--mount` to mount the patched app on top of the un-patched app.
-> Make sure you have root permissions and the same app you are patching and mounting over is installed on your device:
+> Make sure you have root permissions and the same app you are patching and mounting over is
+> installed on your device:
 >
 > ```bash
 > adb shell su -c exit
@@ -164,8 +174,46 @@ java -jar revanced-cli.jar utility uninstall --package-name <package-name> --unm
 
 > [!TIP]
 > By default, the app is installed or uninstalled to the first connected device.
-> You can append one or more devices by their serial to install or uninstall an app on your selected choice of devices:
+> You can append one or more devices by their serial to install or uninstall an app on your selected
+> choice of devices:
 >
 > ```bash
 > java -jar revanced-cli.jar utility uninstall --package-name <package-name> [<device-serial> ...]
 > ```
+
+## 🔐 Signature and build provenance verification
+
+To increase confidence and security that the patches you are applying are from a trusted source
+and have not been tampered with, artifacts such as the patches files
+are signed with PGP by the respective author
+and their provenance attested by the platform in which they are built.
+
+ReVanced CLI currently supports build provenance verification for these platforms:
+
+- GitHub
+
+By default, ReVanced CLI requires additional inputs to verify the signature and provenance,
+but to bypass these verifications, you can use the option `--bypass-verification` or `-b`
+for each input of patches.
+
+```bash
+java -jar revanced-cli.jar patch -bp patches.rvp input.apk
+```
+
+To verify the signature and provenance, you need to provide the following options
+for each input of patches:
+
+- `--public-key-ring` or `-k`: Path to the PGP public key ring 
+containing the public key of the author who signed the patches file
+- `--signature` or `-s`: Path to the PGP signature file
+- `--attestation` or `-a`: Path to the build provenance attestation file
+- Additional verification options for the respective platform which produced the patches file:
+    - GitHub:
+        - `--repository` or `-r`: GitHub repository in the format 'owner/repo'
+
+For example, to verify the signature and provenance of a patches file from GitHub
+when using the `list-patches` command, use the following command:
+
+```bash
+java -jar revanced-cli.jar list-patches -p patches.rvp -k public-key-ring.gpg -s patches.rvp.asc -a patches.rvp.sigstore.json -r owner/repo
+```
