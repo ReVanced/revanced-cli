@@ -3,8 +3,10 @@ package app.revanced.cli.command
 import app.revanced.cli.command.PatchesFileInput.Companion.loadPatches
 import app.revanced.library.ApkUtils
 import app.revanced.library.ApkUtils.applyTo
+import app.revanced.library.ApkUtils.applyToSplits
 import app.revanced.library.installation.installer.*
 import app.revanced.library.setOptions
+import app.revanced.patcher.Apk
 import app.revanced.patcher.patch.Patch
 import app.revanced.patcher.patcher
 import kotlinx.coroutines.runBlocking
@@ -221,6 +223,26 @@ internal object PatchCommand : Callable<Int> {
     // region Resource compilation
 
     @CommandLine.Option(
+        names = ["--splits"],
+        description = ["Paths to split APK files, keyed by split name (e.g. --splits split_config.arm64_v8a=split_arm64.apk)."],
+    )
+    @Suppress("unused")
+    private fun setSplitApkFiles(splitApkFiles: Map<String, File>) {
+        splitApkFiles.forEach { (splitName, splitFile) ->
+            if (!splitFile.exists()) {
+                throw CommandLine.ParameterException(
+                    spec.commandLine(),
+                    "Split APK file for $splitName does not exist: ${splitFile.path}",
+                )
+            }
+        }
+
+        this.splitApkFiles = splitApkFiles.toMutableMap()
+    }
+
+    private var splitApkFiles = mutableMapOf<String, File>()
+
+    @CommandLine.Option(
         names = ["--custom-aapt2-binary"],
         description = ["Path to a custom AAPT binary to compile resources with."],
     )
@@ -312,11 +334,23 @@ internal object PatchCommand : Callable<Int> {
 
         // endregion
         val patcherTemporaryFilesPath = temporaryFilesPath.resolve("patcher")
+        val signingDetails = ApkUtils.KeyStoreDetails(
+            keystoreFilePath,
+            signing?.keystorePassword,
+            signing?.keystoreEntryAlias ?: "ReVanced Key",
+            signing?.keystoreEntryPassword ?: "",
+        )
+
+        val apkInput: Apk = if (splitApkFiles.isNotEmpty()) {
+            Apk.Split(apk, splitApkFiles)
+        } else {
+            Apk.Single(apk)
+        }
 
         lateinit var packageName: String
 
         val patch = patcher(
-            apk,
+            apkInput,
             patcherTemporaryFilesPath,
             aaptBinaryPath,
             patcherTemporaryFilesPath.absolutePath,
@@ -353,6 +387,22 @@ internal object PatchCommand : Callable<Int> {
 
         // region Save.
 
+        val splitOutputFiles =
+            if (splitApkFiles.isNotEmpty()) {
+                val splitOutputDir = outputFilePath.parentFile.resolve("splits")
+                splitOutputDir.mkdirs()
+
+                splitApkFiles.mapValues { (name, file) ->
+                    file.copyTo(splitOutputDir.resolve(splitOutputFileName(name)), overwrite = true)
+                }.also { copiedSplits ->
+                    if (patchesResult.splitResources.isNotEmpty()) {
+                        patchesResult.applyToSplits(copiedSplits)
+                    }
+                }
+            } else {
+                emptyMap()
+            }
+
         apk.copyTo(temporaryFilesPath.resolve(apk.name), overwrite = true).let {
             patchesResult.applyTo(it)
 
@@ -361,12 +411,13 @@ internal object PatchCommand : Callable<Int> {
                     it,
                     outputFilePath,
                     signing?.signer ?: "ReVanced",
-                    ApkUtils.KeyStoreDetails(
-                        keystoreFilePath,
-                        signing?.keystorePassword,
-                        signing?.keystoreEntryAlias ?: "ReVanced Key",
-                        signing?.keystoreEntryPassword ?: "",
-                    ),
+                    signingDetails,
+                )
+
+                ApkUtils.signApks(
+                    splitOutputFiles.values,
+                    signing?.signer ?: "ReVanced",
+                    signingDetails,
                 )
             } else {
                 it.copyTo(outputFilePath, overwrite = true)
@@ -375,6 +426,11 @@ internal object PatchCommand : Callable<Int> {
 
         logger.info("Saved to $outputFilePath")
 
+        if (splitOutputFiles.isNotEmpty()) {
+            val splitOutputDir = splitOutputFiles.values.first().parentFile
+            logger.info("Saved patched splits to $splitOutputDir")
+        }
+
         // endregion
 
         // region Install.
@@ -382,7 +438,7 @@ internal object PatchCommand : Callable<Int> {
         installation?.deviceSerial?.let {
             runBlocking {
                 when (val result =
-                    installer!!.install(Installer.Apk(outputFilePath, packageName))) {
+                    installer!!.install(Installer.Apk(outputFilePath, packageName, splitOutputFiles))) {
                     RootInstallerResult.FAILURE -> logger.severe("Failed to mount the patched APK file")
                     is AdbInstallerResult.Failure -> logger.severe(result.exception.toString())
                     else -> logger.info("Installed the patched APK file")
@@ -477,4 +533,7 @@ internal object PatchCommand : Callable<Int> {
             }
         logger.info(result)
     }
+
+    private fun splitOutputFileName(splitName: String) =
+        if (splitName.endsWith(".apk")) splitName else "$splitName.apk"
 }
