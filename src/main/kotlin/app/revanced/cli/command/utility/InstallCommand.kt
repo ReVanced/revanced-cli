@@ -7,6 +7,7 @@ import kotlinx.coroutines.runBlocking
 import picocli.CommandLine.*
 import java.io.File
 import java.util.logging.Logger
+import kotlin.system.exitProcess
 
 @Command(
     name = "install",
@@ -44,20 +45,35 @@ internal object InstallCommand : Runnable {
                 }.install(Installer.Apk(apk, packageName))
             } catch (e: Exception) {
                 logger.severe(e.toString())
+                throw e
             }
 
             when (result) {
-                RootInstallerResult.FAILURE ->
+                RootInstallerResult.SUCCESS ->
+                    logger.info("Mounted the APK file")
+                RootInstallerResult.FAILURE -> {
                     logger.severe("Failed to mount the APK file")
-                is AdbInstallerResult.Failure ->
-                    logger.severe(result.exception.toString())
-                else ->
+                    throw Exception()
+                }
+                AdbInstallerResult.Success ->
                     logger.info("Installed the APK file")
+                is AdbInstallerResult.Failure -> {
+                    logger.severe("Failed to install the APK file: ${result.exception}")
+                    throw Exception()
+                }
+                else -> {
+                    logger.severe("Unknown installation result")
+                    throw Exception()
+                }
             }
         }
 
         runBlocking {
-            deviceSerials?.map { async { install(it) } }?.awaitAll() ?: install()
+            try {
+                deviceSerials?.map { async { install(it) } }?.awaitAll() ?: install()
+            } catch (_: Exception) {
+                exitProcess(1)
+            }
         }
     }
 }
