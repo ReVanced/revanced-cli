@@ -156,7 +156,6 @@ internal object PatchCommand : Callable<Int> {
     private class Installation {
         @CommandLine.Option(
             names = ["-i", "--install"],
-            required = true,
             description = ["Serial of the ADB device to install to. If not specified, the first connected device will be used."],
             fallbackValue = "",
             arity = "0..1",
