@@ -1,6 +1,6 @@
 [versions]
 bouncy-castle = "1.83"
-shadow = "9.3.1"
+shadow = "9.4.1"
 kotlin = "2.3.10"
 kotlinx = "1.10.2"
 picocli = "4.7.7"
