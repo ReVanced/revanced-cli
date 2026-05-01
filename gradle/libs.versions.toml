@@ -1,5 +1,5 @@
 [versions]
-bouncy-castle = "1.83"
+bouncy-castle = "1.84"
 shadow = "9.3.1"
 kotlin = "2.3.10"
 kotlinx = "1.10.2"
