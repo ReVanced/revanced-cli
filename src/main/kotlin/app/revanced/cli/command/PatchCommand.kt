@@ -21,7 +21,7 @@ import java.util.logging.Logger
 
 @CommandLine.Command(
     name = "patch",
-    description = ["Patch an APK file."],
+    description = ["Patch an APK or APKM file."],
     sortOptions = false,
 )
 internal object PatchCommand : Callable<Int> {
@@ -33,7 +33,8 @@ internal object PatchCommand : Callable<Int> {
     // region Required parameters
 
     @CommandLine.Parameters(
-        description = ["APK file to patch."],
+        description = ["APK or APKM file to patch."],
+        paramLabel = "<input>",
         arity = "1",
     )
     @Suppress("unused")
@@ -41,7 +42,7 @@ internal object PatchCommand : Callable<Int> {
         if (!apk.exists()) {
             throw CommandLine.ParameterException(
                 spec.commandLine(),
-                "APK file ${apk.path} does not exist",
+                "APK or APKM file ${apk.path} does not exist",
             )
         }
         this.apk = apk
@@ -137,7 +138,7 @@ internal object PatchCommand : Callable<Int> {
 
     @CommandLine.Option(
         names = ["-o", "--out"],
-        description = ["Path to save the patched APK file to. Defaults to the same path as the supplied APK file."],
+        description = ["Path to save the patched APK file to. Defaults to the same path as the supplied input file. APKM inputs use an APK output extension."],
     )
     @Suppress("unused")
     private fun setOutputFilePath(outputFilePath: File?) {
@@ -261,13 +262,26 @@ internal object PatchCommand : Callable<Int> {
 
         val outputFilePath =
             outputFilePath ?: File("").absoluteFile.resolve(
-                "${apk.nameWithoutExtension}-patched.${apk.extension}",
+                "${apk.nameWithoutExtension}-patched.${if (apk.isApkm()) "apk" else apk.extension}",
             )
 
         val temporaryFilesPath =
             temporaryFilesPath ?: outputFilePath.parentFile.resolve(
                 "${outputFilePath.nameWithoutExtension}-temporary-files",
             )
+
+        val extractedApkm = if (apk.isApkm()) {
+            try {
+                ApkmUtils.extract(apk, temporaryFilesPath.resolve("apkm"))
+            } catch (exception: Exception) {
+                logger.severe("Failed to extract APKM file ${apk.path}:\n${exception.stackTraceToString()}")
+                return -1
+            }
+        } else {
+            null
+        }
+
+        val patchTarget = extractedApkm?.baseApk ?: apk
 
         val keystoreFilePath =
             signing?.keystoreFilePath ?: outputFilePath.parentFile
@@ -316,7 +330,7 @@ internal object PatchCommand : Callable<Int> {
         lateinit var packageName: String
 
         val patch = patcher(
-            apk,
+            patchTarget,
             patcherTemporaryFilesPath,
             aaptBinaryPath,
             patcherTemporaryFilesPath.absolutePath,
@@ -353,24 +367,35 @@ internal object PatchCommand : Callable<Int> {
 
         // region Save.
 
-        apk.copyTo(temporaryFilesPath.resolve(apk.name), overwrite = true).let {
+        val patchedApkFile = patchTarget.copyTo(
+            temporaryFilesPath.resolve(patchTarget.name),
+            overwrite = true,
+        ).also {
             patchesResult.applyTo(it)
+        }
 
-            if (installation?.mount != true) {
-                ApkUtils.signApk(
-                    it,
-                    outputFilePath,
-                    signing?.signer ?: "ReVanced",
-                    ApkUtils.KeyStoreDetails(
-                        keystoreFilePath,
-                        signing?.keystorePassword,
-                        signing?.keystoreEntryAlias ?: "ReVanced Key",
-                        signing?.keystoreEntryPassword ?: "",
-                    ),
-                )
-            } else {
-                it.copyTo(outputFilePath, overwrite = true)
-            }
+        val apkFileToSave = extractedApkm?.let {
+            ApkmUtils.mergeExtractedApks(
+                it,
+                temporaryFilesPath.resolve("merged").resolve(outputFilePath.name),
+                patchedApkFile,
+            )
+        } ?: patchedApkFile
+
+        if (installation?.mount != true) {
+            ApkUtils.signApk(
+                apkFileToSave,
+                outputFilePath,
+                signing?.signer ?: "ReVanced",
+                ApkUtils.KeyStoreDetails(
+                    keystoreFilePath,
+                    signing?.keystorePassword,
+                    signing?.keystoreEntryAlias ?: "ReVanced Key",
+                    signing?.keystoreEntryPassword ?: "",
+                ),
+            )
+        } else {
+            apkFileToSave.copyTo(outputFilePath, overwrite = true)
         }
 
         logger.info("Saved to $outputFilePath")

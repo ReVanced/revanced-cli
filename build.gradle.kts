@@ -17,6 +17,7 @@ dependencies {
     implementation(libs.sigstore.java)
     implementation(libs.revanced.patcher)
     implementation(libs.revanced.library)
+    implementation(libs.reandroid.arsclib)
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.picocli)
 
@@ -51,6 +52,7 @@ tasks {
         minimize {
             exclude(dependency("org.bouncycastle:.*"))
             exclude(dependency("app.revanced:patcher"))
+            exclude(dependency("io.github.reandroid:ARSCLib"))
             exclude(dependency("commons-logging:commons-logging"))
         }
     }
