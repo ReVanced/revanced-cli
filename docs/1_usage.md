@@ -28,6 +28,14 @@ To patch an app using the default list of patches, use the `patch` command.
 java -jar revanced-cli.jar patch -bp patches.rvp input.apk
 ```
 
+APKM inputs are supported too. The CLI patches the base APK, merges the patched base APK with
+the APKM splits, and saves the result as a single APK. The default patched output uses the
+`.apk` extension:
+
+```bash
+java -jar revanced-cli.jar patch -bp patches.rvp input.apkm
+```
+
 You can also use multiple RVP files:
 
 ```bash
