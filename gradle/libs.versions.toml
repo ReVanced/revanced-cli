@@ -6,7 +6,7 @@ kotlinx = "1.10.2"
 picocli = "4.7.7"
 revanced-patcher = "22.0.1"
 revanced-library = "4.0.1"
-sigstore = "2.0.0"
+sigstore = "2.1.0"
 
 [libraries]
 bcpg-jdk18on = { module = "org.bouncycastle:bcpg-jdk18on", version.ref = "bouncy-castle" }
